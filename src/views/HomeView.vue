@@ -1,15 +1,15 @@
 <template>
   <v-app>
-    <app-header />
-    <v-main>
-      <hero-section />
-      <user-types />
-      <popular-projects />
-      <testimonials />
-      <impact-stats />
-      <news-updates />
-    </v-main>
-    <app-footer />
+    <div class="main-bg">
+      <AppHeader />
+      <HeroSection />
+      <UserTypes />
+      <PopularProjects />
+      <Testimonials />
+      <ImpactStats />
+      <NewsUpdates />
+      <AppFooter />
+    </div>
   </v-app>
 </template>
 
@@ -24,7 +24,7 @@ import NewsUpdates from '@/components/NewsUpdates.vue'
 import AppFooter from '@/components/AppFooter.vue'
 
 export default {
-  name: 'MainLayout',
+  name: 'HomeView',
   components: {
     AppHeader,
     HeroSection,
@@ -37,3 +37,12 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.main-bg {
+  min-height: 100vh;
+  width: 100%;
+background: linear-gradient(to bottom, #4ec7a5 30%, #3f51b5 100%);
+
+}
+</style>

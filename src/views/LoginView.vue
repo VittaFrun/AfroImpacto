@@ -1,6 +1,6 @@
 <template>
   <div class="login-page">
-    <!-- Imagen de fondo a la izquierda (solo en desktop) -->
+    <!-- Imagen de fondo a la izquierda -->
     <div class="login-bg d-none d-md-flex">
       <v-img
         src="/src/components/icons/background_login.png"
@@ -8,6 +8,7 @@
         cover
         height="100vh"
         width="100%"
+        style="box-shadow: 0 0px 9px rgba(119, 45, 0, 0.5)"
       />
     </div>
     <!-- Formulario a la derecha -->
@@ -15,7 +16,7 @@
       <v-card
         elevation="2"
         class="pa-8"
-        style="border-radius: 16px; min-width: 340px; max-width: 400px; width: 100%;"
+        style="border-radius: 16px; min-width: 340px; max-width: 400px; width: 100%; "
       >
         <div class="text-center mb-6">
           <span style="color:#4ec7a5; font-size:32px; font-weight:bold;">Afro Impacto</span>

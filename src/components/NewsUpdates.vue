@@ -1,7 +1,7 @@
 <template>
-  <div style="background-color: #e6faf2;">
+  <div>
     <v-container fluid class="py-12">
-      <h3 class="text-center font-weight-bold mb-8" style="font-size:1.5rem;">Noticias y Actualizaciones</h3>
+      <h3 class="text-center font-weight-bold mb-8 titulo2" style="font-size:32px;">Noticias y Actualizaciones</h3>
       <v-carousel
         cycle
         :interval="5000"
@@ -131,5 +131,12 @@ export default {
   background-color: #4ec7a5 !important;
   color: #fff !important;
   box-shadow: 0 4px 10px #4ec7a5 !important;
+}
+
+.titulo2 {
+  background:white;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 </style>

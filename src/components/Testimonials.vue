@@ -1,7 +1,7 @@
 <template>
-  <div style="background-color: #e6faf2;">
+  <div>
     <v-container fluid class="py-8">
-      <h3 class="text-center font-weight-bold mb-8" style="font-size:1.5rem;">Testimonios</h3>
+      <h3 class="text-center font-weight-bold mb-8 titulo" style="font-size:32px;">Testimonios</h3>
       <v-carousel
         show-arrows
         hide-delimiters
@@ -87,3 +87,11 @@ export default {
   }
 }
 </script>
+<style>
+.titulo {
+  background:white;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+</style>
