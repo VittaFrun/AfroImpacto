@@ -42,7 +42,7 @@ export default {
 .main-bg {
   min-height: 100vh;
   width: 100%;
-background: linear-gradient(to bottom, #4ec7a5 30%, #3f51b5 100%);
+background: linear-gradient(to bottom, #4ec7a5 10%, #3f51b5 100%);
 
 }
 </style>

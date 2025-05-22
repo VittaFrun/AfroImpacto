@@ -11,7 +11,7 @@
     <v-container fluid>
       <v-row align="center" justify="space-between" no-gutters>
         <!-- Logo y título -->
-        <v-col cols="auto" class="d-flex align-center" style="padding-left: 16px;">
+        <v-col cols="auto" class="logo-d d-flex align-center">
           <v-img
             src="/src/components/icons/logo_afroimpacto.png"
             alt="Logo"
@@ -93,119 +93,185 @@
     </v-navigation-drawer>
 
     <!-- MODAL LOGIN/REGISTER -->
-    <v-dialog v-model="showModal" max-width="430" transition="dialog-bottom-transition" persistent>
-      <v-card class="glass-modal pa-0">
-        <v-btn icon @click="showModal = false" class="close-btn" elevation="0">
-          <v-icon size="28">mdi-close</v-icon>
+    <v-dialog
+      v-model="showModal"
+      max-width="520"
+      persistent
+      transition="dialog-bottom-transition"
+      content-class="custom-auth-dialog"
+    >
+      <div class="auth-modal-close-outer">
+        <v-btn icon @click="showModal = false" class="auth-modal-close-btn" elevation="2">
+          <v-icon size="32">mdi-close</v-icon>
         </v-btn>
-        <div class="modal-header">
+      </div>
+      <v-card class="auth-modal-card pa-0">
+        <div class="auth-modal-title text-center font-weight-bold">
+          Afro Impacto
+        </div>
+        <div class="auth-modal-tabs-wrap">
           <v-tabs
             v-model="tab"
             background-color="transparent"
             grow
-            class="modal-tabs"
-            slider-color="gradient"
+            class="auth-modal-tabs"
             align-tabs="center"
+            slider-color="#18b97e"
+            slider-size="3"
+            @update:model-value="resetForm"
           >
-            <v-tab value="register" class="font-weight-medium tab-gradient">Regístrate</v-tab>
-            <v-tab value="login" class="font-weight-medium tab-gradient">Iniciar sesión</v-tab>
+            <v-tab value="register" class="font-weight-medium auth-modal-tab">Regístrate</v-tab>
+            <v-tab value="login" class="font-weight-medium auth-modal-tab">Iniciar sesión</v-tab>
           </v-tabs>
         </div>
         <v-divider></v-divider>
-        <v-window v-model="tab" class="pa-4">
+        <v-window v-model="tab" class="pa-7 pt-5" :touch="false" transition="fade-transition">
           <!-- LOGIN -->
           <v-window-item value="login">
             <div>
-              <v-btn block class="mb-3 social-btn google-btn" elevation="0">
+              <v-btn block class="mb-3 social-btn" elevation="0">
                 <v-icon left color="#ea4335">mdi-google</v-icon>
-                Google
+                Continuar con Google
               </v-btn>
-              <v-btn block class="mb-5 social-btn facebook-btn" elevation="0">
+              <v-btn block class="mb-5 social-btn" elevation="0">
                 <v-icon left color="#4267B2">mdi-facebook</v-icon>
-                Facebook
+                Continuar con Facebook
               </v-btn>
               <div class="d-flex align-center mb-4">
                 <v-divider class="flex-grow-1"></v-divider>
-                <span class="mx-3 text-grey">o</span>
+                <span class="mx-3 text-grey">or</span>
                 <v-divider class="flex-grow-1"></v-divider>
               </div>
-              <v-form>
+              <v-form ref="loginForm">
                 <v-text-field
+                  v-model="loginUser"
                   label="Usuario o email"
-                  placeholder="example@gmail.com"
-                  prepend-inner-icon="mdi-email"
+                  prepend-inner-icon="mdi-account"
                   dense
-                  class="mb-3"
+                  class="mb-4 modern-field"
                   hide-details
-                  variant="solo"
+                  variant="outlined"
                 />
                 <v-text-field
+                  v-model="loginPassword"
                   label="Contraseña"
                   type="password"
                   prepend-inner-icon="mdi-lock"
                   dense
-                  class="mb-5"
+                  class="mb-2 modern-field"
                   hide-details
-                  variant="solo"
+                  variant="outlined"
                 />
-                <v-btn block color="#4ec7a5" class="font-weight-bold text-white mb-2 login-btn" large>
+                <div class="text-center mb-4">
+                  <a href="#" class="auth-link">¿Olvidaste tu contraseña?</a>
+                </div>
+                <v-btn block color="#18b97e" class="font-weight-bold text-white mb-2 main-btn" large>
                   Iniciar sesión
                 </v-btn>
               </v-form>
+              <div class="auth-footer-links text-center mt-5">
+                <a href="#" class="auth-link">Soporte</a> — 
+                <a href="#" class="auth-link">Términos de Uso</a> — 
+                <a href="#" class="auth-link">Política de Privacidad</a>
+              </div>
             </div>
           </v-window-item>
           <!-- REGISTER -->
           <v-window-item value="register">
             <div>
-              <v-btn block class="mb-3 social-btn google-btn" elevation="0">
+              <v-btn block class="mb-3 social-btn" elevation="0">
                 <v-icon left color="#ea4335">mdi-google</v-icon>
-                Google
+                Continuar con Google
               </v-btn>
-              <v-btn block class="mb-5 social-btn facebook-btn" elevation="0">
+              <v-btn block class="mb-5 social-btn" elevation="0">
                 <v-icon left color="#4267B2">mdi-facebook</v-icon>
-                Facebook
+                Continuar con Facebook
               </v-btn>
               <div class="d-flex align-center mb-4">
                 <v-divider class="flex-grow-1"></v-divider>
-                <span class="mx-3 text-grey">o</span>
+                <span class="mx-3 text-grey">or</span>
                 <v-divider class="flex-grow-1"></v-divider>
               </div>
-              <v-form>
+              <v-form ref="registerForm">
                 <v-text-field
-                  label="Usuario o email"
-                  placeholder="example@gmail.com"
-                  prepend-inner-icon="mdi-email"
+                  v-model="registerUser"
+                  label="Usuario"
+                  prepend-inner-icon="mdi-account"
                   dense
-                  class="mb-3"
+                  class="mb-4 modern-field"
                   hide-details
-                  variant="solo"
+                  variant="outlined"
                 />
                 <v-text-field
+                  v-model="registerEmail"
+                  label="Correo"
+                  prepend-inner-icon="mdi-email"
+                  dense
+                  class="mb-4 modern-field"
+                  hide-details
+                  variant="outlined"
+                />
+                <v-text-field
+                  v-model="registerPassword"
                   label="Contraseña"
                   type="password"
                   prepend-inner-icon="mdi-lock"
                   dense
-                  class="mb-1"
+                  class="mb-2 modern-field"
                   hide-details
-                  variant="solo"
-                  v-model="registerPassword"
-                  @input="checkPasswordStrength"
+                  variant="outlined"
                 />
-                <!-- Barra de intensidad -->
-                <v-progress-linear
-                  :color="passwordStrengthColor"
-                  :value="passwordStrengthValue"
-                  height="7"
-                  class="mb-1 password-strength-bar"
-                  rounded
-                />
-                <div class="mb-2" :style="{ color: passwordStrengthColor, fontWeight: 'bold', fontSize: '0.97rem' }">
-                  Intensidad {{ passwordStrengthText }}
+                <!-- Selección de rol horizontal -->
+                <div class="mb-4">
+                  <v-radio-group
+                    v-model="registerRole"
+                    row
+                    :mandatory="true"
+                    class="role-radio-group"
+                  >
+                    <v-radio
+                      :value="'voluntariado'"
+                      class="role-radio"
+                      hide-details
+                    >
+                      <template #label>
+                        <span class="role-label">
+                          <v-icon left size="22" color="#18b97e">mdi-account-heart</v-icon>
+                          Voluntariado
+                        </span>
+                      </template>
+                    </v-radio>
+                    <v-radio
+                      :value="'organizacion'"
+                      class="role-radio"
+                      hide-details
+                    >
+                      <template #label>
+                        <span class="role-label">
+                          <v-icon left size="22" color="#3f51b5">mdi-domain</v-icon>
+                          Organización
+                        </span>
+                      </template>
+                    </v-radio>
+                  </v-radio-group>
+                  <div v-if="registerRoleError" class="role-error text-center mt-1">
+                    Selecciona un rol para continuar
+                  </div>
                 </div>
-                <div class="mb-3 text-grey-darken-1" style="font-size: 0.98rem;">
-                  * al menos 8 caracteres, incluido un número
+                <div class="text-center mb-4">
+                  <input type="checkbox" id="terms" v-model="acceptedTerms" style="margin-right:7px;"/>
+                  <label for="terms" class="auth-terms-label">
+                    Acepto los <a href="#" class="auth-link">Términos y Condiciones</a>
+                  </label>
                 </div>
-                <v-btn block color="#4ec7a5" class="font-weight-bold text-white mb-2 login-btn" large>
+                <v-btn
+                  block
+                  color="#18b97e"
+                  class="font-weight-bold text-white mb-2 main-btn"
+                  large
+                  :disabled="!acceptedTerms || !registerRole"
+                  @click="validateRegister"
+                >
                   Registrarse
                 </v-btn>
               </v-form>
@@ -226,143 +292,232 @@ export default {
       scrolled: false,
       showModal: false,
       tab: "login",
+      // Login
+      loginUser: "",
+      loginPassword: "",
+      // Register
+      registerUser: "",
+      registerEmail: "",
       registerPassword: "",
-      passwordStrengthValue: 0,
-      passwordStrengthText: 'muy fácil',
-      passwordStrengthColor: '#e53935',
+      registerRole: "",
+      registerRoleError: false,
+      acceptedTerms: false,
       menuItems: [
         { text: 'Proyectos', href: '#' },
         { text: 'Perfiles', href: '#' },
         { text: 'Nosotros', href: '#' }
       ]
-    }
+    };
   },
   mounted() {
-    window.addEventListener('scroll', this.handleScroll)
+    window.addEventListener('scroll', this.handleScroll);
   },
   beforeUnmount() {
-    window.removeEventListener('scroll', this.handleScroll)
+    window.removeEventListener('scroll', this.handleScroll);
   },
   methods: {
     handleScroll() {
-      this.scrolled = window.scrollY > 20
+      this.scrolled = window.scrollY > 20;
     },
     openModal(type) {
-      this.tab = type
-      this.showModal = true
+      this.tab = type;
+      this.showModal = true;
+      this.resetForm();
     },
-    checkPasswordStrength() {
-      const pwd = this.registerPassword
-      let score = 0
-      if (pwd.length >= 8) score += 1
-      if (/\d/.test(pwd)) score += 1
-      if (/[A-Z]/.test(pwd)) score += 1
-      if (/[a-z]/.test(pwd)) score += 1
-      if (/[^A-Za-z0-9]/.test(pwd)) score += 1
-
-      if (score <= 1) {
-        this.passwordStrengthValue = 20
-        this.passwordStrengthText = 'muy fácil'
-        this.passwordStrengthColor = '#e53935'
-      } else if (score === 2) {
-        this.passwordStrengthValue = 40
-        this.passwordStrengthText = 'fácil'
-        this.passwordStrengthColor = '#fb8c00'
-      } else if (score === 3) {
-        this.passwordStrengthValue = 60
-        this.passwordStrengthText = 'media'
-        this.passwordStrengthColor = '#fdd835'
-      } else if (score === 4) {
-        this.passwordStrengthValue = 80
-        this.passwordStrengthText = 'fuerte'
-        this.passwordStrengthColor = '#43a047'
-      } else if (score === 5) {
-        this.passwordStrengthValue = 100
-        this.passwordStrengthText = 'muy fuerte'
-        this.passwordStrengthColor = '#1e88e5'
+    resetForm() {
+      this.loginUser = "";
+      this.loginPassword = "";
+      this.registerUser = "";
+      this.registerEmail = "";
+      this.registerPassword = "";
+      this.registerRole = "";
+      this.registerRoleError = false;
+      this.acceptedTerms = false;
+      if (this.$refs.loginForm) this.$refs.loginForm.resetValidation();
+      if (this.$refs.registerForm) this.$refs.registerForm.resetValidation();
+    },
+    validateRegister() {
+      if (!this.registerRole) {
+        this.registerRoleError = true;
+        return;
       }
+      this.registerRoleError = false;
+      // Aquí va la lógica real de registro
     }
   }
 }
 </script>
 
 <style scoped>
-/* Glassmorphism modal */
-.glass-modal {
-  background: rgba(255,255,255,0.18) !important;
-  backdrop-filter: blur(16px);
-  border-radius: 26px !important;
-  box-shadow: 0 12px 48px 0 rgba(31,38,135,0.15);
+.custom-auth-dialog {
+  align-items: flex-start !important;
+  justify-content: center !important;
+  padding-top: 60px !important;
+  background: rgba(24, 185, 126, 0.06) !important;
+}
+.auth-modal-card {
+  background: #fff !important;
+  border-radius: 10px !important;
+  width: 520px !important;
+  height: 780px !important;
+  min-width: 520px !important;
+  max-width: 520px !important;
+  min-height: 780px !important;
+  max-height: 780px !important;
+  box-shadow: 0 16px 48px 0 rgba(31,38,135,0.13) !important;
   position: relative;
-  overflow: visible;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
   animation: modalFadeIn 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  padding-left: 36px !important;
+  padding-right: 36px !important;
+}
+@media (max-width: 600px) {
+  .auth-modal-card {
+    width: 98vw !important;
+    min-width: 98vw !important;
+    max-width: 98vw !important;
+    height: 98vh !important;
+    min-height: 98vh !important;
+    max-height: 98vh !important;
+    padding-left: 6vw !important;
+    padding-right: 6vw !important;
+  }
 }
 @keyframes modalFadeIn {
   0% { opacity: 0; transform: translateY(30px) scale(0.97);}
   100% { opacity: 1; transform: translateY(0) scale(1);}
 }
-.close-btn {
-  background: rgba(255,255,255,0.7) !important;
-  color: #4ec7a5 !important;
+.auth-modal-title {
+  font-size: 2.2rem;
+  color: #18b97e;
+  letter-spacing: 1px;
+  margin-top: 36px;
+  margin-bottom: 0;
+}
+.auth-modal-close-outer {
+  position: absolute;
+  right: calc(50% - 325px);
+  z-index: 10;
+}
+.auth-modal-close-btn {
+  background: #fff !important;
+  color: #18b97e !important;
   border-radius: 50% !important;
-  box-shadow: 0 2px 8px #4ec7a5 !important;
-  position: absolute !important;
-  top: 14px;
-  right: 14px;
-  z-index: 2;
+  box-shadow: 0 2px 12px #18b97e30 !important;
   transition: background 0.2s, color 0.2s;
 }
-.close-btn:hover {
-  background: #4ec7a5 !important;
+.auth-modal-close-btn:hover {
+  background: #18b97e !important;
   color: #fff !important;
 }
-.modal-header {
-  padding-top: 36px;
+.auth-modal-tabs-wrap {
+  padding-top: 16px;
   padding-bottom: 0;
 }
-.modal-tabs {
+.auth-modal-tabs {
+  background: transparent !important;
+  min-height: 0 !important;
+}
+.auth-modal-tab {
+  font-size: 1.22rem !important;
+  letter-spacing: 0.5px;
+  color: #7a7a7a !important;
+  font-weight: 700 !important;
+  text-transform: none !important;
+  min-width: 50%;
+}
+.v-tab--selected.auth-modal-tab {
+  color: #18b97e !important;
+  border-bottom: 3px solid #18b97e !important;
   background: transparent !important;
 }
-.tab-gradient {
-  background: linear-gradient(90deg, #4ec7a5, #3f51b5 80%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  font-size: 1.13rem !important;
-  font-weight: bold !important;
-  letter-spacing: 0.4px;
-}
-.v-tab--selected.tab-gradient {
-  border-bottom: 3px solid #4ec7a5 !important;
-  -webkit-text-fill-color: #4ec7a5;
-  color: #4ec7a5 !important;
-}
 .social-btn {
-  border-radius: 28px !important;
+  border-radius: 32px !important;
   font-weight: 500 !important;
   text-transform: none !important;
-  font-size: 1.07rem !important;
+  font-size: 1.13rem !important;
+  border: 1.5px solid #e0e0e0 !important;
+  color: #222 !important;
+  background: #fff !important;
   box-shadow: none !important;
-  background: rgba(255,255,255,0.66);
-  transition: box-shadow 0.18s, background 0.18s;
+  transition: box-shadow 0.18s, background 0.18s, color 0.18s;
 }
-.google-btn:hover {
-  background: #ea4335 !important;
-  color: #fff !important;
+.social-btn:hover {
+  box-shadow: 0 2px 12px #18b97e20 !important;
+  background: #f7f7f7 !important;
 }
-.facebook-btn:hover {
-  background: #4267B2 !important;
-  color: #fff !important;
-}
-.login-btn {
+.main-btn {
   border-radius: 22px !important;
-  font-size: 1.11rem !important;
-  box-shadow: 0 4px 12px #4ec7a5a0 !important;
+  font-size: 1.18rem !important;
+  box-shadow: 0 4px 16px #18b97e40 !important;
+  text-transform: none !important;
+  font-weight: 700 !important;
   letter-spacing: 0.5px;
-  text-transform: none;
+}
+.role-radio-group {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 10px;
+}
+.role-radio {
+  margin: 0 20px !important;
+}
+.role-label {
+  display: flex;
+  align-items: center;
+  font-size: 1.11rem;
+  font-weight: 600;
+  color: #333;
+  gap: 6px;
+}
+.v-selection-control__input input[type="radio"] {
+  accent-color: #18b97e;
+}
+.v-radio .v-icon {
+  margin-right: 8px;
+}
+.role-error {
+  color: #e53935;
+  font-size: 1.01rem;
+  font-weight: 500;
 }
 .password-strength-bar {
   transition: all 0.3s cubic-bezier(.4,2,.6,1);
+  background: linear-gradient(90deg, #e53935 0%, #fb8c00 50%, #43a047 100%) !important;
+}
+.modern-field .v-input__control {
+  background: #f6f8fa !important;
+  border-radius: 14px !important;
+  border: 1.5px solid #e0e0e0 !important;
+  transition: border-color 0.2s;
+}
+.modern-field input {
+  font-size: 1.09rem !important;
+  color: #222 !important;
+}
+.modern-field .v-input__control:focus-within {
+  border-color: #18b97e !important;
+}
+.auth-link {
+  color: #18b97e !important;
+  font-weight: 500 !important;
+  text-transform: none !important;
+  text-decoration: underline !important;
+  cursor: pointer;
+}
+.auth-terms-label {
+  color: #7a7a7a !important;
+  font-size: 1.05rem !important;
+  font-weight: 500;
+}
+.auth-footer-links {
+  margin-top: 16px;
+  font-size: 0.99rem;
 }
 .header-blur {
   box-shadow:#4ec7a5 0px 0px 20px rgba(95, 179, 125, 0.12);

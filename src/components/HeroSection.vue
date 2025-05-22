@@ -98,8 +98,8 @@ export default {
   letter-spacing: 0.5px;
 }
 .crear-cuenta:hover {
-  background-color: #43b493 !important;
-  color: #fff !important;
+  background: #fff !important;
+  color: #4ec7a5 !important;
   box-shadow: 0 4px 10px #4ec7a5 !important;
 }
 .rounded-lg {

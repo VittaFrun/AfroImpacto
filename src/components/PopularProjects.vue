@@ -5,7 +5,7 @@
         <h2 class="font-weight-bold mb-2 display-1 gradient-text" style="font-size:32px;">
           Proyectos más Populares
         </h2>
-        <p class="mb-6 text-grey-darken-1 text-h6">
+        <p class="mb-6 text-h6" style="color:floralwhite">
           Inspírate con las iniciativas más destacadas de nuestra comunidad.
         </p>
       </v-col>

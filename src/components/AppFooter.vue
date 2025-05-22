@@ -1,5 +1,5 @@
 <template>
-  <v-footer color="white" padless>
+  <v-footer color="transparent" padless>
     <v-container fluid class="py-10 px-4 px-md-12">
       <v-row class="footer-row" align="start" justify="center">
         <!-- Logo y misión -->
@@ -13,7 +13,7 @@
               class="mr-2"
               style="border-radius: 12px;"
             />
-            <span class="font-weight-bold" style="color:#1a3a2a; font-size: 1.5rem; letter-spacing: 1px;">
+            <span class="font-weight-bold" style="color:white; font-size: 1.5rem; letter-spacing: 1px;">
               Afro Impacto
             </span>
           </div>
@@ -24,7 +24,7 @@
 
         <!-- Enlaces rápidos -->
         <v-col cols="6" md="2" class="mb-6 mb-md-0">
-          <h4 class="footer-title">Enlaces</h4>
+          <h4 class="footer-title" style="color:white;">Enlaces</h4>
           <v-list density="compact" class="bg-transparent pa-0">
             <v-list-item link class="footer-link">Inicio</v-list-item>
             <v-list-item link class="footer-link">Proyecto</v-list-item>
@@ -35,7 +35,7 @@
 
         <!-- Contacto -->
         <v-col cols="6" md="3" class="mb-6 mb-md-0">
-          <h4 class="footer-title">Contacto</h4>
+          <h4 class="footer-title" style="color:white;">Contacto</h4>
           <div class="footer-contact">
             <v-icon left color="#4ec7a5" size="22">mdi-email-outline</v-icon>
             <a href="mailto:contacto@afroimpacto.org">contacto@afroimpacto.org</a>
@@ -88,7 +88,7 @@
         </v-col>
       </v-row>
       <v-divider class="my-6" color="#4ec7a5"></v-divider>
-      <div class="text-center" style="color:#1a3a2a; font-size: 0.97rem;">
+      <div class="text-center" style="color:white; font-size: 0.97rem;">
         © {{ new Date().getFullYear() }} Afro Impacto. Todos los derechos reservados.
       </div>
     </v-container>
@@ -119,7 +119,7 @@ export default {
   letter-spacing: 1px;
 }
 .footer-link {
-  color: #1a3a2a !important;
+  color: #ffffff !important;
   font-size: 1rem;
   padding-left: 0 !important;
   transition: color 0.2s;
@@ -129,7 +129,7 @@ export default {
   text-decoration: underline;
 }
 .footer-contact {
-  color: #1a3a2a;
+  color: #ffffff;
   font-size: 1rem;
   margin-bottom: 7px;
   display: flex;
@@ -151,7 +151,7 @@ export default {
 }
 .footer-subscribe-card {
   background-color: #4ec7a5;
-  border-radius: 18px;
+  border-radius: 10px;
   box-shadow: 0 4px 24px 0 rgba(76,199,165,0.10);
   display: flex;
   flex-direction: column;
@@ -169,8 +169,9 @@ export default {
   font-size: 1rem;
 }
 .suscribete-b:hover {
-  background-color: #1a3a2a !important;
-  color: #fff !important;
+  background-color: #ffffff !important;
+  color: #4ec7a5 !important;
+  box-shadow: 0 0px 5px #ffffff !important;
 }
 .footer-input input {
   color: #1a3a2a !important;
