@@ -215,7 +215,8 @@ export default {
 .contact-link {
   color: #555 !important;
   text-decoration: none; /* Eliminar subrayado por defecto */
-  transition: all 0.2s ease-in-out;
+  font-weight: 400;
+  transition: color 0.2s ease-in-out, transform 0.2s ease-out;
   display: inline-block; /* Para transform */
 }
 

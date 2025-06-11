@@ -1,16 +1,18 @@
 <template>
   <v-container id="get-involved" fluid class="user-types-section py-12 py-md-16">
-    <v-row align="stretch" justify="center">
+    <v-row align="stretch" justify="center" class="animate__animated animate__fadeInUp animate__delay-0.3s">
       <v-col cols="12" md="5" class="d-flex mb-8 mb-md-0">
         <v-card
-          class="user-card volunteer-card pa-8 w-100 d-flex flex-column align-center justify-start"
-          elevation="4"
+          class="user-card volunteer-card pa-8 w-100 d-flex flex-column align-center text-center"
+          elevation="8"
           hover
           @click="goToRegister('voluntario')"
         >
-          <v-icon size="56" color="primary" class="mb-5">mdi-handshake</v-icon>
-          <div class="user-card-title font-weight-bold mb-3">Voluntariado</div>
-          <div class="user-card-description text-center mb-6 flex-grow-1">
+          <div class="card-icon-wrapper mb-5">
+            <v-icon size="64" color="primary">mdi-handshake</v-icon>
+          </div>
+          <h2 class="user-card-title font-weight-bold mb-3">Voluntariado</h2>
+          <div class="user-card-description flex-grow-1">
             <p>
               Únete a nuestra comunidad de voluntarios y ayuda a empoderar comunidades afro.
             </p>
@@ -26,7 +28,7 @@
           <v-btn
             block
             depressed
-            class="user-action-btn mt-auto"
+            class="user-action-btn primary-btn mt-auto"
             tabindex="-1"
           >
             Regístrate como voluntario
@@ -40,14 +42,16 @@
 
       <v-col cols="12" md="5" class="d-flex">
         <v-card
-          class="user-card organization-card pa-8 w-100 d-flex flex-column align-center justify-start"
-          elevation="4"
+          class="user-card organization-card pa-8 w-100 d-flex flex-column align-center text-center"
+          elevation="8"
           hover
           @click="goToRegister('organizacion')"
         >
-          <v-icon size="56" color="accent" class="mb-5">mdi-domain</v-icon>
-          <div class="user-card-title font-weight-bold mb-3">Organización</div>
-          <div class="user-card-description text-center mb-6 flex-grow-1">
+          <div class="card-icon-wrapper mb-5">
+            <v-icon size="64" color="accent">mdi-domain</v-icon>
+          </div>
+          <h2 class="user-card-title font-weight-bold mb-3">Organización</h2>
+          <div class="user-card-description flex-grow-1">
             <p>
               Colabora con nosotros para impulsar el desarrollo sostenible en comunidades afro.
             </p>
@@ -63,7 +67,7 @@
           <v-btn
             block
             depressed
-            class="user-action-btn mt-auto"
+            class="user-action-btn accent-btn mt-auto"
             tabindex="-1"
           >
             Regístrate como organización
@@ -75,6 +79,8 @@
 </template>
 
 <script>
+import 'animate.css'; // Importa Animate.css
+
 export default {
   name: 'UserTypes',
   methods: {
@@ -86,120 +92,135 @@ export default {
 </script>
 
 <style scoped>
-/* Colores de la paleta (referencia de AboutUs):
-    primary: #18b97e (Verde principal)
-    secondary: #4EC7A5 (Verde secundario, más claro)
-    accent: #3f51b5 (Azul para acentos)
-*/
-
+/* Sección contenedora */
 .user-types-section {
-  background: linear-gradient(to bottom, #ffffff 20%, #fcfae9 100%); /* Un fondo ligeramente más claro que el de las tarjetas */
-  padding-bottom: 120px; /* Asegura un buen espacio en la parte inferior */
+  background: linear-gradient(to bottom, #ffffff 20%, #fcfae9 100%); /* Fondo suave para contraste */
+  padding-bottom: 100px;
 }
 
-/* Estilo de las Tarjetas de Usuario */
+/* Estilo base de las Tarjetas de Usuario */
 .user-card {
   border-radius: 20px !important;
   background: #ffffff !important;
-  transition: all 0.3s ease-in-out;
-  min-height: 480px; /* Altura mínima para asegurar consistencia */
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between; /* Distribuye el espacio entre los elementos */
-  align-items: center;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.07) !important;
-  position: relative; /* Para el borde lateral */
-  overflow: hidden; /* Asegura que el borde lateral no se desborde */
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); /* Transición global más suave */
+  min-height: 520px; /* Aumenta ligeramente la altura mínima para más espacio */
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08) !important;
+  border: 1px solid rgba(0, 0, 0, 0.05); /* Borde sutil para definición */
 }
 
 .user-card:hover {
-  transform: translateY(-8px) scale(1.005);
-  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.15) !important;
+  transform: translateY(-10px) scale(1.01); /* Efecto de elevación y ligero crecimiento */
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2) !important; /* Sombra más pronunciada al hover */
+  border-color: rgba(0, 0, 0, 0.1);
 }
 
-.volunteer-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 8px;
-  height: 100%;
-  background-color: #18b97e; /* Primary color */
-  border-radius: 20px 0 0 20px; /* Bordes redondeados solo a la izquierda */
+/* Wrapper para el icono para un mejor control de espaciado */
+.card-icon-wrapper {
+  background-color: rgba(78, 199, 165, 0.1); /* Fondo sutil para el icono */
+  border-radius: 50%;
+  padding: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
 }
 
-.organization-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 8px;
-  height: 100%;
-  background-color: #3f51b5; /* Accent color */
-  border-radius: 20px 0 0 20px;
+.user-card:hover .card-icon-wrapper {
+  background-color: rgba(78, 199, 165, 0.2);
+  transform: scale(1.1); /* Icono crece ligeramente con la tarjeta */
 }
 
+/* Títulos de las tarjetas */
 .user-card-title {
-  font-size: 2rem;
+  font-size: 2.2rem;
   color: #2c3e50;
-  letter-spacing: -0.5px;
+  letter-spacing: -0.8px;
+  line-height: 1.2;
 }
 
+/* Descripción de las tarjetas */
 .user-card-description {
   color: #555;
   font-size: 1.05rem;
   line-height: 1.7;
-  max-width: 90%; /* Limita el ancho del texto para mejor legibilidad */
+  max-width: 95%; /* Ligeramente más ancho */
+  padding: 0 10px; /* Padding para el texto */
 }
 
 .user-card-description p {
-  margin-bottom: 10px; /* Espaciado entre párrafos de descripción */
+  margin-bottom: 12px; /* Espaciado entre párrafos de descripción */
 }
 
-/* Botón de Acción dentro de las Tarjetas */
+/* Botones de Acción dentro de las Tarjetas */
 .user-action-btn {
-  background-color: #18b97e !important; /* Primary color */
-  color: #fff !important;
   border-radius: 12px !important;
-  min-height: 50px;
-  font-size: 1.05rem !important;
+  min-height: 55px; /* Botones un poco más altos */
+  font-size: 1.1rem !important; /* Texto ligeramente más grande */
   font-weight: bold !important;
   text-transform: none !important;
-  box-shadow: 0 5px 15px rgba(24, 185, 126, 0.4) !important; /* Sombra sutil del primary */
-  transition: all 0.3s ease;
+  letter-spacing: 0.5px;
+  transition: all 0.35s cubic-bezier(0.25, 0.8, 0.5, 1); /* Transición más robusta */
 }
 
-.user-action-btn:hover {
-  background: #fff !important;
-  color: #18b97e !important; /* Texto primary en hover */
-  box-shadow: 0 10px 25px rgba(24, 185, 126, 0.6) !important; /* Sombra más fuerte del primary en hover */
-  transform: translateY(-3px);
+/* Estilos específicos para el botón principal (Voluntario) */
+.primary-btn {
+  background-color: #4ec7a5 !important; /* Usa el verde secundario para un contraste más suave */
+  color: #fff !important;
+  box-shadow: 0 6px 15px rgba(78, 199, 165, 0.4) !important;
+}
+
+.primary-btn:hover {
+  background: #39b294 !important; /* Un verde un poco más oscuro al hover */
+  color: #fff !important;
+  box-shadow: 0 12px 28px rgba(78, 199, 165, 0.7) !important;
+  transform: translateY(-5px); /* Efecto "lift" más pronunciado */
+}
+
+/* Estilos específicos para el botón de acento (Organización) */
+.accent-btn {
+  background-color: #3f51b5 !important; /* Mantiene el azul */
+  color: #fff !important;
+  box-shadow: 0 6px 15px rgba(63, 81, 181, 0.4) !important;
+}
+
+.accent-btn:hover {
+  background: #33439e !important; /* Un azul un poco más oscuro al hover */
+  color: #fff !important;
+  box-shadow: 0 12px 28px rgba(63, 81, 181, 0.7) !important;
+  transform: translateY(-5px);
 }
 
 /* Divisor Vertical */
 .user-type-divider {
-  height: 85%;
-  border-color: #c6f1df !important; /* Un verde claro para la línea */
+  height: 80%; /* Ajusta la altura del divisor */
+  border-color: rgba(0, 0, 0, 0.1) !important; /* Un gris muy sutil para el divisor */
   width: 2px;
+  opacity: 0.7;
 }
 
 /* --- Responsive Adjustments --- */
 @media (max-width: 959px) { /* md breakpoint */
   .user-card {
-    min-height: auto; /* Permite que las tarjetas se adapten mejor en mobile */
+    min-height: auto;
     padding: 30px;
+    margin-bottom: 24px; /* Espacio entre tarjetas en móvil */
   }
-
   .user-card-title {
-    font-size: 1.8rem;
+    font-size: 2rem;
   }
-
   .user-card-description {
     font-size: 1rem;
+    padding: 0;
   }
   .user-action-btn {
-    min-height: 45px;
+    min-height: 50px;
     font-size: 1rem;
+  }
+  .user-types-section {
+    padding-bottom: 80px; /* Ajuste para mobile */
   }
 }
 
@@ -211,16 +232,20 @@ export default {
   .user-card {
     padding: 25px;
     border-radius: 16px !important;
-  }
-  .user-card::before {
-    width: 6px; /* Borde más delgado en mobile */
-    border-radius: 16px 0 0 16px;
+    min-height: auto; /* Asegura adaptabilidad total */
   }
   .user-card-title {
-    font-size: 1.6rem;
+    font-size: 1.8rem;
   }
   .user-card-description {
     font-size: 0.95rem;
+  }
+  .user-action-btn {
+    min-height: 48px;
+    font-size: 0.95rem;
+  }
+  .card-icon-wrapper {
+    padding: 12px; /* Icono un poco más pequeño en móvil */
   }
 }
 </style>
