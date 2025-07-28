@@ -1,0 +1,190 @@
+Table Usuario {
+
+id_usuario int [pk, increment]
+nombre varchar(100)
+correo varchar(100) [unique]
+contraseña varchar(255)
+id_rol int
+
+}
+
+Table Rol {
+
+id_rol int [pk, increment]
+nombre varchar(100)
+descripcion varchar(255)
+
+}
+
+Table Estado {
+
+id_estado int [pk, increment]
+nombre varchar(50) // Ej: 'Activo', 'Inactivo', 'Completado', 'Pendiente'
+
+}
+
+Table Voluntario {
+
+id_voluntario int [pk, increment]
+id_usuario int [unique]
+id_jornada int
+id_estado int // FK a Tabla Estado
+disponibilidad varchar(50) // Este campo se mantiene para flexibilidad adicional, aunque el estado general esté en id_estado
+
+}
+
+Table Jornada {
+
+id_jornada int [pk, increment]
+nombre varchar(50)
+
+}
+
+Table Habilidad {
+
+id_habilidad int [pk, increment]
+nombre varchar(100)
+descripcion text
+
+}
+
+Table Voluntario_Habilidad {
+
+id_voluntario int [pk]
+id_habilidad int [pk]
+tiempo_experiencia varchar(50)
+
+}
+
+Table Organizacion {
+
+id_organizacion int [pk, increment]
+id_usuario int [unique]
+nombre varchar(100)
+tipo varchar(50)
+sitio_web varchar(255)
+pais varchar(100)
+ciudad varchar(100)
+areas_enfoque text
+mision_vision text
+
+}
+
+Table Donacion {
+
+id_donacion int [pk, increment]
+id_organizacion int
+monto_total decimal(12,2)
+fecha date
+condiciones text
+id_estado int // FK a Tabla Estado
+
+}
+
+Table Donacion_Proyecto {
+
+id_donacion_proyecto int [pk, increment]
+id_donacion int
+id_proyecto int
+monto_asignado decimal(12,2) // Monto específico de esta donación asignado a este proyecto
+
+}
+
+Table Proyecto {
+
+id_proyecto int [pk, increment]
+nombre varchar(100)
+descripcion text
+objetivo text
+ubicacion varchar(100)
+fecha_inicio date
+fecha_fin date
+id_estado int // FK a Tabla Estado
+
+}
+
+Table Fase {
+
+id_fase int [pk, increment]
+nombre varchar(100)
+descripcion text
+orden int
+id_proyecto int
+
+}
+
+Table Tarea {
+
+id_tarea int [pk, increment]
+descripcion text
+fecha_inicio date
+fecha_fin date
+id_estado int // FK a Tabla Estado
+id_fase int
+
+}
+
+Table Asignacion {
+
+id_asignacion int [pk, increment]
+id_tarea int
+id_voluntario int
+rol_asignado varchar(100)
+
+}
+
+Table Movimiento {
+
+id_movimiento int [pk, increment]
+tipo varchar(50) // 'recurso' o 'gasto'
+descripcion text
+cantidad int [note: 'Para recursos: unidades, para gastos: 1']
+monto decimal(12,2)
+fecha date
+comprobante varchar(255)
+id_proyecto int
+id_tarea int // opcional
+id_donacion int // opcional
+
+}
+
+Table Reporte {
+
+id_reporte int [pk, increment]
+tipo varchar(50)
+fecha date
+contenido text
+id_proyecto int
+
+}
+
+// Relaciones Clave
+
+Ref: Rol.id_rol < Usuario.id_rol // Usuario tiene un rol (1:N)
+Ref: Estado.id_estado < Voluntario.id_estado // Voluntario tiene un estado
+Ref: Estado.id_estado < Donacion.id_estado // Donación tiene un estado
+Ref: Estado.id_estado < Proyecto.id_estado // Proyecto tiene un estado
+Ref: Estado.id_estado < Tarea.id_estado // Tarea tiene un estado
+
+Ref: Usuario.id_usuario - Voluntario.id_usuario // Usuario puede ser voluntario (1:1)
+Ref: Usuario.id_usuario - Organizacion.id_usuario // Usuario puede ser organización (1:1)
+Ref: Voluntario.id_jornada < Jornada.id_jornada // Voluntario tiene una jornada de disponibilidad (N:1)
+
+Ref: Voluntario.id_voluntario < Voluntario_Habilidad.id_voluntario // Voluntario tiene muchas habilidades (N:M)
+Ref: Habilidad.id_habilidad < Voluntario_Habilidad.id_habilidad // Habilidad es de muchos voluntarios (N:M)
+Ref: Organizacion.id_organizacion > Donacion.id_organizacion // Organización hace muchas donaciones (1:N)
+
+Ref: Donacion.id_donacion < Donacion_Proyecto.id_donacion // Donación asignada a muchos proyectos (N:M)
+Ref: Proyecto.id_proyecto < Donacion_Proyecto.id_proyecto // Proyecto financiado por muchas donaciones (N:M)
+
+Ref: Proyecto.id_proyecto > Fase.id_proyecto // Proyecto tiene muchas fases (1:N)
+Ref: Fase.id_fase > Tarea.id_fase // Fase tiene muchas tareas (1:N)
+
+Ref: Tarea.id_tarea < Asignacion.id_tarea // Tarea tiene muchas asignaciones de voluntarios (N:M)
+Ref: Voluntario.id_voluntario < Asignacion.id_voluntario // Voluntario es asignado a muchas tareas (N:M)
+
+Ref: Proyecto.id_proyecto > Reporte.id_proyecto // Proyecto tiene muchos reportes (1:N)
+Ref: Proyecto.id_proyecto > Movimiento.id_proyecto // Proyecto tiene muchos movimientos económicos (1:N)
+
+Ref: Tarea.id_tarea < Movimiento.id_tarea // Movimientos pueden estar vinculados a tareas (N:1, opcional)
+Ref: Donacion.id_donacion < Movimiento.id_donacion // Movimientos pueden estar vinculados a donaciones (N:1, opcional)

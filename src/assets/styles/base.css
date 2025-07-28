@@ -1,0 +1,73 @@
+
+/* Project specific fonts */
+:root {
+  --font-family-headings: 'Open Sans', sans-serif;
+  --font-family-body: 'Open Sans', sans-serif;
+  --v-font-family: 'Open Sans', sans-serif;
+}
+
+/* semantic color variables for this project */
+:root {
+  --color-background: var(--vt-c-white);
+  --color-background-soft: var(--vt-c-white-soft);
+  --color-background-mute: var(--vt-c-white-mute);
+
+  --color-border: var(--vt-c-divider-light-2);
+  --color-border-hover: var(--vt-c-divider-light-1);
+
+  --color-heading: var(--vt-c-text-light-1);
+  --color-text: var(--vt-c-text-light-1);
+
+  --section-gap: 160px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-background: var(--vt-c-black);
+    --color-background-soft: var(--vt-c-black-soft);
+    --color-background-mute: var(--vt-c-black-mute);
+
+    --color-border: var(--vt-c-divider-dark-2);
+    --color-border-hover: var(--vt-c-divider-dark-1);
+
+    --color-heading: var(--vt-c-text-dark-1);
+    --color-text: var(--vt-c-text-dark-2);
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  font-weight: normal;
+}
+
+body {
+  min-height: 100vh;
+  color: var(--color-text);
+  background: var(--color-background);
+  transition:
+    color 0.5s,
+    background-color 0.5s;
+  line-height: 1.7;
+  font-family: 'Open Sans', sans-serif !important; /* Aplicación forzada de Open Sans */
+  font-size: 16px;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  font-family: 'Open Sans', sans-serif !important; /* Aplicación forzada de Open Sans a html */
+}
+
+h1, h2, h3, h4, h5, h6, .v-card-title, .v-card-subtitle, .text-h1, .text-h2, .text-h3, .text-h4, .text-h5, .text-h6 {
+  font-family: var(--font-family-headings) !important;
+}
+
+.v-btn {
+  font-family: var(--font-family-headings);
+  letter-spacing: 0.5px !important;
+  text-transform: none !important;
+}

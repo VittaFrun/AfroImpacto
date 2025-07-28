@@ -6,7 +6,20 @@ import '@mdi/font/css/materialdesignicons.css'
 
 
 export default createVuetify({
-icons: {
+theme: {
+    defaultTheme: 'light',
+  },
+  defaults: {
+    global: {
+      style: {
+        fontFamily: 'Open Sans, sans-serif',
+      },
+    },
+    VCard: {
+      variant: 'flat',
+    },
+  },
+  icons: {
     defaultSet: 'mdi',
     aliases,
     sets: {
@@ -14,6 +27,21 @@ icons: {
     },
 },
 theme: {
-    defaultTheme: 'light',
+    defaultTheme: 'afroImpactoTheme',
+    themes: {
+      afroImpactoTheme: {
+        colors: {
+          primary: '#4ec7a5',
+          secondary: '#18b97e',
+          accent: '#3f51b5',
+          background: '#e9eef2',
+          surface: '#ffffff',
+          error: '#FF5252',
+          info: '#2196F3',
+          success: '#4CAF50',
+          warning: '#FFC107',
+        },
+      },
+    },
 },
 })
