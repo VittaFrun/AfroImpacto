@@ -94,6 +94,7 @@ Table Proyecto {
 
 id_proyecto int [pk, increment]
 nombre varchar(100)
+imagen 
 descripcion text
 objetivo text
 ubicacion varchar(100)

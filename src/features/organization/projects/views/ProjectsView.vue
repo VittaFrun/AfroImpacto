@@ -13,36 +13,36 @@
     </v-row>
 
     <v-row class="mb-6">
-      <!-- Card 1: Último Proyecto Activo -->
+      <!-- Card 1: Proyecto Principal -->
       <v-col cols="12" md="6">
         <v-card class="pa-6 rounded-lg elevation-0 highlight-card h-100">
-          <v-card-title class="text-h6 font-weight-bold mb-2">Último Proyecto Activo</v-card-title>
+          <v-card-title class="text-h6 font-weight-bold mb-2">Proyecto Principal</v-card-title>
           <v-divider class="mb-4"></v-divider>
-          <div v-if="lastActiveProject">
+          <div v-if="mainProject">
             <v-row>
               <v-col cols="12" md="4">
                 <v-img
-                  :src="lastActiveProject.coverImage"
+                  :src="mainProject.coverImage"
                   class="rounded-lg"
                   height="150"
                   cover
                 ></v-img>
               </v-col>
               <v-col cols="12" md="8">
-                <h3 class="text-h5 font-weight-bold text-primary mb-2">{{ lastActiveProject.name }}</h3>
-                <v-chip :color="lastActiveProject.statusColor" size="small" class="mb-3">{{ lastActiveProject.status }}</v-chip>
-                <p class="text-body-2 text-grey-darken-1 mb-2">{{ lastActiveProject.description }}</p>
-                <p class="text-body-2 mb-1"><strong>Ubicación:</strong> {{ lastActiveProject.location }}</p>
-                <p class="text-body-2 mb-1"><strong>Inicio:</strong> {{ lastActiveProject.startDate }}</p>
-                <p class="text-body-2"><strong>Fin:</strong> {{ lastActiveProject.endDate }}</p>
+                <h3 class="text-h5 font-weight-bold text-primary mb-2">{{ mainProject.name }}</h3>
+                <v-chip :color="mainProject.statusColor" size="small" class="mb-3">{{ mainProject.status }}</v-chip>
+                <p class="text-body-2 text-grey-darken-1 mb-2">{{ mainProject.description }}</p>
+                <p class="text-body-2 mb-1"><strong>Ubicación:</strong> {{ mainProject.location }}</p>
+                <p class="text-body-2 mb-1"><strong>Inicio:</strong> {{ mainProject.startDate }}</p>
+                <p class="text-body-2"><strong>Fin:</strong> {{ mainProject.endDate }}</p>
                 <v-card-actions class="pa-0 mt-4">
-                  <v-btn variant="text" color="primary" @click="viewProjectDetails(lastActiveProject.id)">Ver Detalles</v-btn>
+                  <v-btn variant="text" color="primary" @click="viewProjectDetails(mainProject.id)">Ver Detalles</v-btn>
                 </v-card-actions>
               </v-col>
             </v-row>
           </div>
           <div v-else>
-            <p class="text-body-1 text-grey-darken-1">No hay proyectos activos recientemente.</p>
+            <p class="text-body-1 text-grey-darken-1">Selecciona un proyecto como principal.</p>
           </div>
         </v-card>
       </v-col>
@@ -52,10 +52,10 @@
         <v-card class="pa-6 rounded-lg elevation-0 highlight-card h-100">
           <v-card-title class="text-h6 font-weight-bold mb-2">Cronograma de Actividades</v-card-title>
           <v-divider class="mb-4"></v-divider>
-          <div v-if="lastActiveProject && lastActiveProject.tasks.length > 0">
+          <div v-if="mainProject && mainProject.tasks.length > 0">
             <v-timeline density="compact" side="end" class="timeline-custom">
               <v-timeline-item
-                v-for="task in lastActiveProject.tasks"
+                v-for="task in mainProject.tasks"
                 :key="task.id"
                 :dot-color="task.statusColor"
                 size="small"
@@ -86,22 +86,49 @@
           <v-divider class="mb-4"></v-divider>
           <v-data-table
             :headers="headers"
-            :items="otherProjects"
+            :items="projects"
             item-value="id"
             class="elevation-0 projects-table"
           >
             <template v-slot:item.status="{ item }">
               <v-chip :color="item.statusColor" size="small">{{ item.status }}</v-chip>
             </template>
+
+            <template v-slot:item.progress="{ item }">
+              <div class="d-flex align-center">
+                <span class="text-caption font-weight-bold me-2">{{ item.progress.percentage }}%</span>
+                <v-progress-linear
+                  :model-value="item.progress.percentage"
+                  :color="item.statusColor"
+                  height="8"
+                  rounded
+                ></v-progress-linear>
+              </div>
+            </template>
+
             <template v-slot:item.actions="{ item }">
-              <v-btn icon size="small" variant="text" color="info" @click="viewProjectDetails(item.id)">
-                <v-icon>mdi-eye</v-icon>
-              </v-btn>
-              <v-btn icon size="small" variant="text" color="warning" @click="editProject(item.id)">
-                <v-icon>mdi-pencil</v-icon>
-              </v-btn>
-              <v-btn icon size="small" variant="text" color="error" @click="deactivateProject(item.id)">
-                <v-icon>mdi-delete</v-icon>
+              <v-menu offset-y>
+                <template v-slot:activator="{ props }">
+                  <v-btn icon size="small" variant="text" v-bind="props">
+                    <v-icon>mdi-dots-vertical</v-icon>
+                  </v-btn>
+                </template>
+                <v-list dense>
+                  <v-list-item @click="viewProjectDetails(item.id)">
+                    <v-list-item-title><v-icon small left>mdi-eye</v-icon> Ver Detalles</v-list-item-title>
+                  </v-list-item>
+                  <v-list-item @click="editProject(item.id)">
+                    <v-list-item-title><v-icon small left>mdi-pencil</v-icon> Editar</v-list-item-title>
+                  </v-list-item>
+                  <v-list-item @click="deactivateProject(item.id)">
+                    <v-list-item-title><v-icon small left>mdi-delete</v-icon> Eliminar</v-list-item-title>
+                  </v-list-item>
+                </v-list>
+              </v-menu>
+            </template>
+            <template v-slot:item.main="{ item }">
+              <v-btn icon @click="projectStore.setMainProject(item.id)">
+                <v-icon>{{ item.id === projectStore.mainProjectId ? 'mdi-star' : 'mdi-star-outline' }}</v-icon>
               </v-btn>
             </template>
           </v-data-table>
@@ -113,8 +140,8 @@
         <v-card class="pa-6 rounded-lg elevation-0 highlight-card">
           <v-card-title class="text-h6 font-weight-bold mb-2">Progreso del Proyecto</v-card-title>
           <v-divider class="mb-4"></v-divider>
-          <div v-if="lastActiveProject && projectProgress.phases.length > 0">
-            <h3 class="text-h6 font-weight-bold text-primary mb-4">{{ lastActiveProject.name }}</h3>
+          <div v-if="mainProject && projectProgress.phases.length > 0">
+            <h3 class="text-h6 font-weight-bold text-primary mb-4">{{ mainProject.name }}</h3>
             <v-timeline density="compact" side="end" class="timeline-custom">
               <v-timeline-item
                 v-for="(phase, index) in projectProgress.phases"
@@ -132,7 +159,7 @@
               </v-timeline-item>
             </v-timeline>
             <v-card-actions class="pa-0 mt-4">
-              <v-btn variant="text" color="primary" @click="viewProjectDetails(lastActiveProject.id)">Gestionar proyecto</v-btn>
+              <v-btn variant="text" color="primary" @click="viewProjectDetails(mainProject.id)">Gestionar proyecto</v-btn>
             </v-card-actions>
           </div>
           <div v-else>
@@ -152,28 +179,13 @@ import { useProjectStore } from '@/features/organization/projects/stores/project
 const router = useRouter();
 const projectStore = useProjectStore();
 
-// Computed property for the last active project
-const lastActiveProject = computed(() => {
-  const activeProjects = projectStore.allProjects.filter(p => p.status === 'Activo' || p.status === 'Pendiente');
-  if (activeProjects.length === 0) return null;
-
-  return activeProjects.sort((a, b) => {
-    const dateA = new Date(a.endDate || a.startDate);
-    const dateB = new Date(b.endDate || b.startDate);
-    return dateB.getTime() - dateA.getTime();
-  })[0];
-});
-
-// Computed property for other projects (excluding the last active one)
-const otherProjects = computed(() => {
-  if (!lastActiveProject.value) return projectStore.allProjects;
-  return projectStore.allProjects.filter(p => p.id !== lastActiveProject.value.id);
-});
+const projects = computed(() => projectStore.projects);
+const mainProject = computed(() => projectStore.mainProject);
 
 // Computed property for project progress (now includes phases for timeline)
 const projectProgress = computed(() => {
-  if (!lastActiveProject.value) return null;
-  const phases = lastActiveProject.value.phases || [];
+  if (!mainProject.value) return { phases: [] };
+  const phases = mainProject.value.phases || [];
   const totalPhases = phases.length;
   const completedPhases = phases.filter(p => p.status === 'Completado').length;
   const currentPhase = phases.find(p => p.status === 'Activo') || null;
@@ -188,11 +200,12 @@ const projectProgress = computed(() => {
 
 // Table headers
 const headers = ref([
-  { title: 'Nombre del Proyecto', key: 'name', align: 'center' },
+  { title: 'Principal', key: 'main', sortable: false, align: 'center' },
+  { title: 'Nombre del Proyecto', key: 'name', align: 'start' },
   { title: 'Estado', key: 'status', align: 'center' },
+  { title: 'Progreso', key: 'progress', sortable: false, align: 'center' },
   { title: 'Inicio', key: 'startDate', align: 'center' },
   { title: 'Fin', key: 'endDate', align: 'center' },
-  { title: 'Ubicación', key: 'location', align: 'center' },
   { title: 'Acciones', key: 'actions', sortable: false, align: 'center' },
 ]);
 

@@ -122,12 +122,23 @@ export const useProjectStore = defineStore('project', () => {
       volunteers: [],
     },
   ]);
+  const mainProjectId = ref(1);
 
   // Getters
   const projects = computed(() => allProjects.value);
   const getProjectById = computed(() => (id) => allProjects.value.find(p => p.id === id));
+  const mainProject = computed(() => {
+    if (!mainProjectId.value) {
+      return allProjects.value.length > 0 ? allProjects.value[0] : null;
+    }
+    return allProjects.value.find(p => p.id === mainProjectId.value);
+  });
 
   // Actions
+  function setMainProject(projectId) {
+    mainProjectId.value = projectId;
+  }
+
   function addProject(newProject) {
     const newId = Math.max(...allProjects.value.map(p => p.id)) + 1;
     allProjects.value.push({ ...newProject, id: newId });
@@ -295,6 +306,8 @@ export const useProjectStore = defineStore('project', () => {
     allProjects,
     projects,
     getProjectById,
+    mainProject,
+    setMainProject,
     addProject,
     updateProject,
     deleteProject,
@@ -309,3 +322,4 @@ export const useProjectStore = defineStore('project', () => {
     updatePhaseStatusBasedOnTasks,
   };
 });
+""

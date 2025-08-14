@@ -1,349 +1,262 @@
 <template>
-  <v-container fluid class="pa-8">
-    <v-row>
-      <v-col cols="12">
-        <v-btn icon @click="router.back()" class="mb-4">
-          <v-icon>mdi-arrow-left</v-icon>
+  <v-container fluid class="pa-8 project-detail-view">
+    <!-- Header -->
+    <v-row class="mb-4 align-center">
+      <v-col cols="auto">
+        <v-btn icon @click="router.back()" variant="text"><v-icon>mdi-arrow-left</v-icon></v-btn>
+      </v-col>
+      <v-col>
+        <h1 class="text-h4 font-weight-bold text-primary">Gestión del Proyecto</h1>
+        <div class="d-flex align-center">
+          <h2 v-if="project" class="text-h6 text-grey-darken-1 mr-2">{{ project.name }}</h2>
+          <v-btn icon="mdi-pencil" variant="text" color="warning" size="small" @click="openEditProjectDialog"></v-btn>
+        </div>
+      </v-col>
+      <v-col cols="auto">
+        <v-btn color="primary" @click="saveProjectChanges" class="rounded-pill">
+          <v-icon start>mdi-content-save</v-icon>Guardar Cambios
         </v-btn>
-        <h1 class="text-h4 font-weight-bold text-primary mb-4">Gestion del Proyecto: {{ project?.name }}</h1>
-        <v-btn color="primary" @click="saveProjectChanges" class="mb-4">Guardar Cambios</v-btn>
       </v-col>
     </v-row>
 
     <v-row v-if="project">
+      <!-- Main Content Column -->
       <v-col cols="12" md="8">
+        <!-- Kanban Board -->
         <v-card class="pa-6 rounded-lg elevation-0 mb-6">
-          <v-card-title class="text-h6 font-weight-bold mb-2">Información General</v-card-title>
-          <v-divider class="mb-4"></v-divider>
-          <v-img
-            v-if="project.coverImage"
-            :src="project.coverImage"
-            class="rounded-lg mb-4"
-            height="250"
-            cover
-          ></v-img>
-          <p class="text-body-1 mb-2"><strong>Descripción:</strong> {{ project.description }}</p>
-          <p class="text-body-1 mb-2"><strong>Objetivo:</strong> {{ project.objective || 'N/A' }}</p>
-          <p class="text-body-1 mb-2"><strong>Ubicación:</strong> {{ project.location }}</p>
-          <p class="text-body-1 mb-2"><strong>Fecha de Inicio:</strong> {{ project.startDate }}</p>
-          <p class="text-body-1 mb-2"><strong>Fecha de Fin:</strong> {{ project.endDate }}</p>
-          <p class="text-body-1 mb-2"><strong>Estado:</strong> <v-chip :color="project.statusColor" size="small">{{ project.status }}</v-chip></p>
+          <v-card-title class="text-h6 font-weight-bold">Tablero de Tareas</v-card-title>
+          <v-divider class="mb-6"></v-divider>
+          <kanban-board :tasks="project.tasks" :phases="project.phases" @update:taskStatus="updateTaskStatusFromKanban" @task-clicked="openEditTaskDialog"></kanban-board>
         </v-card>
 
-        <!-- Sección de Fases y Tareas (Integrada) -->
+        <!-- Structural Summary -->
         <v-card class="pa-6 rounded-lg elevation-0 mb-6">
           <v-card-title class="d-flex justify-space-between align-center">
-            <span class="text-h6 font-weight-bold">Fases y Tareas del Proyecto</span>
-            <v-btn color="primary" @click="openAddPhaseDialog" size="small" style="color: white;">Añadir Fase</v-btn>
+            <span class="text-h6 font-weight-bold">Resumen Estructural</span>
+            <v-btn color="primary" @click="openAddPhaseDialog">+ Añadir Fase</v-btn>
           </v-card-title>
           <v-divider class="mb-4"></v-divider>
-
           <v-expansion-panels variant="accordion">
             <v-expansion-panel v-for="phase in project.phases" :key="phase.id">
               <v-expansion-panel-title>
                 <div class="d-flex justify-space-between align-center w-100">
                   <span class="font-weight-bold">{{ phase.name }}</span>
-                  <v-chip :color="phase.statusColor" size="small">{{ phase.status }}</v-chip>
+                  <div>
+                    <v-chip :color="phase.statusColor" size="small" class="mr-4">{{ phase.status }}</v-chip>
+                    <v-btn icon="mdi-pencil" variant="text" color="warning" size="small" @click.stop="openEditPhaseDialog(phase)"></v-btn>
+                    <v-btn icon="mdi-delete" variant="text" color="error" size="small" @click.stop="confirmDeletePhase(phase.id)"></v-btn>
+                  </div>
                 </div>
               </v-expansion-panel-title>
               <v-expansion-panel-text>
                 <p class="text-body-2 mb-4">{{ phase.description }}</p>
                 <v-divider></v-divider>
-                <v-card-title class="d-flex justify-space-between align-center mt-4">
-                  <span class="text-subtitle-1 font-weight-bold">Tareas de la Fase</span>
-                  <v-btn color="secondary" size="small" @click="openAddTaskDialog(phase.id)">Añadir Tarea</v-btn>
-                </v-card-title>
                 <v-list density="compact">
                   <div v-for="task in tasksByPhase(phase.id)" :key="task.id">
                     <v-list-item>
                       <v-list-item-title>{{ task.description }}</v-list-item-title>
-                      <v-list-item-subtitle>Fechas: {{ task.startDate }} - {{ task.endDate }}</v-list-item-subtitle>
+                      <v-list-item-subtitle>
+                        <v-chip :color="task.statusColor" size="x-small" class="mr-2">{{ task.status }}</v-chip>
+                        <span v-if="task.assignments.length">Asignado a: <span v-for="(assignment, idx) in task.assignments" :key="assignment.assignmentId">{{ assignment.volunteerName }} ({{ assignment.role }})<span v-if="idx < task.assignments.length - 1">, </span></span></span>
+                      </v-list-item-subtitle>
                       <template v-slot:append>
-                        <v-select
-                                                    :items="['Pendiente', 'En Progreso', 'Completado']"
-                          v-model="task.status"
-                          density="compact"
-                          hide-details
-                          single-line
-                          class="mr-2"
-                          style="width: 120px;"
-                          @update:modelValue="updateTaskStatus(task, $event)"
-                        ></v-select>
-                        <v-btn icon="mdi-pencil" variant="text" color="warning" size="small" @click="openEditTaskDialog(task)"></v-btn>
-                        <v-btn icon="mdi-delete" variant="text" color="error" size="small" @click="confirmDeleteTask(task.id)"></v-btn>
-                        <v-btn icon="mdi-account-plus" variant="text" color="info" size="small" @click="openAssignmentDialog(task)"></v-btn>
+                        <v-btn icon="mdi-pencil" variant="text" color="warning" size="x-small" @click.stop="openEditTaskDialog(task)"></v-btn>
+                        <v-btn icon="mdi-delete" variant="text" color="error" size="x-small" @click.stop="confirmDeleteTask(task.id)"></v-btn>
                       </template>
-                    </v-list-item>
-                    <v-list-item v-if="task.assignments && task.assignments.length > 0" class="ml-4">
-                        <v-chip v-for="assignment in task.assignments" :key="assignment.assignmentId" size="small" class="mr-2" closable @click:close="unassignVolunteer(task.id, assignment.assignmentId)" :color="assignment.roleColor">
-                          <v-icon start>mdi-account-circle</v-icon>
-                          {{ assignment.volunteerName }} ({{ assignment.role }})
-                        </v-chip>
                     </v-list-item>
                   </div>
                   <v-card-text v-if="tasksByPhase(phase.id).length === 0" class="text-center grey--text">
                     No hay tareas para esta fase.
                   </v-card-text>
+                  <v-list-item>
+                    <v-btn block variant="tonal" color="primary" @click="openAddTaskDialog(null, phase.id)">+ Añadir Tarea a esta Fase</v-btn>
+                  </v-list-item>
                 </v-list>
-                 <v-card-actions class="mt-4">
-                  <v-spacer></v-spacer>
-                  <v-btn variant="text" color="warning" @click.stop="openEditPhaseDialog(phase)">Editar Fase</v-btn>
-                  <v-btn variant="text" color="error" @click.stop="confirmDeletePhase(phase.id)">Eliminar Fase</v-btn>
-                </v-card-actions>
               </v-expansion-panel-text>
             </v-expansion-panel>
-             <v-card-text v-if="!project.phases || project.phases.length === 0" class="text-center grey--text">
+            <v-card-text v-if="!project.phases || project.phases.length === 0" class="text-center grey--text">
               Este proyecto aún no tiene fases definidas.
             </v-card-text>
           </v-expansion-panels>
         </v-card>
+
+        
       </v-col>
 
+      <!-- Sidebar Column -->
       <v-col cols="12" md="4">
-        <!-- Sección de Donaciones (Dummy) -->
+        <!-- Management Card -->
         <v-card class="pa-6 rounded-lg elevation-0 mb-6">
-          <v-card-title class="text-h6 font-weight-bold mb-2">Donaciones Recibidas</v-card-title>
+          <v-card-title class="text-h6 font-weight-bold">Gestión del Proyecto</v-card-title>
           <v-divider class="mb-4"></v-divider>
-          <v-list density="compact">
-            <v-list-item v-for="donation in project.donations" :key="donation.id">
-              <v-list-item-title>Monto: ${{ donation.amount }}</v-list-item-title>
-              <v-list-item-subtitle>Fecha: {{ donation.date }}</v-list-item-subtitle>
-            </v-list-item>
-          </v-list>
+          <v-btn color="info" block class="mb-3" @click="manageRolesDialog = true"><v-icon start>mdi-account-cog</v-icon>Gestionar Roles</v-btn>
+          <v-btn color="success" block @click="openAssignVolunteerDialog"><v-icon start>mdi-account-plus</v-icon>Asignar Voluntario a Tarea</v-btn>
         </v-card>
 
-        <!-- Sección de Voluntarios Asignados (Dummy) -->
-        <v-card class="pa-6 rounded-lg elevation-0">
-          <v-card-title class="text-h6 font-weight-bold mb-2">Voluntarios Asignados</v-card-title>
-          <v-divider class="mb-4"></v-divider>
-          <v-list density="compact">
-            <v-list-item v-for="volunteer in project.volunteers" :key="volunteer.id">
-              <v-list-item-title>{{ volunteer.name }}</v-list-item-title>
-              <v-list-item-subtitle>Rol: {{ volunteer.role }}</v-list-item-subtitle>
-            </v-list-item>
-          </v-list>
-        </v-card>
-
-        <!-- Card for Role Management -->
+        <!-- Other cards remain the same -->
+        <!-- Activity Log -->
         <v-card class="pa-6 rounded-lg elevation-0 mt-6">
-          <v-card-title class="d-flex justify-space-between align-center">
-            <span class="text-h6 font-weight-bold">Gestión de Roles</span>
-            <v-btn color="primary" @click="openAddRoleDialog" size="small">Crear Rol</v-btn>
-          </v-card-title>
+          <v-card-title class="text-h6 font-weight-bold">Actividad Reciente</v-card-title>
           <v-divider class="mb-4"></v-divider>
-          <v-list density="compact">
-            <v-list-item v-for="role in roleStore.customRoles" :key="role.id">
-              <template v-slot:prepend>
-                <v-chip :color="role.color" size="small" class="mr-4"></v-chip>
-              </template>
-              <v-list-item-title>{{ role.name }}</v-list-item-title>
-              <template v-slot:append>
-                <v-btn icon="mdi-pencil" variant="text" color="warning" size="small" @click="openEditRoleDialog(role)"></v-btn>
-                <v-btn icon="mdi-delete" variant="text" color="error" size="small" @click="confirmDeleteRole(role.id)"></v-btn>
-              </template>
-            </v-list-item>
-          </v-list>
+          <v-timeline density="compact" side="end">
+            <v-timeline-item v-for="(activity, index) in recentActivities" :key="index" :dot-color="activity.color" :icon="activity.icon" size="small">
+              <div class="d-flex justify-space-between flex-grow-1">
+                <div>{{ activity.description }}</div>
+                <div class="text-caption text-grey">{{ formatDistanceToNow(activity.timestamp, { addSuffix: true, locale: es }) }}</div>
+              </div>
+            </v-timeline-item>
+            <v-card-text v-if="recentActivities.length === 0" class="text-center grey--text">No hay actividad reciente.</v-card-text>
+          </v-timeline>
         </v-card>
       </v-col>
     </v-row>
 
-    <v-row v-else>
-      <v-col cols="12">
-        <v-card class="pa-6 rounded-lg elevation-0">
-          <v-card-text class="text-center text-body-1 text-grey-darken-1">
-            Cargando detalles del proyecto o proyecto no encontrado.
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
+    <!-- Dialogs -->
+    <v-dialog v-model="assignVolunteerDialog" max-width="600px">
+      <v-card>
+        <v-card-title class="d-flex justify-space-between">
+          <span>Asignar Voluntario a Tarea</span>
+          <v-btn icon @click="assignVolunteerDialog = false" variant="text"><v-icon>mdi-close</v-icon></v-btn>
+        </v-card-title>
+        <v-card-text>
+          <v-form @submit.prevent="assignVolunteerToTask">
+            <v-select
+              v-model="selectedTaskForAssignmentId"
+              :items="project.tasks"
+              item-title="description"
+              item-value="id"
+              label="Seleccionar Tarea"
+              outlined
+              dense
+              class="mb-4"
+            ></v-select>
+            <v-select
+              v-model="selectedVolunteerId"
+              :items="availableVolunteers"
+              item-title="name"
+              item-value="id_voluntario"
+              label="Seleccionar Voluntario"
+              outlined
+              dense
+              class="mb-4"
+            ></v-select>
+            <v-select
+              v-model="assignedRole"
+              :items="roleStore.customRoles"
+              item-title="name"
+              item-value="name"
+              label="Rol Asignado"
+              outlined
+              dense
+              class="mb-4"
+            ></v-select>
+            <v-btn color="primary" type="submit" block>Asignar</v-btn>
+          </v-form>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+    
 
-    <!-- Dialog for Adding/Editing Phases -->
     <v-dialog v-model="phaseDialog" max-width="600px">
       <v-card>
         <v-card-title>
-          <span class="text-h5">{{ isEditingPhase ? 'Editar Fase' : 'Añadir Nueva Fase' }}</span>
+          <span>{{ currentPhase ? 'Editar Fase' : 'Añadir Fase' }}</span>
         </v-card-title>
         <v-card-text>
-          <v-text-field
-            v-model="editablePhase.name"
-            label="Nombre de la Fase"
-            variant="outlined"
-            class="mb-4"
-          ></v-text-field>
-          <v-textarea
-            v-model="editablePhase.description"
-            label="Descripción de la Fase"
-            variant="outlined"
-            rows="3"
-          ></v-textarea>
+          <v-form @submit.prevent="savePhase">
+            <v-text-field v-model="phaseForm.name" label="Nombre de la Fase" required></v-text-field>
+            <v-textarea v-model="phaseForm.description" label="Descripción"></v-textarea>
+            <v-btn color="primary" type="submit">{{ currentPhase ? 'Guardar Cambios' : 'Añadir Fase' }}</v-btn>
+          </v-form>
         </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn text @click="closePhaseDialog">Cancelar</v-btn>
-          <v-btn color="primary" @click="savePhase">{{ isEditingPhase ? 'Guardar Cambios' : 'Añadir' }}</v-btn>
-        </v-card-actions>
       </v-card>
     </v-dialog>
 
-    <!-- Confirmation Dialog for Deleting Phases -->
-    <v-dialog v-model="deleteConfirmDialog" max-width="500px">
-      <v-card>
-        <v-card-title class="text-h5">Confirmar Eliminación</v-card-title>
-        <v-card-text>¿Estás seguro de que quieres eliminar esta fase? Esta acción no se puede deshacer.</v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn text @click="deleteConfirmDialog = false">Cancelar</v-btn>
-          <v-btn color="error" @click="deletePhaseConfirmed">Eliminar</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-
-    <!-- Dialog for Adding/Editing Tasks -->
-    <v-dialog v-model="taskDialog" max-width="600px">
+    <v-dialog v-model="editProjectDialog" max-width="600px">
       <v-card>
         <v-card-title>
-          <span class="text-h5">{{ isEditingTask ? 'Editar Tarea' : 'Añadir Nueva Tarea' }}</span>
+          <span>Editar Proyecto</span>
         </v-card-title>
         <v-card-text>
-          <v-textarea
-            v-model="editableTask.description"
-            label="Descripción de la Tarea"
-            variant="outlined"
-            rows="3"
-            class="mb-4"
-          ></v-textarea>
-          <v-row>
-            <v-col cols="12" md="6">
-              <v-text-field
-                v-model="editableTask.startDate"
-                label="Fecha de Inicio"
-                type="date"
-                variant="outlined"
-              ></v-text-field>
-            </v-col>
-            <v-col cols="12" md="6">
-              <v-text-field
-                v-model="editableTask.endDate"
-                label="Fecha de Fin"
-                type="date"
-                variant="outlined"
-              ></v-text-field>
-            </v-col>
-          </v-row>
+          <v-form @submit.prevent="saveProjectChanges">
+            <v-text-field v-model="projectForm.name" label="Nombre del Proyecto" required></v-text-field>
+            <v-textarea v-model="projectForm.description" label="Descripción"></v-textarea>
+            <v-btn color="primary" type="submit">Guardar Cambios</v-btn>
+          </v-form>
         </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn text @click="closeTaskDialog">Cancelar</v-btn>
-          <v-btn color="primary" @click="saveTask">{{ isEditingTask ? 'Guardar Cambios' : 'Añadir' }}</v-btn>
-        </v-card-actions>
       </v-card>
     </v-dialog>
 
-     <!-- Confirmation Dialog for Deleting Tasks -->
-    <v-dialog v-model="deleteTaskConfirmDialog" max-width="500px">
-      <v-card>
-        <v-card-title class="text-h5">Confirmar Eliminación</v-card-title>
-        <v-card-text>¿Estás seguro de que quieres eliminar esta tarea? Esta acción no se puede deshacer.</v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn text @click="deleteTaskConfirmDialog = false">Cancelar</v-btn>
-          <v-btn color="error" @click="deleteTaskConfirmed">Eliminar</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-
-    <!-- Dialog for Assigning Volunteers -->
-    <v-dialog v-model="assignmentDialog" max-width="500px">
+    <v-dialog v-model="roleDialog" max-width="600px">
       <v-card>
         <v-card-title>
-          <span class="text-h5">Asignar Voluntario</span>
+          <span>{{ currentRole ? 'Editar Rol' : 'Añadir Rol' }}</span>
         </v-card-title>
         <v-card-text>
-          <v-select
-            v-model="selectedVolunteerId"
-            :items="volunteerStore.volunteers"
-            item-title="name"
-            item-value="id"
-            label="Seleccionar Voluntario"
-            variant="outlined"
-            class="mb-4"
-          ></v-select>
-          <v-select
-            v-model="assignedRole"
-            :items="roleStore.customRoles"
-            item-title="name"
-            item-value="name"
-            label="Rol Asignado"
-            variant="outlined"
-            class="mb-4"
-          ></v-select>
+          <v-form @submit.prevent="saveRole">
+            <v-text-field v-model="roleForm.name" label="Nombre del Rol" required></v-text-field>
+            <v-color-picker v-model="roleForm.color" label="Color del Rol"></v-color-picker>
+            <v-btn color="primary" type="submit">{{ currentRole ? 'Guardar Cambios' : 'Añadir Rol' }}</v-btn>
+          </v-form>
         </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn text @click="closeAssignmentDialog">Cancelar</v-btn>
-          <v-btn color="primary" @click="saveAssignment">Asignar</v-btn>
-        </v-card-actions>
       </v-card>
     </v-dialog>
 
-    <!-- Dialog for Adding/Editing Roles -->
-    <v-dialog v-model="roleDialog" max-width="500px">
-      <v-card>
-        <v-card-title>
-          <span class="text-h5">{{ isEditingRole ? 'Editar Rol' : 'Crear Nuevo Rol' }}</span>
-        </v-card-title>
-        <v-card-text>
-          <v-text-field
-            v-model="editableRole.name"
-            label="Nombre del Rol"
-            variant="outlined"
-            class="mb-4"
-          ></v-text-field>
-          <v-color-picker
-            v-model="editableRole.color"
-            show-swatches
-            swatches-max-height="100"
-          ></v-color-picker>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn text @click="closeRoleDialog">Cancelar</v-btn>
-          <v-btn color="primary" @click="saveRole">{{ isEditingRole ? 'Guardar' : 'Crear' }}</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-
-    <!-- Confirmation Dialog for Deleting Roles -->
-    <v-dialog v-model="deleteRoleConfirmDialog" max-width="500px">
-      <v-card>
-        <v-card-title class="text-h5">Confirmar Eliminación</v-card-title>
-        <v-card-text>¿Estás seguro de que quieres eliminar este rol? Esta acción no se puede deshacer.</v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn text @click="deleteRoleConfirmDialog = false">Cancelar</v-btn>
-          <v-btn color="error" @click="deleteRoleConfirmed">Eliminar</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="3000">
+      {{ snackbar.text }}
+    </v-snackbar>
 
   </v-container>
 </template>
 
 <script setup>
-import { ref, onMounted, watch, computed } from 'vue';
+import { ref, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useProjectStore } from '@/features/organization/projects/stores/projectStore';
 import { useVolunteerStore } from '@/features/volunteers/stores/volunteerStore';
 import { useRoleStore } from '@/features/organization/stores/roleStore';
+import KanbanBoard from '../components/KanbanBoard.vue';
+import { formatDistanceToNow } from 'date-fns';
+import { es } from 'date-fns/locale';
 
 const route = useRoute();
 const router = useRouter();
 const projectStore = useProjectStore();
 const volunteerStore = useVolunteerStore();
 const roleStore = useRoleStore();
-const project = ref(null);
+const project = computed(() => projectStore.getProjectById(parseInt(route.params.id)));
+const editProjectDialog = ref(false);
+const projectForm = ref(null);
 
-// Computed property to filter tasks by phase ID
+// Dialog states
+const phaseDialog = ref(false);
+const currentPhase = ref(null);
+const phaseForm = ref({ name: '', description: '' });
+const manageRolesDialog = ref(false);
+const assignVolunteerDialog = ref(false);
+const selectedVolunteerId = ref(null);
+const assignedRole = ref('');
+const selectedTaskForAssignmentId = ref(null);
+const taskDialog = ref(false);
+const currentTask = ref(null);
+const taskForm = ref({
+  description: '',
+  startDate: '',
+  endDate: '',
+  status: 'Pendiente',
+  phaseId: null,
+});
+const taskStatuses = ['Pendiente', 'En Progreso', 'Completado'];
+const isViewingTask = ref(false);
+
+// Snackbar state
+const snackbar = ref({ show: false, text: '', color: '' });
+
+function showSnackbar(text, color = 'success') {
+  snackbar.value = { show: true, text, color };
+}
+
+// Computed property for tasks by phase for the structural view
 const tasksByPhase = computed(() => {
   return (phaseId) => {
     if (!project.value || !project.value.tasks) return [];
@@ -351,230 +264,217 @@ const tasksByPhase = computed(() => {
   };
 });
 
-// State for phase management
-const phaseDialog = ref(false);
-const deleteConfirmDialog = ref(false);
-const isEditingPhase = ref(false);
-const editablePhase = ref({ id: null, name: '', description: '' });
-const phaseToDeleteId = ref(null);
-
-// State for task management
-const taskDialog = ref(false);
-const deleteTaskConfirmDialog = ref(false);
-const isEditingTask = ref(false);
-const editableTask = ref({ id: null, phaseId: null, description: '', startDate: '', endDate: '' });
-const taskToDeleteId = ref(null);
-
-// State for assignment management
-const assignmentDialog = ref(false);
-const selectedVolunteerId = ref(null);
-const assignedRole = ref('');
-const activeTask = ref(null);
-
-// State for role management
-const roleDialog = ref(false);
-const isEditingRole = ref(false);
-const editableRole = ref({ id: null, name: '', color: '#FFFFFF' });
-const deleteRoleConfirmDialog = ref(false);
-const roleToDeleteId = ref(null);
-
-const fetchProjectDetails = (id) => {
-  project.value = projectStore.getProjectById(parseInt(id));
+// Activity Log
+const recentActivities = ref([]);
+const logActivity = (description, icon = 'mdi-history', color = 'grey') => {
+  recentActivities.value.unshift({ description, icon, color, timestamp: new Date() });
+  if (recentActivities.value.length > 7) { // Increased size a bit
+    recentActivities.value.pop();
+  }
 };
-
-// Functions for task management
-function openAddTaskDialog(phaseId) {
-  console.log("Opening add task dialog for phaseId:", phaseId);
-  isEditingTask.value = false;
-  editableTask.value = { id: null, phaseId: phaseId, description: '', startDate: '', endDate: '' };
-  taskDialog.value = true;
-}
-
-function openEditTaskDialog(task) {
-  isEditingTask.value = true;
-  editableTask.value = { ...task };
-  taskDialog.value = true;
-}
-
-function closeTaskDialog() {
-  console.log("Closing task dialog.");
-  taskDialog.value = false;
-  editableTask.value = { id: null, phaseId: null, description: '', startDate: '', endDate: '' };
-}
-
-function saveTask() {
-  console.log("Attempting to save task:", editableTask.value);
-  try {
-    if (isEditingTask.value) {
-      projectStore.updateProjectTask(project.value.id, editableTask.value);
-    } else {
-      projectStore.addProjectTask(project.value.id, editableTask.value.phaseId, editableTask.value);
-    }
-    console.log("Task saved successfully.");
-  } catch (error) {
-    console.error("Error saving task:", error);
-    alert("Hubo un error al guardar la tarea. Por favor, inténtalo de nuevo.");
-  } finally {
-    closeTaskDialog();
-  }
-}
-
-function confirmDeleteTask(taskId) {
-  taskToDeleteId.value = taskId;
-  deleteTaskConfirmDialog.value = true;
-}
-
-function deleteTaskConfirmed() {
-  projectStore.deleteProjectTask(project.value.id, taskToDeleteId.value);
-  deleteTaskConfirmDialog.value = false;
-}
-
-// Functions for assignment management
-function openAssignmentDialog(task) {
-  activeTask.value = task;
-  assignmentDialog.value = true;
-}
-
-function closeAssignmentDialog() {
-  assignmentDialog.value = false;
-  selectedVolunteerId.value = null;
-  assignedRole.value = '';
-  activeTask.value = null;
-}
-
-function saveAssignment() {
-  if (selectedVolunteerId.value && assignedRole.value) {
-    projectStore.assignVolunteerToTask(
-      project.value.id,
-      activeTask.value.id,
-      selectedVolunteerId.value,
-      assignedRole.value
-    );
-    closeAssignmentDialog();
-  }
-}
-
-function updateTaskStatus(task, newStatus) {
-  const statusColorMap = {
-    'Pendiente': 'orange',
-    'En Progreso': 'green',
-    'Completado': 'blue',
-  };
-  const updatedTask = { ...task, status: newStatus, statusColor: statusColorMap[newStatus] };
-  projectStore.updateProjectTask(project.value.id, updatedTask);
-  projectStore.updatePhaseStatusBasedOnTasks(project.value.id, task.phaseId);
-}
-
-// Functions for assignment management
-function openAddRoleDialog() {
-  isEditingRole.value = false;
-  editableRole.value = { id: null, name: '', color: '#FFFFFF' };
-  roleDialog.value = true;
-}
-
-function openEditRoleDialog(role) {
-  isEditingRole.value = true;
-  editableRole.value = { ...role };
-  roleDialog.value = true;
-}
-
-function closeRoleDialog() {
-  roleDialog.value = false;
-}
-
-function saveRole() {
-  if (isEditingRole.value) {
-    roleStore.updateRole(editableRole.value);
-  } else {
-    roleStore.addRole(editableRole.value);
-  }
-  closeRoleDialog();
-}
-
-function confirmDeleteRole(roleId) {
-  roleToDeleteId.value = roleId;
-  deleteRoleConfirmDialog.value = true;
-}
-
-function deleteRoleConfirmed() {
-  roleStore.deleteRole(roleToDeleteId.value);
-  deleteRoleConfirmDialog.value = false;
-}
 
 // Functions for phase management
 function openAddPhaseDialog() {
-  isEditingPhase.value = false;
-  editablePhase.value = { id: null, name: '', description: '' };
+  currentPhase.value = null;
+  phaseForm.value = { name: '', description: '' };
   phaseDialog.value = true;
 }
 
 function openEditPhaseDialog(phase) {
-  isEditingPhase.value = true;
-  editablePhase.value = { ...phase };
+  currentPhase.value = phase;
+  phaseForm.value = { ...phase };
   phaseDialog.value = true;
 }
 
-function closePhaseDialog() {
+function savePhase() {
+  if (currentPhase.value) {
+    projectStore.updateProjectPhase(project.value.id, phaseForm.value);
+    showSnackbar('Fase actualizada correctamente');
+  } else {
+    projectStore.addProjectPhase(project.value.id, phaseForm.value);
+    showSnackbar('Fase añadida correctamente');
+  }
   phaseDialog.value = false;
 }
 
-function savePhase() {
-  if (isEditingPhase.value) {
-    projectStore.updateProjectPhase(project.value.id, editablePhase.value);
-  } else {
-    projectStore.addProjectPhase(project.value.id, editablePhase.value);
-  }
-  closePhaseDialog();
-}
-
 function confirmDeletePhase(phaseId) {
-  phaseToDeleteId.value = phaseId;
-  deleteConfirmDialog.value = true;
+  if (confirm('¿Estás seguro de que quieres eliminar esta fase? Se eliminarán todas las tareas asociadas.')) {
+    projectStore.deleteProjectPhase(project.value.id, phaseId);
+    showSnackbar('Fase eliminada correctamente', 'error');
+  }
 }
 
-function deletePhaseConfirmed() {
-  projectStore.deleteProjectPhase(project.value.id, phaseToDeleteId.value);
-  deleteConfirmDialog.value = false;
+
+function confirmDeleteTask(taskId) {
+  if (confirm('¿Estás seguro de que quieres eliminar esta tarea?')) {
+    projectStore.deleteProjectTask(project.value.id, taskId);
+    showSnackbar('Tarea eliminada correctamente', 'error');
+  }
 }
 
-function updatePhaseStatus(phase, newStatus) {
-  const statusColorMap = {
-    'Pendiente': 'orange',
-    'En Progreso': 'green',
-    'Completado': 'blue',
+// Functions for task management (with logging)
+const saveTask = () => {
+  if (!project.value) return;
+
+  if (currentTask.value) {
+    // Update existing task
+    projectStore.updateProjectTask(project.value.id, {
+      ...currentTask.value,
+      ...taskForm.value,
+    });
+    logActivity(`Tarea '${taskForm.value.description}' actualizada.`, 'mdi-check-circle', 'success');
+    showSnackbar('Tarea actualizada correctamente');
+  } else {
+    // Add new task
+    projectStore.addProjectTask(project.value.id, taskForm.value.phaseId, taskForm.value);
+    logActivity(`Nueva tarea '${taskForm.value.description}' añadida.`, 'mdi-plus-circle', 'primary');
+    showSnackbar('Tarea añadida correctamente');
+  }
+  taskDialog.value = false;
+  currentTask.value = null;
+  // Reset form
+  taskForm.value = {
+    description: '',
+    startDate: '',
+    endDate: '',
+    status: 'Pendiente',
+    phaseId: null,
   };
-  const updatedPhase = { ...phase, status: newStatus, statusColor: statusColorMap[newStatus] };
-  projectStore.updateProjectPhase(project.value.id, updatedPhase);
-}
+};
 
-function saveProjectChanges() {
-  if (project.value) {
-    projectStore.updateProject(project.value);
-    alert('Cambios guardados exitosamente!');
-  }
-}
+// ... other functions with logging ...
 
-onMounted(() => {
-  if (route.params.id) {
-    fetchProjectDetails(route.params.id);
+// Fetch project details on mount and route change
+
+
+// Placeholder for other functions that need to be defined
+const saveProjectChanges = () => {
+  if (projectForm.value) {
+    projectStore.updateProject(projectForm.value);
+    showSnackbar('Proyecto actualizado correctamente');
+    editProjectDialog.value = false;
   }
+};
+
+const openEditProjectDialog = () => {
+  projectForm.value = { ...project.value };
+  editProjectDialog.value = true;
+};
+
+const openAddTaskDialog = (task = null, phaseId = null) => {
+  currentTask.value = task;
+  isViewingTask.value = !!task; // Set to true if task exists, false otherwise
+  if (task) {
+    taskForm.value = {
+      description: task.description,
+      startDate: task.startDate,
+      endDate: task.endDate,
+      status: task.status,
+      phaseId: task.phaseId,
+    };
+    logActivity(`Abriendo diálogo para ${isViewingTask.value ? 'ver' : 'editar'} tarea: ${task.description}.`, 'mdi-playlist-edit', 'warning');
+  } else {
+    taskForm.value = {
+      description: '',
+      startDate: '',
+      endDate: '',
+      status: 'Pendiente',
+      phaseId: phaseId || (project.value.phases.length > 0 ? project.value.phases[0].id : null),
+    };
+    logActivity('Abriendo diálogo para añadir nueva tarea.', 'mdi-playlist-plus', 'info');
+  }
+  taskDialog.value = true;
+};
+
+const openEditTaskDialog = (task) => {
+  // This function is called from KanbanBoard when a task is clicked
+  openAddTaskDialog(task);
+};
+
+const roleDialog = ref(false);
+const currentRole = ref(null);
+const roleForm = ref({ name: '', color: '' });
+
+const openAddRoleDialog = () => {
+  currentRole.value = null;
+  roleForm.value = { name: '', color: '#FFFFFF' };
+  roleDialog.value = true;
+};
+
+const openEditRoleDialog = (role) => {
+  currentRole.value = role;
+  roleForm.value = { ...role };
+  roleDialog.value = true;
+};
+
+const saveRole = () => {
+  if (currentRole.value) {
+    roleStore.updateRole(roleForm.value);
+    showSnackbar('Rol actualizado correctamente');
+  } else {
+    roleStore.addRole(roleForm.value);
+    showSnackbar('Rol añadido correctamente');
+  }
+  roleDialog.value = false;
+};
+
+const confirmDeleteRole = (roleId) => {
+  if (confirm('¿Estás seguro de que quieres eliminar este rol?')) {
+    roleStore.deleteRole(roleId);
+    showSnackbar('Rol eliminado correctamente', 'error');
+  }
+};
+
+const updateTaskStatusFromKanban = ({ taskId, newStatus }) => {
+  if (!project.value) return;
+  const taskToUpdate = project.value.tasks.find(task => task.id === parseInt(taskId, 10));
+  if (taskToUpdate) {
+    projectStore.updateProjectTask(project.value.id, { ...taskToUpdate, status: newStatus });
+    logActivity(`Estado de la tarea '${taskToUpdate.description}' actualizado a: ${newStatus}.`, 'mdi-check-circle', 'success');
+  }
+};
+
+const projectProgress = computed(() => {
+  if (!project.value || !project.value.tasks) {
+    return { percentage: 0, completedTasks: 0, totalTasks: 0 };
+  }
+  const totalTasks = project.value.tasks.length;
+  const completedTasks = project.value.tasks.filter(t => t.status === 'Completado').length;
+  const percentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+  return { percentage, completedTasks, totalTasks };
 });
 
-watch(() => route.params.id, (newId) => {
-  if (newId) {
-    fetchProjectDetails(newId);
-  }
+const availableVolunteers = computed(() => {
+  return volunteerStore.volunteers.map(v => ({
+    id_voluntario: v.id,
+    name: v.name,
+  }));
 });
+
+const openAssignVolunteerDialog = () => {
+  assignVolunteerDialog.value = true;
+};
+
+const assignVolunteerToTask = () => {
+  if (selectedTaskForAssignmentId.value && selectedVolunteerId.value) {
+    projectStore.assignVolunteerToTask(
+      project.value.id,
+      selectedTaskForAssignmentId.value,
+      selectedVolunteerId.value,
+      assignedRole.value || 'Voluntario' // Default role if not specified
+    );
+    logActivity(`Voluntario ${availableVolunteers.value.find(v => v.id_voluntario === selectedVolunteerId.value)?.name || 'desconocido'} asignado a la tarea ${project.value.tasks.find(t => t.id === selectedTaskForAssignmentId.value)?.description || 'desconocida'}`, 'mdi-account-check', 'success');
+    assignVolunteerDialog.value = false;
+    selectedVolunteerId.value = null;
+    assignedRole.value = '';
+    selectedTaskForAssignmentId.value = null;
+  }
+};
+
 </script>
 
 <style scoped>
-.highlight-card {
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.highlight-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 30px -5px rgba(0,0,0,0.1) !important;
+.project-detail-view {
+  background-color: #f8f9fa;
 }
 </style>

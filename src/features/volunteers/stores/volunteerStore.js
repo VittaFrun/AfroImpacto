@@ -9,6 +9,11 @@ export const useVolunteerStore = defineStore('volunteer', () => {
     { id: 3, name: 'Beatriz Gómez', skills: ['Recaudación de fondos', 'Comunicación'] },
     { id: 4, name: 'David Fernández', skills: ['Tecnología', 'Capacitación'] },
     { id: 5, name: 'Elena Castillo', skills: ['Agricultura', 'Medio ambiente'] },
+    { id: 6, name: 'Francisco Javier', skills: ['Diseño gráfico', 'Marketing'] },
+    { id: 7, name: 'Gloria Pérez', skills: ['Cocina', 'Organización de eventos'] },
+    { id: 8, name: 'Hugo Sánchez', skills: ['Carpintería', 'Fontanería'] },
+    { id: 9, name: 'Irene Molina', skills: ['Traducción (Inglés)', 'Redacción'] },
+    { id: 10, name: 'Javier Torres', skills: ['Primeros auxilios', 'Conducción'] },
   ]);
 
   // Getters

@@ -1,46 +1,6 @@
-│  > me gustaria darle algo mas de personalizacion a la creacion de roles, en la vista de projectdatail, podriamos agregar una card donde podamos   │
-│    gestionar esa parte como la creacion del rol, color y demas estilos de personalizacion                                                         │
-╰───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
-
-✦ ¡Excelente idea! Añadir un sistema de roles personalizados con colores y estilos mejorará enormemente la organización visual y la gestión de las tareas.
-
-  Basado en tu solicitud, propongo la siguiente estrategia para implementar esta funcionalidad de manera limpia y escalable.
-
-  Estrategia de Implementación
-
-  1. Crear un Nuevo Store para Roles (roleStore.js)
-
-  Para mantener la lógica de los roles separada y reutilizable, crearé un nuevo store dedicado a ellos. Esto nos permitirá, en el futuro, usar estos
-  mismos roles en otros proyectos si fuera necesario.
-
-   * Ubicación: src/features/organization/stores/roleStore.js
-   * Contenido:
-       * Estado (`state`): Un array customRoles que contendrá objetos de rol con id, name y color. Lo inicializaré con algunos datos de ejemplo.
-       * Acciones (`actions`): Funciones para gestionar los roles: addRole, updateRole y deleteRole.
-
-  2. Añadir la Nueva Tarjeta de "Gestión de Roles" en ProjectDetailView.vue
-
-  Añadiré una nueva tarjeta en la columna derecha de la vista de detalles del proyecto.
-
-   * Diseño de la Tarjeta:
-       * Mostrará una lista de los roles personalizados existentes.
-       * Cada rol en la lista tendrá una vista previa de su color (usando un v-chip o similar) y botones para Editar y Eliminar.
-       * Un botón principal "Crear Nuevo Rol" permitirá añadir roles a la lista.
-
-   * Diálogo de Creación/Edición:
-       * Al hacer clic en "Crear" o "Editar", se abrirá un diálogo (modal).
-       * Este diálogo contendrá un campo de texto para el nombre del rol y un selector de color (v-color-picker) para una personalización intuitiva.
-
-  3. Integrar los Roles Personalizados en el Flujo de Asignación
-
-  El objetivo final es usar estos roles. Por lo tanto, modificaré el proceso de asignación de voluntarios:
-
-   * Actualizar el Diálogo de Asignación:
-       * En el diálogo "Asignar Voluntario", reemplazaré el campo de texto libre para el "Rol Asignado" por un menú desplegable (`v-select`).
-       * Este desplegable se poblará con los roles personalizados que acabamos de crear en el roleStore.
-
-   * Visualización Mejorada:
-       * Cuando se asigne un voluntario, el chip que lo representa en la lista de tareas usará el color del rol que se le ha asignado, proporcionando una
-         referencia visual inmediata.
-
-  Este plan nos permitirá construir una funcionalidad robusta y bien integrada.
+[plugin:vite:import-analysis] Failed to parse source for import analysis because the content contains invalid JS syntax. If you are using JSX, make sure to name the file with the .jsx or .tsx extension.
+C:/Users/Aprendiz.MONAPRRCBFSD056/Desktop/AfroImpacto/src/features/organization/projects/stores/projectStore.js:1:40
+1  |  """import { defineStore } from 'pinia';
+   |                                         ^
+2  |  import { ref, computed } from 'vue';
+3  |  import defaultCoverImage from '@/assets/images/background_login.png';
