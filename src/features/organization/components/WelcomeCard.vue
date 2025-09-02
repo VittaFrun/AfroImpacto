@@ -8,7 +8,7 @@
         <v-icon size="64" color="white" class="welcome-icon">mdi-hand-wave</v-icon>
       </v-col>
       <v-col>
-        <h2 class="text-h4 font-extrabold mb-3">¡Bienvenida, Organización XYZ!</h2>
+        <h2 class="text-h4 font-extrabold mb-3">¡Bienvenido!</h2>
         <p class="text-body-1 mb-6" style="opacity: 0.95;">
           Aquí puedes gestionar tus proyectos, donaciones y voluntarios de manera eficiente.
           Mantente al día con la actividad reciente y el progreso de tus iniciativas.

@@ -46,7 +46,7 @@
               color="primary"
               hide-details
             />
-            <router-link to="/forgot-password" class="text-body-2 text-primary font-weight-bold text-decoration-none">¿Olvidaste tu contraseña?</router-link>
+            <router-link to="/auth/forgot-password" class="text-body-2 text-primary font-weight-bold text-decoration-none">¿Olvidaste tu contraseña?</router-link>
           </div>
 
           <v-btn
@@ -63,7 +63,7 @@
 
         <div class="mt-8 text-center text-body-2">
           <span class="text-subtitle-color">¿No tienes cuenta?</span>
-          <router-link to="/register" class="text-primary font-weight-bold text-decoration-none ml-2">Regístrate aquí</router-link>
+          <router-link to="/auth/register" class="text-primary font-weight-bold text-decoration-none ml-2">Regístrate aquí</router-link>
         </div>
       </div>
     </template>
@@ -71,15 +71,36 @@
       <InfoCarousel />
     </template>
   </AuthLayout>
+
+  <v-snackbar
+    v-model="snackbar.show"
+    :timeout="snackbar.timeout"
+    :color="snackbar.color"
+    location="bottom right"
+  >
+    {{ snackbar.message }}
+    <template v-slot:actions>
+      <v-btn
+        color="white"
+        variant="text"
+        @click="snackbar.show = false"
+      >
+        Cerrar
+      </v-btn>
+    </template>
+  </v-snackbar>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import AuthLayout from '@/layouts/AuthLayout.vue';
 import InfoCarousel from '@/features/auth/components/InfoCarousel.vue';
 
+import { useAuthStore } from '@/features/auth/stores/authStore';
+
 const router = useRouter();
+const authStore = useAuthStore();
 
 const email = ref('');
 const password = ref('');
@@ -87,6 +108,13 @@ const showPassword = ref(false);
 const rememberMe = ref(false);
 const loading = ref(false);
 const loginForm = ref(null);
+
+const snackbar = ref({
+  show: false,
+  message: '',
+  color: 'error',
+  timeout: 3000,
+});
 
 const emailRules = [
   v => !!v || 'El correo es requerido',
@@ -102,15 +130,32 @@ const handleLogin = async () => {
   if (!valid) return;
 
   loading.value = true;
-  try {
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    console.log('Iniciando sesión...', { email: email.value });
-    router.push('/');
-  } catch (error) {
-    console.error(error);
-  } finally {
-    loading.value = false;
+  const success = await authStore.login({
+    email: email.value,
+    password: password.value,
+  });
+
+  if (success) {
+    // Espera a que Vue actualice las propiedades computadas como userRole
+    await nextTick();
+    
+    if (authStore.userRole === 'organizacion') {
+      router.push({ name: 'organization-dashboard' });
+    } else if (authStore.userRole === 'voluntario') {
+      router.push({ name: 'volunteer-dashboard' });
+    } else {
+      router.push('/'); // Fallback por si no hay rol
+    }
+  } else {
+    snackbar.value = {
+      show: true,
+      message: authStore.error || 'Email o contraseña incorrectos.',
+      color: 'error',
+      timeout: 3000,
+    };
   }
+
+  loading.value = false;
 };
 </script>
 

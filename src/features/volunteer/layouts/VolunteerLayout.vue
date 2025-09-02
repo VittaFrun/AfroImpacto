@@ -1,35 +1,19 @@
 <!--
-  Este es el componente principal para el Dashboard de la Organización.
-  Está construido con Vuetify y sigue una estructura de layout moderna con una barra de navegación lateral y un área de contenido principal.
+  Este es el componente principal para el Dashboard del Voluntario.
 -->
 <template>
   <v-app>
-    <!-- 
-      BARRA DE NAVEGACIÓN SUPERIOR (App Bar)
-      - Es fija (`app`) y transparente (`flat`, `color="transparent"`) con un borde inferior.
-      - Contiene el título, un campo de búsqueda, notificaciones y un menú de usuario.
-      - El ícono de navegación (`v-app-bar-nav-icon`) solo aparece en pantallas pequeñas (`d-md-none`) para abrir/cerrar el menú lateral.
-    -->
     <v-app-bar color="white" class="app-bar-style" flat elevation="2">
       <v-app-bar-nav-icon @click="drawer = !drawer" class="d-md-none"></v-app-bar-nav-icon>
       <div class="d-flex align-center">
-        <v-icon class="mr-2 text-primary" size="32">mdi-alpha-a-box</v-icon>
-        <v-toolbar-title class="font-weight-bold text-primary">Afro Impacto</v-toolbar-title>
+        <v-icon class="mr-2 text-primary" size="32">mdi-account-heart</v-icon>
+        <v-toolbar-title class="font-weight-bold text-primary">Portal del Voluntario</v-toolbar-title>
       </div>
       <v-spacer></v-spacer>
-      <v-btn 
-        color="primary" 
-        variant="flat" 
-        class="d-none d-md-flex rounded-pill new-project-btn"
-        @click="createNewProject"
-      >
-        <v-icon start>mdi-plus</v-icon>
-        Nuevo Proyecto
-      </v-btn>
 
       <div class="d-flex align-center ml-6">
         <v-btn icon class="mr-1" aria-label="Notificaciones" style="color: #2c3e50;">
-          <v-badge content="3" color="red-accent-2">
+          <v-badge dot color="red-accent-2">
             <v-icon>mdi-bell</v-icon>
           </v-badge>
         </v-btn>
@@ -39,44 +23,37 @@
               <v-icon size="large" style="color: #2c3e50;">mdi-account-circle</v-icon>
             </v-btn>
           </template>
-        <v-list density="compact" class="user-menu-list pa-2">
-          <v-list-item class="mb-2">
-            <template v-slot:prepend>
-              <v-avatar color="primary" size="40" class="mr-3">
-                <span class="white--text text-h6">O</span>
-              </v-avatar>
-            </template>
-            <v-list-item-title class="font-weight-bold">Organización XYZ</v-list-item-title>
-            <v-list-item-subtitle>admin@organizacion.com</v-list-item-subtitle>
-          </v-list-item>
-          <v-divider></v-divider>
-          <div class="mt-2">
-            <v-list-item link @click="goToProfile" class="user-menu-item">
-              <template v-slot:prepend><v-icon>mdi-account-cog-outline</v-icon></template>
-              <v-list-item-title>Mi Perfil</v-list-item-title>
+          <v-list density="compact" class="user-menu-list pa-2">
+            <v-list-item class="mb-2" v-if="authStore.user">
+              <template v-slot:prepend>
+                <v-avatar color="primary" size="40" class="mr-3">
+                  <v-icon>mdi-account</v-icon>
+                </v-avatar>
+              </template>
+              <v-list-item-title class="font-weight-bold">{{ authStore.user.nombre }}</v-list-item-title>
+              <v-list-item-subtitle>{{ authStore.user.correo }}</v-list-item-subtitle>
             </v-list-item>
-            <v-list-item link @click="goToSettings" class="user-menu-item">
-              <template v-slot:prepend><v-icon>mdi-cog-outline</v-icon></template>
-              <v-list-item-title>Configuración</v-list-item-title>
+            <v-divider></v-divider>
+            <div class="mt-2">
+              <v-list-item link @click="goToProfile" class="user-menu-item">
+                <template v-slot:prepend><v-icon>mdi-account-cog-outline</v-icon></template>
+                <v-list-item-title>Mi Perfil</v-list-item-title>
+              </v-list-item>
+              <v-list-item link @click="goToSettings" class="user-menu-item">
+                <template v-slot:prepend><v-icon>mdi-cog-outline</v-icon></template>
+                <v-list-item-title>Configuración</v-list-item-title>
+              </v-list-item>
+            </div>
+            <v-divider></v-divider>
+            <v-list-item link @click="handleLogout" class="logout-item mt-2">
+              <template v-slot:prepend><v-icon>mdi-logout</v-icon></template>
+              <v-list-item-title>Cerrar Sesión</v-list-item-title>
             </v-list-item>
-          </div>
-          <v-divider></v-divider>
-          <v-list-item link @click="logout" class="logout-item mt-2">
-            <template v-slot:prepend><v-icon>mdi-logout</v-icon></template>
-            <v-list-item-title>Cerrar Sesión</v-list-item-title>
-          </v-list-item>
-        </v-list>
-      </v-menu>
+          </v-list>
+        </v-menu>
       </div>
     </v-app-bar>
 
-    <!-- 
-      MENÚ DE NAVEGACIÓN LATERAL (Navigation Drawer)
-      - Es flotante (`floating`) y permanente en pantallas grandes (`permanent="$vuetify.display.mdAndUp"`).
-      - Puede minimizarse (`mini-variant`) para ahorrar espacio.
-      - El ancho (`width`) se ajusta dinámicamente si está minimizado o no.
-      - Contiene la lista de enlaces de navegación del dashboard.
-    -->
     <v-navigation-drawer
       v-model="drawer"
       :permanent="$vuetify.display.mdAndUp"
@@ -105,7 +82,7 @@
       <v-divider></v-divider>
 
       <v-list nav density="compact" class="mt-4">
-        <v-list-item v-for="item in items" :key="item.text" :value="item.text" :to="item.route" :active="isActive(item.route)" link class="nav-item mx-2 mb-1">
+        <v-list-item v-for="item in items" :key="item.text" :to="item.route" link class="nav-item mx-2 mb-1">
           <template v-slot:prepend>
             <v-icon :icon="item.icon"></v-icon>
           </template>
@@ -114,12 +91,6 @@
       </v-list>
     </v-navigation-drawer>
 
-    <!-- 
-      CONTENIDO PRINCIPAL (Main Content)
-      - Aquí es donde se renderiza el contenido principal del dashboard.
-      - Muestra un indicador de carga (`v-progress-circular`) mientras los datos se están obteniendo.
-      - Una vez cargados los datos, muestra los diferentes componentes del dashboard (WelcomeCard, MetricCards, etc.).
-    -->
     <v-main>
       <router-view v-slot="{ Component }">
         <Transition name="slide-fade" mode="out-in">
@@ -131,84 +102,38 @@
 </template>
 
 <script setup>
-// --- SCRIPT (LÓGICA DEL COMPONENTE) ---
-
-// Importaciones de Vue y Pinia
-import { ref, computed, watch, onMounted } from 'vue';
+import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/features/auth/stores/authStore';
 
-// --- ESTADO DEL LAYOUT ---
-// `drawer`: controla si el menú lateral está visible o no (especialmente en móvil).
 const drawer = ref(null);
-// `miniVariant`: controla si el menú está minimizado.
 const miniVariant = ref(false);
-// `drawerWidth`: calcula el ancho del menú dependiendo de si está minimizado.
 const drawerWidth = computed(() => miniVariant.value ? 100 : 280);
 
-// --- ELEMENTOS DE NAVEGACIÓN ---
-// `selectedItem`: mantiene el elemento de la lista que está seleccionado.
-const selectedItem = ref(null);
-// `items`: un array de objetos que define los enlaces del menú lateral.
 const items = ref([
-  { text: 'Dashboard', icon: 'mdi-view-dashboard', route: '/organization/dashboard' },
-  { text: 'Proyectos', icon: 'mdi-folder-multiple', route: '/organization/dashboard/projects' },
-  { text: 'Voluntarios', icon: 'mdi-account-group', route: '/organization/dashboard/volunteers' },
-  { text: 'Donaciones', icon: 'mdi-cash-multiple', route: '/organization/dashboard/donations' },
-  { text: 'Reportes', icon: 'mdi-file-chart', route: '/organization/dashboard/reports' },
-  { text: 'Configuración', icon: 'mdi-cog', route: '/organization/dashboard/settings' },
+  { text: 'Dashboard', icon: 'mdi-view-dashboard', route: '/volunteer/dashboard' },
+  { text: 'Mis Proyectos', icon: 'mdi-folder-heart', route: '/volunteer/projects' },
+  { text: 'Mi Perfil', icon: 'mdi-account-star', route: '/volunteer/profile' },
+  { text: 'Disponibilidad', icon: 'mdi-calendar-clock', route: '/volunteer/availability' },
+  { text: 'Configuración', icon: 'mdi-cog', route: '/volunteer/settings' },
 ]);
 
 const router = useRouter();
-
-function createNewProject() {
-  router.push('/organization/dashboard/projects/create');
-}
+const authStore = useAuthStore();
 
 function goToProfile() {
-  // Navegar a perfil
-  console.log('Ir a perfil');
+  router.push('/volunteer/profile');
 }
 
 function goToSettings() {
-  // Navegar a configuración
-  console.log('Ir a configuración');
+  router.push('/volunteer/settings');
 }
 
-function logout() {
-  // Lógica de cierre de sesión
-  console.log('Cerrar sesión');
+async function handleLogout() {
+  await authStore.logout();
+  router.push('/auth/login');
 }
-
-const isActive = (routePath) => {
-  const currentRoute = router.currentRoute.value;
-  const currentPath = currentRoute.path;
-
-  // Find all items whose route is a prefix of currentPath
-  const matchingItems = items.value.filter(item => currentPath.startsWith(item.route));
-
-  if (matchingItems.length === 0) {
-    return false;
-  }
-
-  // Find the item with the longest route prefix match
-  const longestMatch = matchingItems.reduce((prev, curr) => {
-    return curr.route.length > prev.route.length ? curr : prev;
-  });
-
-  // Return true if the routePath matches the longest matching item's route
-  return routePath === longestMatch.route;
-};
-
-// Sincronizar selectedItem con la ruta actual al cargar y al cambiar la ruta
-onMounted(() => {
-  // No es necesario aquí, ya que isActive se encarga de la reactividad
-});
-
-watch(() => router.currentRoute.value, (newRoute) => {
-  // No es necesario aquí, ya que isActive se encarga de la reactividad
-});
 </script>
-
 
 <style>
 /* --- ESTILOS GLOBALES PARA EL DASHBOARD --- */
@@ -377,8 +302,6 @@ watch(() => router.currentRoute.value, (newRoute) => {
     display: none;
   }
 }
-
-
 </style>
 
 <style scoped>

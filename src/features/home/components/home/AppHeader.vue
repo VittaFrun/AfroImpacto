@@ -32,11 +32,11 @@ const handleScrollToSection = (section) => {
 };
 
 const goToLogin = () => {
-  router.push('/login');
+  router.push('/auth/login');
 };
 
 const goToRegister = () => {
-  router.push('/register');
+  router.push('/auth/register');
 };
 </script>
 

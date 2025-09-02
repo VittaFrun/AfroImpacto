@@ -18,20 +18,20 @@
     </v-card-text>
     <div class="d-flex justify-center mt-2 text-body-2 text-grey-darken-1">
       <div class="mx-2 d-flex align-center">
-        <v-sheet class="w-3 h-3 rounded-circle bg-green-lighten-2 mr-1"></v-sheet> Activos: 70%
+        <v-sheet class="w-3 h-3 rounded-circle bg-green-lighten-2 mr-1"></v-sheet> Activos: 0%
       </div>
       <div class="mx-2 d-flex align-center">
-        <v-sheet class="w-3 h-3 rounded-circle bg-blue-lighten-2 mr-1"></v-sheet> Completados: 20%
+        <v-sheet class="w-3 h-3 rounded-circle bg-blue-lighten-2 mr-1"></v-sheet> Completados: 0%
       </div>
       <div class="mx-2 d-flex align-center">
-        <v-sheet class="w-3 h-3 rounded-circle bg-orange-lighten-2 mr-1"></v-sheet> Pendientes: 10%
+        <v-sheet class="w-3 h-3 rounded-circle bg-orange-lighten-2 mr-1"></v-sheet> Pendientes: 0%
       </div>
     </div>
   </v-card>
 </template>
 
 <script setup>
-import { defineProps } from 'vue';
+
 
 defineProps({
   projectStatusData: {

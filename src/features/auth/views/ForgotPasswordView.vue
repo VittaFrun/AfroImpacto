@@ -35,7 +35,7 @@
         </v-form>
 
         <div class="mt-8 text-center text-body-2">
-          <router-link to="/login" class="text-primary font-weight-bold text-decoration-none">Volver a Iniciar Sesión</router-link>
+          <router-link to="/auth/login" class="text-primary font-weight-bold text-decoration-none">Volver a Iniciar Sesión</router-link>
         </div>
       </div>
     </template>

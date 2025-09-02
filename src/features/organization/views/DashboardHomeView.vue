@@ -1,6 +1,19 @@
 <template>
   <v-container fluid class="pa-8">
-    <div>
+    <div v-if="loading" class="d-flex justify-center align-center" style="height: 60vh;">
+      <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
+    </div>
+    
+    <div v-else-if="error" class="d-flex justify-center align-center" style="height: 60vh;">
+      <v-alert type="error" prominent>
+        {{ error }}
+        <v-btn @click="retryFetch" class="mt-4" color="white" variant="outlined">
+          Reintentar
+        </v-btn>
+      </v-alert>
+    </div>
+    
+    <div v-else>
       <v-row class="mb-6">
         <v-col cols="12"><WelcomeCard /></v-col>
       </v-row>
@@ -31,14 +44,19 @@ import DonationTrendChart from '@/features/organization/components/DonationTrend
 
 const dashboardStore = useDashboardStore();
 const { 
-   
   metrics, 
   recentActivities, 
   upcomingTasks, 
   projectStatusData, 
   donationTrendData, 
-  sparklineGradient 
+  sparklineGradient,
+  loading,
+  error
 } = storeToRefs(dashboardStore);
+
+const retryFetch = () => {
+  dashboardStore.fetchDashboardData();
+};
 
 onMounted(() => {
   dashboardStore.fetchDashboardData();

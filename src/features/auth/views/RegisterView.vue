@@ -1,4 +1,3 @@
-
 <template>
   <AuthLayout>
     <template #form>
@@ -109,7 +108,7 @@
 
         <div class="mt-8 text-center text-body-2">
           <span class="text-subtitle-color">¿Ya tienes cuenta?</span>
-          <router-link to="/login" class="text-primary font-weight-bold text-decoration-none ml-2">Inicia Sesión</router-link>
+          <router-link to="/auth/login" class="text-primary font-weight-bold text-decoration-none ml-2">Inicia Sesión</router-link>
         </div>
       </div>
     </template>
@@ -141,9 +140,11 @@
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import AuthLayout from '@/layouts/AuthLayout.vue';
+import { useAuthStore } from '@/features/auth/stores/authStore';
 import InfoCarousel from '@/features/auth/components/InfoCarousel.vue';
 
 const router = useRouter();
+const authStore = useAuthStore();
 
 const fullName = ref('');
 const registerEmail = ref('');
@@ -210,33 +211,32 @@ const handleRegister = async () => {
   if (!valid) return;
 
   loading.value = true;
-  try {
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    console.log('Registrando...', {
-      fullName: fullName.value,
-      email: registerEmail.value,
-      role: registerRole.value,
-    });
+  const success = await authStore.register({
+    nombre: fullName.value,
+    email: registerEmail.value,
+    password: registerPassword.value,
+    tipo_usuario: registerRole.value,
+  });
+
+  if (success) {
+    loading.value = false; // Stop loading indicator
     snackbar.value = {
       show: true,
-      message: '¡Usuario creado con éxito!',
+      message: '¡Registro exitoso! Serás redirigido para iniciar sesión.',
       color: 'success',
-      timeout: 2000,
+      timeout: 3000,
     };
-    // Opcional: Redirigir después de un breve retraso para que el usuario vea el snackbar
     setTimeout(() => {
-      router.push('/login');
-    }, snackbar.value.timeout);
-  } catch (error) {
-    console.error(error);
+      router.push({ name: 'login' });
+    }, 2000);
+  } else {
+    loading.value = false;
     snackbar.value = {
       show: true,
-      message: 'Error al crear usuario.',
+      message: authStore.error || 'Error al crear la cuenta.',
       color: 'error',
-      timeout: 1000,
+      timeout: 3000,
     };
-  } finally {
-    loading.value = false;
   }
 };
 </script>

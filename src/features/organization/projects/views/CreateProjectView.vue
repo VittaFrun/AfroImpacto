@@ -1,106 +1,53 @@
 <template>
   <v-container fluid class="pa-8">
     <v-card class="project-create-card" elevation="0" variant="flat">
-    <v-card-title class="text-h5 font-weight-bold pa-6" style="color: #344767;">
-      Crear Nuevo Proyecto
-    </v-card-title>
+      <v-card-title class="text-h5 font-weight-bold pa-6" style="color: #344767;">
+        {{ isEditing ? 'Editar Proyecto' : 'Crear Nuevo Proyecto' }}
+      </v-card-title>
       <v-divider></v-divider>
 
       <v-stepper v-model="currentStep" class="elevation-0">
         <v-stepper-header class="elevation-0">
-          <v-stepper-item
-            title="Información Básica"
-            :value="1"
-            :complete="currentStep > 1"
-          ></v-stepper-item>
-
+          <v-stepper-item title="Información Básica" :value="1" :complete="currentStep > 1"></v-stepper-item>
           <v-divider></v-divider>
-
-          <v-stepper-item
-            title="Fases del Proyecto"
-            :value="2"
-            :complete="currentStep > 2"
-          ></v-stepper-item>
-
+          <v-stepper-item title="Fases del Proyecto" :value="2" :complete="currentStep > 2"></v-stepper-item>
           <v-divider></v-divider>
-
-          <v-stepper-item
-            title="Revisión y Envío"
-            :value="3"
-          ></v-stepper-item>
+          <v-stepper-item title="Revisión y Envío" :value="3"></v-stepper-item>
         </v-stepper-header>
 
         <v-stepper-window>
-          <!-- Paso 1: Información Básica -->
+          <!-- Step 1: Basic Information -->
           <v-stepper-window-item :value="1">
             <v-card-text>
               <v-row>
                 <v-col cols="12">
-                  <v-text-field
-                    v-model="project.name"
-                    label="Nombre del Proyecto"
-                    variant="outlined"
-                    color="primary"
-                  ></v-text-field>
+                  <v-text-field v-model="project.name" label="Nombre del Proyecto" variant="outlined"
+                    color="primary"></v-text-field>
                 </v-col>
                 <v-col cols="12">
-                  <v-textarea
-                    v-model="project.description"
-                    label="Descripción Corta"
-                    variant="outlined"
-                    color="primary"
-                    rows="3"
-                  ></v-textarea>
+                  <v-textarea v-model="project.description" label="Descripción Corta" variant="outlined" color="primary"
+                    rows="3"></v-textarea>
                 </v-col>
                 <v-col cols="12">
-                  <v-textarea
-                    v-model="project.objective"
-                    label="Objetivo Principal"
-                    variant="outlined"
-                    color="primary"
-                    rows="3"
-                  ></v-textarea>
+                  <v-textarea v-model="project.objective" label="Objetivo Principal" variant="outlined" color="primary"
+                    rows="3"></v-textarea>
                 </v-col>
                 <v-col cols="12" md="6">
-                  <v-text-field
-                    v-model="project.location"
-                    label="Ubicación"
-                    variant="outlined"
-                    color="primary"
-                    prepend-inner-icon="mdi-map-marker"
-                  ></v-text-field>
+                  <v-text-field v-model="project.location" label="Ubicación" variant="outlined" color="primary"
+                    prepend-inner-icon="mdi-map-marker"></v-text-field>
                 </v-col>
                 <v-col cols="12" md="6">
-                  <v-file-input
-                    v-model="project.coverImage"
-                    label="Imagen de Portada"
-                    variant="outlined"
-                    color="primary"
-                    prepend-icon=""
-                    prepend-inner-icon="mdi-image"
-                    accept="image/*"
-                    @change="previewCoverImage"
-                  ></v-file-input>
+                  <v-file-input :model-value="project.coverImage ? [project.coverImage] : []"
+                    @update:model-value="handleCoverImageUpdate" label="Imagen de Portada" variant="outlined"
+                    color="primary" prepend-icon="" prepend-inner-icon="mdi-image" accept="image/*"></v-file-input>
                 </v-col>
                 <v-col v-if="coverImagePreview" cols="12">
                   <p class="text-subtitle-1 font-weight-bold">Vista Previa de la Imagen:</p>
-                  <v-img
-                    :src="coverImagePreview"
-                    max-height="200"
-                    contain
-                    class="mt-2"
-                  ></v-img>
+                  <v-img :src="coverImagePreview" max-height="200" contain class="mt-2"></v-img>
                 </v-col>
                 <v-col cols="12" md="6">
-                   <v-file-input
-                    v-model="project.files"
-                    label="Adjuntar Documentos"
-                    multiple
-                    variant="outlined"
-                    color="primary"
-                    prepend-icon=""
-                    prepend-inner-icon="mdi-paperclip"
-                  >
+                  <v-file-input v-model="project.files" label="Adjuntar Documentos" multiple variant="outlined"
+                    color="primary" prepend-icon="" prepend-inner-icon="mdi-paperclip">
                     <template v-slot:selection="{ fileNames }">
                       <template v-for="fileName in fileNames" :key="fileName">
                         <v-chip class="ma-1" color="primary" label size="small">
@@ -110,49 +57,29 @@
                     </template>
                   </v-file-input>
                 </v-col>
-                 <v-col cols="12" md="6">
-                  <v-text-field
-                    v-model="project.startDate"
-                    label="Fecha de Inicio"
-                    type="date"
-                    variant="outlined"
-                    color="primary"
-                  ></v-text-field>
+                <v-col cols="12" md="6">
+                  <v-text-field v-model="project.startDate" label="Fecha de Inicio" type="date" variant="outlined"
+                    color="primary"></v-text-field>
                 </v-col>
                 <v-col cols="12" md="6">
-                  <v-text-field
-                    v-model="project.endDate"
-                    label="Fecha de Fin"
-                    type="date"
-                    variant="outlined"
-                    color="primary"
-                  ></v-text-field>
+                  <v-text-field v-model="project.endDate" label="Fecha de Fin" type="date" variant="outlined"
+                    color="primary"></v-text-field>
                 </v-col>
               </v-row>
             </v-card-text>
           </v-stepper-window-item>
 
-          <!-- Paso 2: Fases del Proyecto -->
+          <!-- Step 2: Project Phases -->
           <v-stepper-window-item :value="2">
             <v-card-text>
               <v-row align="center">
                 <v-col cols="12" md="5">
-                  <v-text-field
-                    v-model="newPhase.name"
-                    label="Nombre de la Fase"
-                    variant="outlined"
-                    color="primary"
-                    hide-details
-                  ></v-text-field>
+                  <v-text-field v-model="newPhase.name" label="Nombre de la Fase" variant="outlined" color="primary"
+                    hide-details></v-text-field>
                 </v-col>
                 <v-col cols="12" md="5">
-                  <v-text-field
-                    v-model="newPhase.description"
-                    label="Descripción de la Fase"
-                    variant="outlined"
-                    color="primary"
-                    hide-details
-                  ></v-text-field>
+                  <v-text-field v-model="newPhase.description" label="Descripción de la Fase" variant="outlined"
+                    color="primary" hide-details></v-text-field>
                 </v-col>
                 <v-col cols="12" md="2">
                   <v-btn color="primary" @click="addPhase" block>
@@ -162,13 +89,8 @@
               </v-row>
               <v-list lines="two" class="mt-4 phases-list">
                 <transition-group name="list" tag="div">
-                  <v-list-item
-                    v-for="(phase, index) in project.phases"
-                    :key="index"
-                    :title="phase.name"
-                    :subtitle="phase.description"
-                    class="list-item"
-                  >
+                  <v-list-item v-for="(phase, index) in project.phases" :key="index" :title="phase.name"
+                    :subtitle="phase.description" class="list-item">
                     <template v-slot:append>
                       <v-btn icon="mdi-delete" variant="text" color="error" @click="removePhase(index)"></v-btn>
                     </template>
@@ -181,12 +103,12 @@
             </v-card-text>
           </v-stepper-window-item>
 
-          <!-- Paso 3: Revisión -->
+          <!-- Step 3: Review -->
           <v-stepper-window-item :value="3">
             <v-card-text>
               <h3 class="text-h6 font-weight-bold" style="color: #344767;">Revisa la Información</h3>
               <v-divider class="my-4"></v-divider>
-              
+
               <v-list density="compact" class="py-0">
                 <v-list-item>
                   <v-list-item-title class="font-weight-bold">Nombre:</v-list-item-title>
@@ -212,24 +134,12 @@
 
               <div v-if="coverImagePreview" class="mt-4">
                 <h4 class="text-subtitle-1 font-weight-bold">Imagen de Portada:</h4>
-                <v-img
-                  :src="coverImagePreview"
-                  max-height="150"
-                  contain
-                  class="mt-2"
-                ></v-img>
+                <v-img :src="coverImagePreview" max-height="150" contain class="mt-2"></v-img>
               </div>
 
               <div v-if="project.files.length" class="mt-4">
                 <h4 class="text-subtitle-1 font-weight-bold">Archivos Adjuntos:</h4>
-                <v-chip 
-                  v-for="file in project.files" 
-                  :key="file.name" 
-                  class="ma-1"
-                  color="primary"
-                  label
-                  size="small"
-                >
+                <v-chip v-for="file in project.files" :key="file.name" class="ma-1" color="primary" label size="small">
                   {{ file.name }}
                 </v-chip>
               </div>
@@ -255,15 +165,9 @@
           <v-btn v-if="currentStep < 3" color="primary" @click="currentStep++" append-icon="mdi-arrow-right">
             Siguiente
           </v-btn>
-          <v-btn 
-            v-if="currentStep === 3" 
-            color="primary" 
-            variant="flat" 
-            @click="submitProject"
-            :loading="isLoading"
-            :disabled="isLoading"
-          >
-            Crear Proyecto
+          <v-btn v-if="currentStep === 3" color="primary" variant="flat" @click="submitProject" :loading="isLoading"
+            :disabled="isLoading">
+            {{ isEditing ? 'Guardar Cambios' : 'Crear Proyecto' }}
           </v-btn>
         </v-card-actions>
       </v-stepper>
@@ -272,16 +176,19 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useProjectStore } from '@/features/organization/projects/stores/projectStore';
+import { storeToRefs } from 'pinia';
 
 const router = useRouter();
 const route = useRoute();
 const projectStore = useProjectStore();
+const { error } = storeToRefs(projectStore);
 
 const currentStep = ref(1);
 const isLoading = ref(false);
+const isEditing = computed(() => !!route.query.id);
 
 const project = ref({
   id: null,
@@ -294,90 +201,101 @@ const project = ref({
   coverImage: null,
   files: [],
   phases: [],
-  status: 'Pendiente',
-  statusColor: 'orange',
-  progress: { percentage: 0, completedPhases: 0, totalPhases: 0 },
 });
 
 const coverImagePreview = ref(null);
+const newPhase = ref({ name: '', description: '' });
 
-const newPhase = ref({
-  name: '',
-  description: '',
-});
-
-// Load project data if editing
-onMounted(() => {
-  if (route.query.id) {
+onMounted(async () => {
+  if (isEditing.value) {
     const projectId = parseInt(route.query.id);
-    const existingProject = projectStore.getProjectById(projectId);
+    // Fetch fresh data from the store/API
+    const existingProject = await projectStore.fetchProjectById(projectId);
     if (existingProject) {
-      project.value = { ...existingProject };
+      project.value = { 
+        ...existingProject,
+        // Ensure files are handled correctly, as they won't be part of the JSON response
+        coverImage: null,
+        files: [],
+       };
       if (existingProject.coverImage) {
-        // If coverImage is a URL, set it for preview
-        if (typeof existingProject.coverImage === 'string') {
-          coverImagePreview.value = existingProject.coverImage;
-        }
+        coverImagePreview.value = existingProject.coverImage; // This should be a URL from the backend
       }
     }
   }
 });
 
-function previewCoverImage(event) {
-  const file = event.target.files[0];
+function handleCoverImageUpdate(files) {
+  const file = files[0];
   if (file) {
+    project.value.coverImage = file;
     const reader = new FileReader();
     reader.onload = (e) => {
       coverImagePreview.value = e.target.result;
-      project.value.coverImage = e.target.result; // Store the base64 string
     };
     reader.readAsDataURL(file);
+  } else {
+    project.value.coverImage = null;
+    coverImagePreview.value = null;
   }
 }
 
 function addPhase() {
   if (newPhase.value.name) {
-    project.value.phases.push({ 
-      ...newPhase.value, 
-      id: project.value.phases.length + 1, // Simple ID for phases
-      status: 'Pendiente', 
-      statusColor: 'orange' 
-    });
+    project.value.phases.push({ ...newPhase.value });
     newPhase.value.name = '';
     newPhase.value.description = '';
-    // Update total phases for progress
-    project.value.progress.totalPhases = project.value.phases.length;
   }
 }
 
 function removePhase(index) {
   project.value.phases.splice(index, 1);
-  // Update total phases for progress
-  project.value.progress.totalPhases = project.value.phases.length;
 }
 
-function submitProject() {
+async function submitProject() {
   isLoading.value = true;
 
-  // Update progress based on phases
-  const completedPhasesCount = project.value.phases.filter(p => p.status === 'Completado').length;
-  project.value.progress.completedPhases = completedPhasesCount;
-  project.value.progress.percentage = project.value.phases.length > 0 
-    ? Math.round((completedPhasesCount / project.value.phases.length) * 100) 
-    : 0;
+  const formData = new FormData();
+  
+  // Append all non-file fields
+  Object.keys(project.value).forEach(key => {
+    const value = project.value[key];
+    if (key === 'coverImage' || key === 'files') {
+      // Skip, will be handled separately
+    } else if (Array.isArray(value)) {
+      formData.append(key, JSON.stringify(value));
+    } else if (value !== null && value !== undefined) {
+      formData.append(key, value);
+    }
+  });
 
-  if (project.value.id) {
-    projectStore.updateProject(project.value);
-    alert('Proyecto actualizado con éxito!');
-  } else {
-    projectStore.addProject(project.value);
-    alert('Proyecto creado con éxito!');
+  // Append cover image if it's a new file
+  if (project.value.coverImage instanceof File) {
+    formData.append('coverImage', project.value.coverImage);
   }
 
-  setTimeout(() => {
-    isLoading.value = false;
+  // Append other files
+  if (project.value.files && project.value.files.length > 0) {
+    project.value.files.forEach(file => {
+      formData.append('files', file);
+    });
+  }
+
+  let result;
+  if (isEditing.value) {
+    result = await projectStore.updateProject(project.value.id, formData);
+  } else {
+    result = await projectStore.addProject(formData);
+  }
+
+  isLoading.value = false;
+
+  if (result) {
+    alert(`Proyecto ${isEditing.value ? 'actualizado' : 'creado'} con éxito!`);
     router.push('/organization/dashboard/projects');
-  }, 1000); // Simulate API call and redirect
+  } else {
+    alert(`Error: ${error.value || 'No se pudo guardar el proyecto.'}`);
+  }
 }
 </script>
 
@@ -422,6 +340,4 @@ function submitProject() {
 .v-card-actions .v-btn{
   border: 1px solid #dbdbdb;
 }
-
-
 </style>

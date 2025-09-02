@@ -18,13 +18,13 @@
     </v-card-text>
       <div class="d-flex justify-center mt-2 text-body-2 text-grey-darken-1">
       <span class="mr-4">Últimos 6 meses</span>
-      <span>Total: $15,300</span>
+      <span>Total: $0</span>
     </div>
   </v-card>
 </template>
 
 <script setup>
-import { defineProps } from 'vue';
+
 
 defineProps({
   donationTrendData: {
