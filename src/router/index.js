@@ -2,21 +2,32 @@ import { createRouter, createWebHistory } from 'vue-router';
 import { useAuthStore } from '@/features/auth/stores/authStore';
 
 // Layouts
-import AuthLayout from '@/layouts/AuthLayout.vue';
 import OrganizationLayout from '@/features/organization/layouts/OrganizationLayout.vue';
 import VolunteerLayout from '@/features/volunteer/layouts/VolunteerLayout.vue';
 
-// Views
+// General Views
 import HomeView from '@/features/home/views/HomeView.vue';
 import LoginView from '@/features/auth/views/LoginView.vue';
 import RegisterView from '@/features/auth/views/RegisterView.vue';
 import ForgotPasswordView from '@/features/auth/views/ForgotPasswordView.vue';
+import NotFoundView from '@/features/error/views/NotFoundView.vue';
+
+// Organization Views
 import OrganizationDashboard from '@/features/organization/views/DashboardHomeView.vue';
 import ProjectsView from '@/features/organization/projects/views/ProjectsView.vue';
 import CreateProjectView from '@/features/organization/projects/views/CreateProjectView.vue';
 import ProjectDetailView from '@/features/organization/projects/views/ProjectDetailView.vue';
+import VolunteersView from '@/features/organization/views/VolunteersView.vue';
+import DonationsView from '@/features/organization/views/DonationsView.vue';
+import ReportsView from '@/features/organization/views/ReportsView.vue';
+import OrganizationSettingsView from '@/features/organization/views/SettingsView.vue';
+
+// Volunteer Views
 import VolunteerDashboard from '@/features/volunteer/views/DashboardHomeView.vue';
-import NotFoundView from '@/features/error/views/NotFoundView.vue';
+import MyProjectsView from '@/features/volunteer/views/MyProjectsView.vue';
+import VolunteerProfileView from '@/features/volunteer/views/ProfileView.vue';
+import AvailabilityView from '@/features/volunteer/views/AvailabilityView.vue';
+import VolunteerSettingsView from '@/features/volunteer/views/SettingsView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -51,6 +62,10 @@ const router = createRouter({
         { path: 'dashboard/projects', name: 'organization-projects', component: ProjectsView },
         { path: 'dashboard/projects/create', name: 'organization-create-project', component: CreateProjectView },
         { path: 'dashboard/projects/:id', name: 'organization-project-detail', component: ProjectDetailView },
+        { path: 'dashboard/volunteers', name: 'organization-volunteers', component: VolunteersView },
+        { path: 'dashboard/donations', name: 'organization-donations', component: DonationsView },
+        { path: 'dashboard/reports', name: 'organization-reports', component: ReportsView },
+        { path: 'dashboard/settings', name: 'organization-settings', component: OrganizationSettingsView },
       ],
     },
     {
@@ -60,6 +75,10 @@ const router = createRouter({
       redirect: '/volunteer/dashboard',
       children: [
         { path: 'dashboard', name: 'volunteer-dashboard', component: VolunteerDashboard },
+        { path: 'projects', name: 'volunteer-projects', component: MyProjectsView },
+        { path: 'profile', name: 'volunteer-profile', component: VolunteerProfileView },
+        { path: 'availability', name: 'volunteer-availability', component: AvailabilityView },
+        { path: 'settings', name: 'volunteer-settings', component: VolunteerSettingsView },
       ],
     },
     {

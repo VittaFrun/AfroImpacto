@@ -221,7 +221,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { useProjectStore } from '@/features/organization/projects/stores/projectStore';
-import { useVolunteerStore } from '@/features/volunteers/stores/volunteerStore';
+import { useVolunteerStore } from '@/features/volunteer/stores/volunteerStore';
 import { useRoleStore } from '@/features/organization/stores/roleStore';
 import KanbanBoard from '../components/KanbanBoard.vue';
 import { formatDistanceToNow } from 'date-fns';
