@@ -22,8 +22,22 @@ export const useDashboardStore = defineStore('organizationDashboard', () => {
       // Fetch dashboard data from the backend
       const response = await axios.get('/dashboard');
       
-      // Update all dashboard data
-      metrics.value = response.data.metrics || [];
+      // --- Data Transformation ---
+      // Enhance metrics with better icons and colors on the client-side
+      const metricEnhancements = {
+        'Proyectos Activos': { icon: 'mdi-folder-heart', color: 'primary' },
+        'Total Voluntarios': { icon: 'mdi-account-group', color: 'info' },
+        'Donaciones Recibidas': { icon: 'mdi-hand-heart', color: 'success' },
+        'Tareas Pendientes': { icon: 'mdi-format-list-checks', color: 'warning' },
+      };
+
+      const rawMetrics = response.data.metrics || [];
+      metrics.value = rawMetrics.map(metric => ({
+        ...metric,
+        ...(metricEnhancements[metric.title] || {}),
+      }));
+
+      // Update other dashboard data
       recentActivities.value = response.data.recentActivities || [];
       upcomingTasks.value = response.data.upcomingTasks || [];
       projectStatusData.value = response.data.projectStatusData || [];

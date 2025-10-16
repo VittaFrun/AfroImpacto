@@ -10,15 +10,15 @@
       - Contiene el título, un campo de búsqueda, notificaciones y un menú de usuario.
       - El ícono de navegación (`v-app-bar-nav-icon`) solo aparece en pantallas pequeñas (`d-md-none`) para abrir/cerrar el menú lateral.
     -->
-    <v-app-bar color="white" class="app-bar-style" flat elevation="2">
+    <v-app-bar color="primary" class="app-bar-style" flat elevation="2">
       <v-app-bar-nav-icon @click="drawer = !drawer" class="d-md-none"></v-app-bar-nav-icon>
       <div class="d-flex align-center">
-        <v-icon class="mr-2 text-primary" size="32">mdi-alpha-a-box</v-icon>
-        <v-toolbar-title class="font-weight-bold text-primary">Afro Impacto</v-toolbar-title>
+        <v-icon class="mr-2 text-white" size="32">mdi-alpha-a-box</v-icon>
+        <v-toolbar-title class="font-weight-bold text-white">Afro Impacto</v-toolbar-title>
       </div>
       <v-spacer></v-spacer>
       <v-btn 
-        color="primary" 
+        color="white" 
         variant="flat" 
         class="d-none d-md-flex rounded-pill new-project-btn"
         @click="createNewProject"
@@ -28,7 +28,7 @@
       </v-btn>
 
       <div class="d-flex align-center ml-6">
-        <v-btn icon class="mr-1" aria-label="Notificaciones" style="color: #2c3e50;">
+        <v-btn icon class="mr-1" aria-label="Notificaciones" color="white">
           <v-badge dot color="red-accent-2">
             <v-icon>mdi-bell</v-icon>
           </v-badge>
@@ -36,7 +36,7 @@
         <v-menu offset-y left transition="slide-y-transition">
           <template v-slot:activator="{ props }">
             <v-btn icon v-bind="props" class="ml-1" aria-label="Menú de usuario">
-              <v-icon size="large" style="color: #2c3e50;">mdi-account-circle</v-icon>
+              <v-icon size="large" color="white">mdi-account-circle</v-icon>
             </v-btn>
           </template>
         <v-list density="compact" class="user-menu-list pa-2">
@@ -331,7 +331,7 @@ watch(() => router.currentRoute.value, (newRoute) => {
 .new-project-btn {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   font-weight: 600;
-  color: white !important;
+  color: #4ec7a5 !important;
 }
 
 .new-project-btn:hover {

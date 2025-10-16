@@ -6,9 +6,6 @@ import '@mdi/font/css/materialdesignicons.css'
 
 
 export default createVuetify({
-theme: {
-    defaultTheme: 'light',
-  },
   defaults: {
     global: {
       style: {
@@ -23,10 +20,10 @@ theme: {
     defaultSet: 'mdi',
     aliases,
     sets: {
-    mdi,
+      mdi,
     },
-},
-theme: {
+  },
+  theme: {
     defaultTheme: 'afroImpactoTheme',
     themes: {
       afroImpactoTheme: {
@@ -43,5 +40,5 @@ theme: {
         },
       },
     },
-},
+  },
 })

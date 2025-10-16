@@ -1,75 +1,98 @@
 <template>
   <v-container fluid class="pa-8">
-    <h1 class="text-h4 font-weight-bold text-primary mb-4">Mis Proyectos y Tareas</h1>
-    <p class="text-body-1 text-grey-darken-1 mb-6">
-      Aquí puedes ver los proyectos en los que participas y las tareas que tienes asignadas.
-    </p>
+    <!-- Header -->
+    <h1 class="text-h4 font-weight-bold text-primary mb-2">Mis Proyectos</h1>
+    <p class="text-body-1 text-grey-darken-1 mb-8">Un vistazo a los proyectos donde estás dejando tu huella.</p>
 
-    <v-expansion-panels variant="accordion">
-      <v-expansion-panel v-for="project in myProjects" :key="project.id">
-        <v-expansion-panel-title>
-          <div class="d-flex justify-space-between align-center w-100">
-            <span class="font-weight-bold">{{ project.name }}</span>
-            <v-chip color="primary" size="small">{{ project.organization }}</v-chip>
-          </div>
-        </v-expansion-panel-title>
-        <v-expansion-panel-text>
-          <v-list lines="two">
-            <v-list-item v-for="task in project.tasks" :key="task.id">
-              <v-list-item-title>{{ task.description }}</v-list-item-title>
-              <v-list-item-subtitle>Rol: {{ task.role }}</v-list-item-subtitle>
-              <template v-slot:append>
-                <v-select
-                  v-model="task.status"
-                  :items="['Pendiente', 'En Progreso', 'Completado']"
-                  dense
-                  hide-details
-                  variant="outlined"
-                  style="max-width: 180px;"
-                  @update:model-value="updateTaskStatus(task)"
-                ></v-select>
-              </template>
-            </v-list-item>
-          </v-list>
-        </v-expansion-panel-text>
-      </v-expansion-panel>
-    </v-expansion-panels>
+    <!-- Loading and Error States -->
+    <div v-if="loadingProjects" class="d-flex justify-center align-center" style="height: 50vh;">
+      <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
+    </div>
+    <div v-else-if="errorProjects" class="d-flex justify-center align-center" style="height: 50vh;">
+      <v-alert type="error" prominent>{{ errorProjects }}</v-alert>
+    </div>
+
+    <!-- Projects Grid -->
+    <v-row v-else>
+      <v-col v-for="project in myProjects" :key="project.id" cols="12" md="6" lg="4">
+        <v-card class="d-flex flex-column fill-height rounded-lg project-card">
+          <v-img
+            :src="project.image"
+            height="200px"
+            cover
+            class="align-end text-white"
+          >
+            <v-card-title class="project-title">{{ project.name }}</v-card-title>
+          </v-img>
+
+          <v-card-text class="flex-grow-1">
+            <div class="d-flex justify-space-between align-center mb-4">
+                <v-chip size="small" variant="tonal" color="info">
+                    <v-icon start>mdi-account-tie</v-icon>
+                    {{ project.role }}
+                </v-chip>
+                <v-chip :color="project.statusColor" size="small" variant="flat">
+                    {{ project.status }}
+                </v-chip>
+            </div>
+            
+            <div>
+              <div class="d-flex justify-space-between mb-1">
+                <span class="text-caption font-weight-bold">Progreso</span>
+                <span class="text-caption font-weight-bold text-primary">{{ project.progress }}%</span>
+              </div>
+              <v-progress-linear
+                :model-value="project.progress"
+                :color="project.status === 'Completado' ? 'success' : 'primary'"
+                height="8"
+                rounded
+              ></v-progress-linear>
+            </div>
+          </v-card-text>
+
+          <v-divider></v-divider>
+
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="primary" variant="text">Ver Tareas</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-col>
+       <v-col v-if="!myProjects.length" cols="12">
+          <v-card class="pa-8 rounded-lg text-center" variant="tonal">
+            <v-icon size="x-large" color="grey" class="mb-4">mdi-folder-open-outline</v-icon>
+            <h3 class="text-h6">Aún no participas en ningún proyecto.</h3>
+            <p class="text-body-1 mt-2">¡Explora las oportunidades y únete a una causa!</p>
+          </v-card>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { onMounted } from 'vue';
+import { storeToRefs } from 'pinia';
+import { useVolunteerStore } from '@/features/volunteer/stores/volunteerStore';
 
-const myProjects = ref([]);
+const volunteerStore = useVolunteerStore();
+const { myProjects, loadingProjects, errorProjects } = storeToRefs(volunteerStore);
 
 onMounted(() => {
-  myProjects.value = [
-    {
-      id: 1,
-      name: 'Empoderamiento Educativo para Niños Afro',
-      organization: 'Fundación Semillas del Saber',
-      tasks: [
-        { id: 101, description: 'Diseñar material didáctico para taller de lectura', role: 'Diseñador Gráfico', status: 'En Progreso' },
-        { id: 102, description: 'Impartir clase de matemáticas básicas', role: 'Tutor Académico', status: 'Pendiente' },
-      ]
-    },
-    {
-      id: 2,
-      name: 'Reforestación y Conservación del Manglar',
-      organization: 'Guardianes del Ecosistema',
-      tasks: [
-        { id: 201, description: 'Coordinar logística para jornada de siembra', role: 'Coordinador de Campo', status: 'Completado' },
-      ]
-    }
-  ];
+  volunteerStore.fetchMyProjects();
 });
-
-function updateTaskStatus(task) {
-  console.log(`Actualizando estado de la tarea ${task.id} a ${task.status}`);
-  // Lógica para llamar a la API y actualizar el estado
-}
 </script>
 
 <style scoped>
-/* Estilos específicos si son necesarios */
+.project-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.project-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 25px -5px rgba(0,0,0,0.15) !important;
+}
+
+.project-title {
+  background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
+}
 </style>

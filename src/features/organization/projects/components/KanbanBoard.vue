@@ -12,19 +12,36 @@
         <template #item="{ element }">
           <v-card class="kanban-card mb-4" @click="openTaskDetails(element)" :data-id="element.id">
             <v-card-text>
-              <p class="font-weight-bold">{{ element.description }}</p>
-              <p class="text-caption">Fase: {{ getPhaseName(element.phaseId) }}</p>
-              <div class="mt-2">
+              <p class="font-weight-bold mb-2">{{ element.description }}</p>
+              <p class="text-caption text-grey-darken-1 mb-3">Fase: {{ getPhaseName(element.phaseId) }}</p>
+              
+              <div class="d-flex align-center justify-space-between mt-2">
+                <!-- Priority Chip -->
                 <v-chip
-                  v-for="assignment in element.assignments"
-                  :key="assignment.assignmentId"
+                  v-if="element.priority"
+                  :color="priorityConfig(element.priority).color"
                   size="small"
-                  class="mr-2"
-                  :color="assignment.roleColor"
+                  variant="tonal"
+                  class="font-weight-bold"
                 >
-                  <v-icon start>mdi-account-circle</v-icon>
-                  {{ assignment.volunteerName }}
+                  <v-icon start :icon="priorityConfig(element.priority).icon"></v-icon>
+                  {{ element.priority }}
                 </v-chip>
+
+                <!-- Volunteer Avatars -->
+                <div class="d-flex">
+                  <v-chip
+                    v-for="assignment in element.assignments"
+                    :key="assignment.assignmentId"
+                    size="small"
+                    class="ml-1"
+                  >
+                    <v-avatar start>
+                      <span class="text-caption">{{ assignment.volunteerName.charAt(0) }}</span>
+                    </v-avatar>
+                    {{ assignment.volunteerName.split(' ')[0] }}
+                  </v-chip>
+                </div>
               </div>
             </v-card-text>
           </v-card>
@@ -75,6 +92,21 @@ const getPhaseName = (phaseId) => {
   const phase = props.phases.find((p) => p.id === phaseId);
   return phase ? phase.name : 'N/A';
 };
+
+const priorityConfig = computed(() => {
+  return (priority) => {
+    switch (priority) {
+      case 'Alta':
+        return { color: 'error', icon: 'mdi-arrow-up-bold-circle' };
+      case 'Media':
+        return { color: 'warning', icon: 'mdi-minus-circle' };
+      case 'Baja':
+        return { color: 'info', icon: 'mdi-arrow-down-bold-circle' };
+      default:
+        return { color: 'grey', icon: 'mdi-help-circle' };
+    }
+  };
+});
 
 const onDragEnd = (event) => {
   const { to, item } = event;

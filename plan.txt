@@ -1,1 +1,11 @@
-2:41:06 p. m. [vite] (client) Pre-transform error: Failed to load url /src/features/volunteers/stores/volunteerStore.js (resolved id: C:/Users/Aprendiz.MONAPRRCBFSD056/Desktop/trabajo/AfroImpacto/src/features/volunteers/stores/volunteerStore.js) in C:/Users/Aprendiz.MONAPRRCBFSD056/Desktop/trabajo/AfroImpacto/src/features/organization/projects/views/ProjectDetailView.vue. Does the file exist?
+Uncaught TypeError: Cannot read properties of undefined (reading '_c')
+    at Proxy.render (vue-countup-v2.js?v=22f85cd3:156:22)
+    at renderComponentRoot (chunk-A2GZF6RP.js?v=22f85cd3:7771:17)
+    at ReactiveEffect.componentUpdateFn [as fn] (chunk-A2GZF6RP.js?v=22f85cd3:6583:46)
+    at ReactiveEffect.run (chunk-A2GZF6RP.js?v=22f85cd3:1779:23)
+    at setupRenderEffect (chunk-A2GZF6RP.js?v=22f85cd3:6718:5)
+    at mountComponent (chunk-A2GZF6RP.js?v=22f85cd3:6493:7)
+    at processComponent (chunk-A2GZF6RP.js?v=22f85cd3:6446:9)
+    at patch (chunk-A2GZF6RP.js?v=22f85cd3:5962:11)
+    at mountChildren (chunk-A2GZF6RP.js?v=22f85cd3:6194:7)
+    at mountElement (chunk-A2GZF6RP.js?v=22f85cd3:6117:7)

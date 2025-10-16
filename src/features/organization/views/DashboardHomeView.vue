@@ -17,6 +17,38 @@
       <v-row class="mb-6">
         <v-col cols="12"><WelcomeCard /></v-col>
       </v-row>
+
+      <!-- Quick Actions Section -->
+      <v-row class="mb-6">
+        <v-col cols="12">
+          <h2 class="text-h6 font-weight-bold mb-4">Acciones Rápidas</h2>
+        </v-col>
+        <v-col cols="12" sm="6" md="3">
+          <v-card class="text-center pa-4 fill-height d-flex flex-column justify-center" hover to="/organization/dashboard/projects/create">
+            <v-btn icon="mdi-plus-box-outline" color="primary" size="x-large" variant="tonal" class="mx-auto mb-3"></v-btn>
+            <span class="font-weight-bold">Crear Proyecto</span>
+          </v-card>
+        </v-col>
+        <v-col cols="12" sm="6" md="3">
+          <v-card class="text-center pa-4 fill-height d-flex flex-column justify-center" hover to="/organization/dashboard/volunteers">
+            <v-btn icon="mdi-account-plus-outline" color="info" size="x-large" variant="tonal" class="mx-auto mb-3"></v-btn>
+            <span class="font-weight-bold">Invitar Voluntario</span>
+          </v-card>
+        </v-col>
+        <v-col cols="12" sm="6" md="3">
+          <v-card class="text-center pa-4 fill-height d-flex flex-column justify-center" hover to="/organization/dashboard/donations">
+            <v-btn icon="mdi-gift-outline" color="success" size="x-large" variant="tonal" class="mx-auto mb-3"></v-btn>
+            <span class="font-weight-bold">Registrar Donación</span>
+          </v-card>
+        </v-col>
+        <v-col cols="12" sm="6" md="3">
+          <v-card class="text-center pa-4 fill-height d-flex flex-column justify-center" hover to="/organization/dashboard/reports">
+            <v-btn icon="mdi-chart-line" color="warning" size="x-large" variant="tonal" class="mx-auto mb-3"></v-btn>
+            <span class="font-weight-bold">Generar Reporte</span>
+          </v-card>
+        </v-col>
+      </v-row>
+
       <MetricCards :metrics="metrics" />
       <v-row class="mt-4">
         <v-col cols="12" md="6"><RecentActivity :activities="recentActivities" /></v-col>
