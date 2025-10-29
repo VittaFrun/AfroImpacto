@@ -7,6 +7,8 @@ import vuetify from './plugins/vuetify'
 import { useAuthStore } from './features/auth/stores/authStore'
 
 import './assets/styles/base.css'
+import './assets/styles/design-system.css'
+import './assets/styles/professional-buttons.css'
 
 const app = createApp(App)
 

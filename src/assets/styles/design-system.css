@@ -1,0 +1,486 @@
+/* AfroImpacto Design System */
+:root {
+  /* Primary Colors - Professional Blue */
+  --afro-primary: #1e3a8a;
+  --afro-primary-light: #3b82f6;
+  --afro-primary-dark: #1e40af;
+  --afro-primary-50: #eff6ff;
+  --afro-primary-100: #dbeafe;
+  --afro-primary-500: #3b82f6;
+  --afro-primary-900: #1e3a8a;
+
+  /* Secondary Colors - Professional Gray */
+  --afro-secondary: #64748b;
+  --afro-secondary-light: #94a3b8;
+  --afro-secondary-dark: #475569;
+  --afro-secondary-50: #f8fafc;
+  --afro-secondary-100: #f1f5f9;
+  --afro-secondary-500: #64748b;
+  --afro-secondary-900: #0f172a;
+
+  /* Accent Colors */
+  --afro-success: #059669;
+  --afro-success-light: #10b981;
+  --afro-warning: #d97706;
+  --afro-error: #dc2626;
+  --afro-info: #0891b2;
+
+  /* Neutral Colors */
+  --afro-background: #f8fafc;
+  --afro-surface: #ffffff;
+  --afro-surface-variant: #f1f5f9;
+  --afro-text-primary: #1e293b;
+  --afro-text-secondary: #64748b;
+  --afro-text-disabled: #94a3b8;
+  --afro-border: #e2e8f0;
+  --afro-border-light: #f1f5f9;
+
+  /* Spacing Scale */
+  --afro-space-xs: 0.25rem;   /* 4px */
+  --afro-space-sm: 0.5rem;    /* 8px */
+  --afro-space-md: 1rem;      /* 16px */
+  --afro-space-lg: 1.5rem;    /* 24px */
+  --afro-space-xl: 2rem;      /* 32px */
+  --afro-space-2xl: 3rem;     /* 48px */
+  --afro-space-3xl: 4rem;     /* 64px */
+
+  /* Typography Scale */
+  --afro-text-xs: 0.75rem;    /* 12px */
+  --afro-text-sm: 0.875rem;   /* 14px */
+  --afro-text-base: 1rem;     /* 16px */
+  --afro-text-lg: 1.125rem;   /* 18px */
+  --afro-text-xl: 1.25rem;    /* 20px */
+  --afro-text-2xl: 1.5rem;    /* 24px */
+  --afro-text-3xl: 1.875rem;  /* 30px */
+  --afro-text-4xl: 2.25rem;   /* 36px */
+
+  /* Border Radius */
+  --afro-radius-sm: 0.375rem;  /* 6px */
+  --afro-radius-md: 0.5rem;    /* 8px */
+  --afro-radius-lg: 0.75rem;   /* 12px */
+  --afro-radius-xl: 1rem;      /* 16px */
+  --afro-radius-2xl: 1.5rem;   /* 24px */
+
+  /* Shadows */
+  --afro-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --afro-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --afro-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --afro-shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+
+  /* Transitions */
+  --afro-transition-fast: 150ms ease-in-out;
+  --afro-transition-normal: 250ms ease-in-out;
+  --afro-transition-slow: 350ms ease-in-out;
+}
+
+/* Professional Typography */
+.afro-heading-1 {
+  font-size: var(--afro-text-4xl);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--afro-text-primary);
+  letter-spacing: -0.025em;
+}
+
+.afro-heading-2 {
+  font-size: var(--afro-text-3xl);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--afro-text-primary);
+  letter-spacing: -0.025em;
+}
+
+.afro-heading-3 {
+  font-size: var(--afro-text-2xl);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--afro-text-primary);
+}
+
+.afro-heading-4 {
+  font-size: var(--afro-text-xl);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--afro-text-primary);
+}
+
+.afro-body-large {
+  font-size: var(--afro-text-lg);
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--afro-text-primary);
+}
+
+.afro-body {
+  font-size: var(--afro-text-base);
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--afro-text-primary);
+}
+
+.afro-body-small {
+  font-size: var(--afro-text-sm);
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--afro-text-secondary);
+}
+
+.afro-caption {
+  font-size: var(--afro-text-xs);
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--afro-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Professional Cards */
+.afro-card {
+  background: var(--afro-surface);
+  border: 1px solid var(--afro-border);
+  border-radius: var(--afro-radius-lg);
+  box-shadow: var(--afro-shadow-sm);
+  transition: all var(--afro-transition-normal);
+  overflow: hidden;
+}
+
+.afro-card:hover {
+  box-shadow: var(--afro-shadow-md);
+  border-color: var(--afro-primary-100);
+}
+
+.afro-card-elevated {
+  box-shadow: var(--afro-shadow-md);
+}
+
+.afro-card-elevated:hover {
+  box-shadow: var(--afro-shadow-lg);
+  transform: translateY(-2px);
+}
+
+/* Professional Buttons */
+.afro-btn-primary {
+  background: var(--afro-primary);
+  color: white;
+  border: none;
+  border-radius: var(--afro-radius-md);
+  padding: var(--afro-space-sm) var(--afro-space-lg);
+  font-weight: 600;
+  font-size: var(--afro-text-sm);
+  transition: all var(--afro-transition-fast);
+  cursor: pointer;
+}
+
+.afro-btn-primary:hover {
+  background: var(--afro-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--afro-shadow-md);
+}
+
+.afro-btn-secondary {
+  background: transparent;
+  color: var(--afro-primary);
+  border: 1px solid var(--afro-primary);
+  border-radius: var(--afro-radius-md);
+  padding: var(--afro-space-sm) var(--afro-space-lg);
+  font-weight: 600;
+  font-size: var(--afro-text-sm);
+  transition: all var(--afro-transition-fast);
+  cursor: pointer;
+}
+
+.afro-btn-secondary:hover {
+  background: var(--afro-primary-50);
+  border-color: var(--afro-primary-dark);
+}
+
+/* Professional Layout */
+.afro-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--afro-space-lg);
+}
+
+.afro-section {
+  padding: var(--afro-space-2xl) 0;
+}
+
+.afro-grid {
+  display: grid;
+  gap: var(--afro-space-lg);
+}
+
+.afro-grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.afro-grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.afro-grid-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+/* Responsive Grid */
+@media (max-width: 768px) {
+  .afro-grid-2,
+  .afro-grid-3,
+  .afro-grid-4 {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .afro-grid-3,
+  .afro-grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Professional Status Indicators */
+.afro-status-success {
+  background: var(--afro-success);
+  color: white;
+  padding: var(--afro-space-xs) var(--afro-space-sm);
+  border-radius: var(--afro-radius-sm);
+  font-size: var(--afro-text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.afro-status-warning {
+  background: var(--afro-warning);
+  color: white;
+  padding: var(--afro-space-xs) var(--afro-space-sm);
+  border-radius: var(--afro-radius-sm);
+  font-size: var(--afro-text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.afro-status-error {
+  background: var(--afro-error);
+  color: white;
+  padding: var(--afro-space-xs) var(--afro-space-sm);
+  border-radius: var(--afro-radius-sm);
+  font-size: var(--afro-text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.afro-status-info {
+  background: var(--afro-info);
+  color: white;
+  padding: var(--afro-space-xs) var(--afro-space-sm);
+  border-radius: var(--afro-radius-sm);
+  font-size: var(--afro-text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Professional Navigation */
+.afro-nav-item {
+  display: flex;
+  align-items: center;
+  padding: var(--afro-space-sm) var(--afro-space-md);
+  color: var(--afro-text-secondary);
+  text-decoration: none;
+  border-radius: var(--afro-radius-md);
+  transition: all var(--afro-transition-fast);
+  font-weight: 500;
+}
+
+.afro-nav-item:hover {
+  background: var(--afro-primary-50);
+  color: var(--afro-primary);
+}
+
+.afro-nav-item.active {
+  background: var(--afro-primary);
+  color: white;
+}
+
+/* Professional Sidebar */
+.afro-sidebar {
+  background: var(--afro-surface);
+  border-right: 1px solid var(--afro-border);
+  min-height: 100vh;
+  width: 280px;
+  padding: var(--afro-space-lg);
+}
+
+.afro-sidebar-header {
+  padding-bottom: var(--afro-space-lg);
+  border-bottom: 1px solid var(--afro-border);
+  margin-bottom: var(--afro-space-lg);
+}
+
+.afro-sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--afro-space-xs);
+}
+
+/* Professional Header */
+.afro-header {
+  background: var(--afro-surface);
+  border-bottom: 1px solid var(--afro-border);
+  padding: var(--afro-space-md) var(--afro-space-lg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.afro-header-title {
+  font-size: var(--afro-text-xl);
+  font-weight: 600;
+  color: var(--afro-text-primary);
+}
+
+.afro-header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--afro-space-md);
+}
+
+/* Professional Metrics Cards */
+.afro-metric-card {
+  background: var(--afro-surface);
+  border: 1px solid var(--afro-border);
+  border-radius: var(--afro-radius-lg);
+  padding: var(--afro-space-lg);
+  text-align: center;
+  transition: all var(--afro-transition-normal);
+}
+
+.afro-metric-card:hover {
+  box-shadow: var(--afro-shadow-md);
+  transform: translateY(-2px);
+}
+
+.afro-metric-value {
+  font-size: var(--afro-text-3xl);
+  font-weight: 700;
+  color: var(--afro-primary);
+  margin-bottom: var(--afro-space-xs);
+}
+
+.afro-metric-label {
+  font-size: var(--afro-text-sm);
+  color: var(--afro-text-secondary);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Professional Tables */
+.afro-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--afro-surface);
+  border-radius: var(--afro-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--afro-shadow-sm);
+}
+
+.afro-table th {
+  background: var(--afro-secondary-50);
+  padding: var(--afro-space-md);
+  text-align: left;
+  font-weight: 600;
+  color: var(--afro-text-primary);
+  border-bottom: 1px solid var(--afro-border);
+}
+
+.afro-table td {
+  padding: var(--afro-space-md);
+  border-bottom: 1px solid var(--afro-border-light);
+  color: var(--afro-text-primary);
+}
+
+.afro-table tr:hover {
+  background: var(--afro-secondary-50);
+}
+
+/* Professional Forms */
+.afro-form-group {
+  margin-bottom: var(--afro-space-lg);
+}
+
+.afro-form-label {
+  display: block;
+  font-weight: 600;
+  color: var(--afro-text-primary);
+  margin-bottom: var(--afro-space-sm);
+  font-size: var(--afro-text-sm);
+}
+
+.afro-form-input {
+  width: 100%;
+  padding: var(--afro-space-sm) var(--afro-space-md);
+  border: 1px solid var(--afro-border);
+  border-radius: var(--afro-radius-md);
+  font-size: var(--afro-text-base);
+  transition: all var(--afro-transition-fast);
+  background: var(--afro-surface);
+}
+
+.afro-form-input:focus {
+  outline: none;
+  border-color: var(--afro-primary);
+  box-shadow: 0 0 0 3px var(--afro-primary-50);
+}
+
+/* Professional Loading States */
+.afro-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--afro-space-2xl);
+}
+
+.afro-skeleton {
+  background: linear-gradient(90deg, var(--afro-secondary-100) 25%, var(--afro-secondary-50) 50%, var(--afro-secondary-100) 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: var(--afro-radius-md);
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Professional Empty States */
+.afro-empty-state {
+  text-align: center;
+  padding: var(--afro-space-3xl);
+  color: var(--afro-text-secondary);
+}
+
+.afro-empty-state-icon {
+  font-size: var(--afro-text-4xl);
+  margin-bottom: var(--afro-space-lg);
+  opacity: 0.5;
+}
+
+.afro-empty-state-title {
+  font-size: var(--afro-text-xl);
+  font-weight: 600;
+  margin-bottom: var(--afro-space-sm);
+  color: var(--afro-text-primary);
+}
+
+.afro-empty-state-description {
+  font-size: var(--afro-text-base);
+  margin-bottom: var(--afro-space-lg);
+}

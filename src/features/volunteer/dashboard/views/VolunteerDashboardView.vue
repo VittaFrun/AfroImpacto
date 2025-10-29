@@ -1,12 +1,12 @@
 <template>
-  <div class="volunteer-dashboard">
+  <div class="afro-volunteer-dashboard">
     <!-- Dashboard Header -->
-    <div class="dashboard-header">
+    <div class="afro-dashboard-header">
       <div class="d-flex align-center justify-space-between">
         <div>
           <h1 class="afro-heading-2 mb-2">Mi Dashboard</h1>
           <p class="afro-body-small">
-            Bienvenido de vuelta, {{ authStore.user?.nombre || 'Voluntario' }}
+            Bienvenido de vuelta, {{ volunteer?.name || 'Voluntario' }}
           </p>
         </div>
         <div class="dashboard-actions">
@@ -172,8 +172,8 @@
                 </div>
               </div>
             </div>
-    </div>
-    </div>
+          </div>
+        </div>
 
         <!-- Upcoming Tasks -->
         <div class="afro-card afro-card-elevated">
@@ -225,8 +225,8 @@
                 </div>
               </div>
             </div>
-              </div>
-            </div>
+          </div>
+        </div>
 
         <!-- Quick Actions -->
         <div class="afro-card afro-card-elevated">
@@ -239,9 +239,9 @@
                 v-for="action in quickActions"
                 :key="action.name"
                 :color="action.color"
-                variant="outlined"
+                :variant="action.variant"
                 block
-                class="mb-3"
+                class="mb-3 professional-action-btn"
                 @click="action.handler"
               >
                 <v-icon start>{{ action.icon }}</v-icon>
@@ -292,9 +292,9 @@
                   <div class="activity-time">{{ formatTimeAgo(activity.timestamp) }}</div>
                 </div>
               </div>
-              </div>
-              </div>
             </div>
+          </div>
+        </div>
 
         <!-- Skills & Achievements -->
         <div class="afro-card afro-card-elevated">
@@ -350,7 +350,7 @@
         </div>
       </div>
     </div>
-    </div>
+  </div>
 </template>
 
 <script setup>
@@ -365,6 +365,11 @@ const authStore = useAuthStore();
 const { user } = storeToRefs(authStore);
 
 // Mock data - replace with real data from stores
+const volunteer = ref({
+  name: 'María González',
+  id: 1
+});
+
 const stats = ref({
   projects: {
     total: 5,
@@ -500,6 +505,7 @@ const quickActions = computed(() => [
     label: 'Explorar Proyectos',
     icon: 'mdi-magnify',
     color: 'primary',
+    variant: 'outlined',
     handler: () => router.push('/volunteer/catalog')
   },
   {
@@ -507,6 +513,7 @@ const quickActions = computed(() => [
     label: 'Actualizar Disponibilidad',
     icon: 'mdi-calendar-check',
     color: 'success',
+    variant: 'outlined',
     handler: () => router.push('/volunteer/availability')
   },
   {
@@ -514,6 +521,7 @@ const quickActions = computed(() => [
     label: 'Agregar Habilidad',
     icon: 'mdi-school',
     color: 'info',
+    variant: 'outlined',
     handler: () => router.push('/volunteer/skills/add')
   },
   {
@@ -521,6 +529,7 @@ const quickActions = computed(() => [
     label: 'Ver Certificados',
     icon: 'mdi-certificate',
     color: 'warning',
+    variant: 'outlined',
     handler: () => router.push('/volunteer/certificates')
   }
 ]);
@@ -632,14 +641,14 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.volunteer-dashboard {
+.afro-volunteer-dashboard {
   padding: var(--afro-space-lg);
   background: var(--afro-background);
   min-height: 100vh;
 }
 
 /* Dashboard Header */
-.dashboard-header {
+.afro-dashboard-header {
   margin-bottom: var(--afro-space-xl);
 }
 
@@ -969,7 +978,7 @@ onMounted(() => {
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .volunteer-dashboard {
+  .afro-volunteer-dashboard {
     padding: var(--afro-space-md);
   }
   

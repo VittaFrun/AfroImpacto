@@ -1,9 +1,9 @@
 <template>
   <div class="kanban-board">
-    <div v-for="status in statuses" :key="status" class="kanban-column">
-      <h3 class="text-subtitle-1 font-weight-bold mb-4">{{ status }}</h3>
+    <div v-for="status in statuses" :key="status.id" class="kanban-column">
+      <h3 class="text-subtitle-1 font-weight-bold mb-4">{{ status.name }}</h3>
       <draggable
-        v-model="tasksByStatus[status]"
+        v-model="tasksByStatus[status.id]"
         group="tasks"
         item-key="id"
         class="kanban-drag-area"
@@ -12,36 +12,32 @@
         <template #item="{ element }">
           <v-card class="kanban-card mb-4" @click="openTaskDetails(element)" :data-id="element.id">
             <v-card-text>
-              <p class="font-weight-bold mb-2">{{ element.description }}</p>
-              <p class="text-caption text-grey-darken-1 mb-3">Fase: {{ getPhaseName(element.phaseId) }}</p>
+              <p class="font-weight-bold mb-2">{{ element.descripcion }}</p>
+              <p class="text-caption text-grey-darken-1 mb-3">Fase: {{ getPhaseName(element.id_fase) }}</p>
               
               <div class="d-flex align-center justify-space-between mt-2">
                 <!-- Priority Chip -->
                 <v-chip
-                  v-if="element.priority"
-                  :color="priorityConfig(element.priority).color"
+                  v-if="element.prioridad"
+                  :color="priorityConfig(element.prioridad).color"
                   size="small"
                   variant="tonal"
                   class="font-weight-bold"
                 >
-                  <v-icon start :icon="priorityConfig(element.priority).icon"></v-icon>
-                  {{ element.priority }}
+                  <v-icon start :icon="priorityConfig(element.prioridad).icon"></v-icon>
+                  {{ element.prioridad }}
                 </v-chip>
 
-                <!-- Volunteer Avatars -->
-                <div class="d-flex">
-                  <v-chip
-                    v-for="assignment in element.assignments"
-                    :key="assignment.assignmentId"
-                    size="small"
-                    class="ml-1"
-                  >
-                    <v-avatar start>
-                      <span class="text-caption">{{ assignment.volunteerName.charAt(0) }}</span>
-                    </v-avatar>
-                    {{ assignment.volunteerName.split(' ')[0] }}
-                  </v-chip>
-                </div>
+                <!-- Complexity Chip -->
+                <v-chip
+                  v-if="element.complejidad"
+                  :color="complexityConfig(element.complejidad).color"
+                  size="small"
+                  variant="outlined"
+                  class="ml-2"
+                >
+                  {{ element.complejidad }}
+                </v-chip>
               </div>
             </v-card-text>
           </v-card>
@@ -58,39 +54,49 @@ import draggable from 'vuedraggable';
 const props = defineProps({
   tasks: {
     type: Array,
-    required: true,
+    default: () => [],
   },
   phases: {
     type: Array,
-    required: true,
+    default: () => [],
   },
 });
 
 const emit = defineEmits(['update:taskStatus', 'task-clicked']);
 
-const statuses = ['Pendiente', 'En Progreso', 'Completado'];
+const statuses = [
+  { id: 1, name: 'Pendiente' },
+  { id: 2, name: 'En Progreso' },
+  { id: 3, name: 'Completada' }
+];
 
 const tasksByStatus = ref({
-  Pendiente: [],
-  'En Progreso': [],
-  Completado: [],
+  1: [],
+  2: [],
+  3: [],
 });
 
 watch(
   () => props.tasks,
   (newTasks) => {
+    if (!newTasks || !Array.isArray(newTasks)) {
+      tasksByStatus.value = { 1: [], 2: [], 3: [] };
+      return;
+    }
+    
     tasksByStatus.value = {
-      Pendiente: newTasks.filter((t) => t.status === 'Pendiente'),
-      'En Progreso': newTasks.filter((t) => t.status === 'En Progreso'),
-      Completado: newTasks.filter((t) => t.status === 'Completado'),
+      1: newTasks.filter((t) => t.id_estado === 1),
+      2: newTasks.filter((t) => t.id_estado === 2),
+      3: newTasks.filter((t) => t.id_estado === 3),
     };
   },
   { immediate: true, deep: true }
 );
 
 const getPhaseName = (phaseId) => {
+  if (!props.phases || !Array.isArray(props.phases)) return 'N/A';
   const phase = props.phases.find((p) => p.id === phaseId);
-  return phase ? phase.name : 'N/A';
+  return phase ? phase.nombre : 'N/A';
 };
 
 const priorityConfig = computed(() => {
@@ -108,11 +114,33 @@ const priorityConfig = computed(() => {
   };
 });
 
+const complexityConfig = computed(() => {
+  return (complexity) => {
+    switch (complexity) {
+      case 'Alta':
+        return { color: 'error' };
+      case 'Media':
+        return { color: 'warning' };
+      case 'Baja':
+        return { color: 'success' };
+      default:
+        return { color: 'grey' };
+    }
+  };
+});
+
 const onDragEnd = (event) => {
   const { to, item } = event;
-  const newStatus = to.parentElement.querySelector('h3').textContent.trim();
+  const columnElement = to.parentElement;
+  const statusElement = columnElement.querySelector('h3');
+  if (!statusElement) return;
+  
+  const statusName = statusElement.textContent.trim();
+  const status = statuses.find(s => s.name === statusName);
+  if (!status) return;
+  
   const taskId = item.getAttribute('data-id');
-  emit('update:taskStatus', { taskId, newStatus });
+  emit('update:taskStatus', { taskId, newStatus: status.id });
 };
 
 const openTaskDetails = (task) => {

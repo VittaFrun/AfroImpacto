@@ -12,6 +12,22 @@ export const useAuthStore = defineStore('auth', () => {
   // Getters
   const isAuthenticated = computed(() => !!token.value && !!user.value);
   const userRole = computed(() => user.value?.tipo_usuario || null);
+  const userId = computed(() => user.value?.sub || user.value?.id_usuario || null);
+  const userEmail = computed(() => user.value?.email || null);
+  const userName = computed(() => user.value?.nombre || user.value?.username || null);
+  
+  // Role-based permissions
+  const isAdmin = computed(() => userRole.value === 'admin');
+  const isOrganization = computed(() => userRole.value === 'organizacion');
+  const isVolunteer = computed(() => userRole.value === 'voluntario');
+  
+  // Permission checks
+  const canManageProjects = computed(() => isAdmin.value || isOrganization.value);
+  const canViewProjects = computed(() => isAuthenticated.value);
+  const canJoinProjects = computed(() => isVolunteer.value || isOrganization.value);
+  const canCreateProjects = computed(() => isAdmin.value || isOrganization.value);
+  const canManageUsers = computed(() => isAdmin.value);
+  const canViewDashboard = computed(() => isAuthenticated.value);
 
   // Actions
   async function login(credentials) {
@@ -56,6 +72,101 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem('user');
   }
 
+  // Additional auth functions
+  async function refreshUserData() {
+    if (!isAuthenticated.value) return false;
+    
+    try {
+      const response = await axios.get('/auth/profile');
+      user.value = response.data;
+      localStorage.setItem('user', JSON.stringify(response.data));
+      return true;
+    } catch (err) {
+      console.error('Error refreshing user data:', err);
+      // If token is invalid, logout
+      if (err.response?.status === 401) {
+        logout();
+      }
+      return false;
+    }
+  }
+  
+  async function updateProfile(profileData) {
+    if (!isAuthenticated.value) return false;
+    
+    try {
+      const response = await axios.patch('/auth/profile', profileData);
+      user.value = { ...user.value, ...response.data };
+      localStorage.setItem('user', JSON.stringify(user.value));
+      return true;
+    } catch (err) {
+      console.error('Error updating profile:', err);
+      error.value = err.response?.data?.message || 'Error al actualizar el perfil';
+      return false;
+    }
+  }
+  
+  async function changePassword(passwordData) {
+    if (!isAuthenticated.value) return false;
+    
+    try {
+      await axios.patch('/auth/change-password', passwordData);
+      return true;
+    } catch (err) {
+      console.error('Error changing password:', err);
+      error.value = err.response?.data?.message || 'Error al cambiar la contraseña';
+      return false;
+    }
+  }
+  
+  // Permission helper functions
+  function hasPermission(permission) {
+    if (!isAuthenticated.value) return false;
+    
+    const permissions = {
+      'manage.projects': canManageProjects.value,
+      'view.projects': canViewProjects.value,
+      'join.projects': canJoinProjects.value,
+      'create.projects': canCreateProjects.value,
+      'manage.users': canManageUsers.value,
+      'view.dashboard': canViewDashboard.value,
+    };
+    
+    return permissions[permission] || false;
+  }
+  
+  function hasRole(role) {
+    return userRole.value === role;
+  }
+  
+  function hasAnyRole(roles) {
+    return roles.includes(userRole.value);
+  }
+  
+  // Session management
+  function checkTokenExpiry() {
+    if (!token.value) return false;
+    
+    try {
+      const base64Url = token.value.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+      const tokenData = JSON.parse(jsonPayload);
+      
+      const now = Math.floor(Date.now() / 1000);
+      return tokenData.exp > now;
+    } catch (err) {
+      console.error('Error checking token expiry:', err);
+      return false;
+    }
+  }
+  
+  function isTokenExpired() {
+    return !checkTokenExpiry();
+  }
+
   function checkAuth() {
     const storedToken = localStorage.getItem('token');
     if (storedToken) {
@@ -81,15 +192,38 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   return {
+    // State
     user,
     token,
     loading,
     error,
+    // Getters
     isAuthenticated,
     userRole,
+    userId,
+    userEmail,
+    userName,
+    isAdmin,
+    isOrganization,
+    isVolunteer,
+    canManageProjects,
+    canViewProjects,
+    canJoinProjects,
+    canCreateProjects,
+    canManageUsers,
+    canViewDashboard,
+    // Actions
     login,
     logout,
-    checkAuth,
     register,
+    checkAuth,
+    refreshUserData,
+    updateProfile,
+    changePassword,
+    hasPermission,
+    hasRole,
+    hasAnyRole,
+    checkTokenExpiry,
+    isTokenExpired,
   };
 });

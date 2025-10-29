@@ -1,0 +1,377 @@
+/* Professional Button Styles for Volunteer Views */
+
+/* Base button styling - more professional and less colorful */
+.v-btn {
+  font-weight: 500 !important;
+  letter-spacing: 0.5px !important;
+  text-transform: none !important;
+  border-radius: 8px !important;
+  transition: all 0.3s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Ensure proper vertical alignment for button content */
+.v-btn .v-btn__content {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 100% !important;
+  width: 100% !important;
+}
+
+.v-btn .v-icon {
+  margin: 0 !important;
+}
+
+.v-btn .v-icon--start {
+  margin-right: 8px !important;
+}
+
+.v-btn .v-icon--end {
+  margin-left: 8px !important;
+}
+
+/* Professional Save/Submit buttons - override any green defaults */
+.v-btn--variant-flat.v-btn--color-primary,
+.v-btn--variant-elevated.v-btn--color-primary,
+.v-btn--variant-flat:not([class*="color-"]),
+.v-btn--variant-elevated:not([class*="color-"]) {
+  background-color: #10b981 !important;
+  color: white !important;
+  border: 1px solid #10b981 !important;
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2) !important;
+}
+
+.v-btn--variant-flat.v-btn--color-primary:hover,
+.v-btn--variant-elevated.v-btn--color-primary:hover,
+.v-btn--variant-flat:not([class*="color-"]):hover,
+.v-btn--variant-elevated:not([class*="color-"]):hover {
+  background-color: #20c997 !important;
+  border-color: #20c997 !important;
+  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Specific styling for save buttons */
+.v-btn[prepend-icon="mdi-content-save"],
+.v-btn[prepend-icon="mdi-download"],
+.v-btn[prepend-icon="mdi-check"],
+.v-btn[prepend-icon="mdi-check-circle"] {
+  background-color: #10b981 !important;
+  color: white !important;
+  border: 1px solid #10b981 !important;
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2) !important;
+  font-weight: 600 !important;
+}
+
+.v-btn[prepend-icon="mdi-content-save"]:hover,
+.v-btn[prepend-icon="mdi-download"]:hover,
+.v-btn[prepend-icon="mdi-check"]:hover,
+.v-btn[prepend-icon="mdi-check-circle"]:hover {
+  background-color: #1d4ed8 !important;
+  border-color: #1d4ed8 !important;
+  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Outlined buttons - professional gray with colored accents */
+.v-btn--variant-outlined {
+  background-color: transparent !important;
+  border: 1px solid #e5e7eb !important;
+  color: #374151 !important;
+  font-weight: 500 !important;
+}
+
+.v-btn--variant-outlined:hover {
+  background-color: #f9fafb !important;
+  border-color: #d1d5db !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Specific color overrides for outlined buttons */
+.v-btn--variant-outlined.v-btn--color-primary {
+  border-color: #2563eb !important;
+  color: #2563eb !important;
+}
+
+.v-btn--variant-outlined.v-btn--color-primary:hover {
+  background-color: #eff6ff !important;
+  border-color: #2563eb !important;
+  color: #1d4ed8 !important;
+}
+
+.v-btn--variant-outlined.v-btn--color-success {
+  border-color: #16a34a !important;
+  color: #16a34a !important;
+  background-color: transparent !important;
+}
+
+.v-btn--variant-outlined.v-btn--color-success:hover {
+  background-color: #16a34a !important;
+  border-color: #16a34a !important;
+  color: white !important;
+}
+
+.v-btn--variant-outlined.v-btn--color-info {
+  border-color: #2563eb !important;
+  color: #2563eb !important;
+  background-color: transparent !important;
+}
+
+.v-btn--variant-outlined.v-btn--color-info:hover {
+  background-color: #2563eb !important;
+  border-color: #2563eb !important;
+  color: white !important;
+}
+
+.v-btn--variant-outlined.v-btn--color-warning {
+  border-color: #d97706 !important;
+  color: #d97706 !important;
+  background-color: transparent !important;
+}
+
+.v-btn--variant-outlined.v-btn--color-warning:hover {
+  background-color: #d97706 !important;
+  border-color: #d97706 !important;
+  color: white !important;
+}
+
+/* Text buttons - subtle and professional */
+.v-btn--variant-text {
+  background-color: transparent !important;
+  color: #6b7280 !important;
+  font-weight: 500 !important;
+}
+
+.v-btn--variant-text:hover {
+  background-color: #f3f4f6 !important;
+  color: #374151 !important;
+}
+
+/* Icon buttons - professional styling */
+.v-btn--icon {
+  border-radius: 8px !important;
+  background-color: transparent !important;
+  color: #6b7280 !important;
+}
+
+.v-btn--icon:hover {
+  background-color: #f3f4f6 !important;
+  color: #374151 !important;
+}
+
+/* Button sizes - consistent spacing */
+.v-btn--size-small {
+  padding: 8px 16px !important;
+  font-size: 0.875rem !important;
+}
+
+.v-btn--size-default {
+  padding: 12px 24px !important;
+  font-size: 0.875rem !important;
+}
+
+.v-btn--size-large {
+  padding: 16px 32px !important;
+  font-size: 1rem !important;
+}
+
+/* Disabled state */
+.v-btn--disabled {
+  background-color: #f3f4f6 !important;
+  color: #9ca3af !important;
+  border-color: #e5e7eb !important;
+  cursor: not-allowed !important;
+}
+
+/* Loading state */
+.v-btn--loading {
+  opacity: 0.7 !important;
+}
+
+/* Focus state for accessibility */
+.v-btn:focus-visible {
+  outline: 2px solid #2563eb !important;
+  outline-offset: 2px !important;
+}
+
+/* Quick actions grid styling */
+.quick-actions-grid .v-btn {
+  margin-bottom: 12px !important;
+  height: 48px !important;
+  font-weight: 500 !important;
+}
+
+/* Dashboard action buttons */
+.dashboard-actions .v-btn {
+  min-width: 160px !important;
+  height: 44px !important;
+}
+
+/* Header action buttons */
+.header-actions .v-btn {
+  min-width: 140px !important;
+  height: 40px !important;
+}
+
+/* Form action buttons */
+.form-actions .v-btn {
+  min-width: 120px !important;
+  height: 44px !important;
+}
+
+/* Professional button classes for specific use cases */
+.professional-primary-btn {
+  background-color: #2563eb !important;
+  color: white !important;
+  border: 1px solid #2563eb !important;
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2) !important;
+  font-weight: 600 !important;
+  min-width: 180px !important;
+  height: 44px !important;
+}
+
+.professional-primary-btn:hover {
+  background-color: #1d4ed8 !important;
+  border-color: #1d4ed8 !important;
+  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3) !important;
+  transform: translateY(-1px) !important;
+}
+
+.professional-outlined-btn {
+  background-color: transparent !important;
+  border: 1px solid #d1d5db !important;
+  color: #374151 !important;
+  font-weight: 500 !important;
+  min-width: 140px !important;
+  height: 40px !important;
+}
+
+.professional-outlined-btn:hover {
+  background-color: #f9fafb !important;
+  border-color: #9ca3af !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+.professional-action-btn {
+  background-color: transparent !important;
+  border: 1px solid #e5e7eb !important;
+  color: #374151 !important;
+  font-weight: 500 !important;
+  height: 48px !important;
+  margin-bottom: 12px !important;
+}
+
+.professional-action-btn:hover {
+  background-color: #f9fafb !important;
+  border-color: #d1d5db !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Specific color overrides for professional action buttons */
+.professional-action-btn.v-btn--color-primary {
+  border-color: #2563eb !important;
+  color: #2563eb !important;
+}
+
+.professional-action-btn.v-btn--color-primary:hover {
+  background-color: #eff6ff !important;
+  border-color: #2563eb !important;
+  color: #1d4ed8 !important;
+}
+
+.professional-action-btn.v-btn--color-success {
+  border-color: #16a34a !important;
+  color: #16a34a !important;
+  background-color: transparent !important;
+}
+
+.professional-action-btn.v-btn--color-success:hover {
+  background-color: #16a34a !important;
+  border-color: #16a34a !important;
+  color: white !important;
+}
+
+.professional-action-btn.v-btn--color-info {
+  border-color: #2563eb !important;
+  color: #2563eb !important;
+  background-color: transparent !important;
+}
+
+.professional-action-btn.v-btn--color-info:hover {
+  background-color: #2563eb !important;
+  border-color: #2563eb !important;
+  color: white !important;
+}
+
+.professional-action-btn.v-btn--color-warning {
+  border-color: #d97706 !important;
+  color: #d97706 !important;
+  background-color: transparent !important;
+}
+
+/* Professional save button class */
+.professional-save-btn {
+  background-color: #20c997 !important;
+  color: white !important;
+  border: 1px solid #20c997 !important;
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2) !important;
+  font-weight: 600 !important;
+  min-width: 160px !important;
+  height: 44px !important;
+}
+
+.professional-save-btn:hover {
+  background-color: #1d4ed8 !important;
+  border-color: #1d4ed8 !important;
+  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3) !important;
+  transform: translateY(-1px) !important;
+}
+
+.professional-save-btn .v-icon {
+  color: white !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .v-btn {
+    font-size: 0.875rem !important;
+    padding: 10px 20px !important;
+  }
+  
+  .dashboard-actions .v-btn,
+  .header-actions .v-btn {
+    min-width: auto !important;
+    width: 100% !important;
+  }
+  
+  .quick-actions-grid .v-btn {
+    height: 44px !important;
+  }
+  
+  .professional-primary-btn {
+    min-width: auto !important;
+    width: 100% !important;
+  }
+  
+  .professional-outlined-btn {
+    min-width: auto !important;
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .v-btn {
+    font-size: 0.8rem !important;
+    padding: 8px 16px !important;
+  }
+  
+  .professional-action-btn {
+    height: 44px !important;
+  }
+}

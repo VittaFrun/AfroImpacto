@@ -1,0 +1,502 @@
+/* ========================================
+   AFRO IMPACTO - MODERN UI STYLES
+   ======================================== */
+
+/* CSS Variables for consistent theming */
+:root {
+  /* Primary Colors */
+  --afro-primary: #1976d2;
+  --afro-primary-light: #42a5f5;
+  --afro-primary-dark: #1565c0;
+  
+  /* Secondary Colors */
+  --afro-secondary: #388e3c;
+  --afro-secondary-light: #66bb6a;
+  --afro-secondary-dark: #2e7d32;
+  
+  /* Accent Colors */
+  --afro-accent: #f57c00;
+  --afro-accent-light: #ffb74d;
+  --afro-accent-dark: #ef6c00;
+  
+  /* Neutral Colors */
+  --afro-grey-50: #fafafa;
+  --afro-grey-100: #f5f5f5;
+  --afro-grey-200: #eeeeee;
+  --afro-grey-300: #e0e0e0;
+  --afro-grey-400: #bdbdbd;
+  --afro-grey-500: #9e9e9e;
+  --afro-grey-600: #757575;
+  --afro-grey-700: #616161;
+  --afro-grey-800: #424242;
+  --afro-grey-900: #212121;
+  
+  /* Status Colors */
+  --afro-success: #4caf50;
+  --afro-warning: #ff9800;
+  --afro-error: #f44336;
+  --afro-info: #2196f3;
+  
+  /* Shadows */
+  --afro-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --afro-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --afro-shadow-lg: 0 8px 25px rgba(0, 0, 0, 0.15);
+  --afro-shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.2);
+  
+  /* Border Radius */
+  --afro-radius-sm: 8px;
+  --afro-radius-md: 12px;
+  --afro-radius-lg: 16px;
+  --afro-radius-xl: 20px;
+  
+  /* Transitions */
+  --afro-transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --afro-transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --afro-transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ========================================
+   GLOBAL MODERN STYLES
+   ======================================== */
+
+/* Modern Button Base Styles */
+.modern-btn {
+  font-weight: 600 !important;
+  text-transform: none !important;
+  transition: all var(--afro-transition-normal) !important;
+  position: relative !important;
+  overflow: hidden !important;
+  border-radius: var(--afro-radius-md) !important;
+  box-shadow: var(--afro-shadow-sm) !important;
+}
+
+.modern-btn:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: var(--afro-shadow-md) !important;
+}
+
+.modern-btn:active {
+  transform: translateY(0) !important;
+  box-shadow: var(--afro-shadow-sm) !important;
+}
+
+/* Modern Card Base Styles */
+.modern-card {
+  transition: all var(--afro-transition-normal) !important;
+  border: 1px solid rgba(0, 0, 0, 0.05) !important;
+  background: white !important;
+  border-radius: var(--afro-radius-lg) !important;
+}
+
+.modern-card:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: var(--afro-shadow-lg) !important;
+  border-color: rgba(var(--v-theme-primary-rgb), 0.2) !important;
+}
+
+/* Modern Input Base Styles */
+.modern-input {
+  border-radius: var(--afro-radius-md) !important;
+}
+
+.modern-input :deep(.v-field) {
+  border-radius: var(--afro-radius-md) !important;
+  transition: all var(--afro-transition-normal) !important;
+}
+
+.modern-input :deep(.v-field:hover) {
+  box-shadow: var(--afro-shadow-sm) !important;
+}
+
+.modern-input :deep(.v-field--focused) {
+  box-shadow: 0 0 0 2px rgba(var(--v-theme-primary-rgb), 0.2) !important;
+}
+
+/* Modern Dialog Base Styles */
+.modern-dialog {
+  border-radius: var(--afro-radius-xl) !important;
+  overflow: hidden !important;
+  box-shadow: var(--afro-shadow-xl) !important;
+  animation: slideInUp var(--afro-transition-normal);
+}
+
+.modern-dialog-header {
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
+  padding: 24px !important;
+}
+
+.modern-dialog-content {
+  background: white !important;
+  transition: all var(--afro-transition-normal) !important;
+}
+
+.modern-dialog-actions {
+  background: rgba(248, 249, 250, 0.8) !important;
+  border-top: 1px solid rgba(0, 0, 0, 0.1) !important;
+  padding: 24px !important;
+}
+
+/* Modern Table Base Styles */
+.modern-table {
+  border-radius: var(--afro-radius-lg) !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(0, 0, 0, 0.05) !important;
+}
+
+.modern-table :deep(.v-data-table__wrapper) {
+  border-radius: var(--afro-radius-lg) !important;
+}
+
+.modern-table :deep(.v-data-table-header) {
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef) !important;
+}
+
+.modern-table :deep(.v-data-table-header th) {
+  font-weight: 700 !important;
+  color: #495057 !important;
+}
+
+.modern-table :deep(.v-data-table__tr:hover) {
+  background: rgba(var(--v-theme-primary-rgb), 0.02) !important;
+}
+
+/* Modern Chip Base Styles */
+.modern-chip {
+  border-radius: 20px !important;
+  font-weight: 600 !important;
+  transition: all var(--afro-transition-normal) !important;
+}
+
+.modern-chip:hover {
+  transform: scale(1.05) !important;
+}
+
+/* Status Chip Variants */
+.status-verificado {
+  background: linear-gradient(135deg, var(--afro-success), #20c997) !important;
+  color: white !important;
+}
+
+.status-pendiente {
+  background: linear-gradient(135deg, var(--afro-warning), #fd7e14) !important;
+  color: white !important;
+}
+
+.status-rechazado {
+  background: linear-gradient(135deg, var(--afro-error), #e83e8c) !important;
+  color: white !important;
+}
+
+.status-procesando {
+  background: linear-gradient(135deg, var(--afro-info), #17a2b8) !important;
+  color: white !important;
+}
+
+/* ========================================
+   ANIMATIONS
+   ======================================== */
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes bounce {
+  0%, 20%, 53%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40%, 43% {
+    transform: translateY(-10px);
+  }
+  70% {
+    transform: translateY(-5px);
+  }
+  90% {
+    transform: translateY(-2px);
+  }
+}
+
+/* ========================================
+   UTILITY CLASSES
+   ======================================== */
+
+/* Animation Classes */
+.animate-slide-in-up {
+  animation: slideInUp var(--afro-transition-normal);
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp var(--afro-transition-normal);
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft var(--afro-transition-normal);
+}
+
+.animate-slide-in-right {
+  animation: slideInRight var(--afro-transition-normal);
+}
+
+.animate-pulse {
+  animation: pulse 2s infinite;
+}
+
+.animate-bounce {
+  animation: bounce 1s infinite;
+}
+
+/* Hover Effects */
+.hover-lift:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: var(--afro-shadow-lg) !important;
+}
+
+.hover-scale:hover {
+  transform: scale(1.05) !important;
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 20px rgba(var(--v-theme-primary-rgb), 0.3) !important;
+}
+
+/* Focus States */
+.focus-ring:focus-visible {
+  outline: 2px solid rgba(var(--v-theme-primary-rgb), 0.5) !important;
+  outline-offset: 2px !important;
+}
+
+/* Loading States */
+.loading-skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%) !important;
+  background-size: 200% 100% !important;
+  animation: loading 1.5s infinite !important;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* ========================================
+   RESPONSIVE UTILITIES
+   ======================================== */
+
+@media (max-width: 768px) {
+  .modern-dialog {
+    margin: 16px !important;
+    max-width: calc(100vw - 32px) !important;
+  }
+  
+  .modern-dialog-header {
+    padding: 16px !important;
+  }
+  
+  .modern-dialog-content {
+    padding: 16px !important;
+  }
+  
+  .modern-dialog-actions {
+    padding: 16px !important;
+    flex-direction: column !important;
+  }
+  
+  .modern-btn {
+    width: 100% !important;
+    margin-bottom: 8px !important;
+  }
+  
+  .modern-card {
+    margin-bottom: 16px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .modern-dialog {
+    margin: 8px !important;
+    max-width: calc(100vw - 16px) !important;
+  }
+  
+  .modern-dialog-header {
+    padding: 12px !important;
+  }
+  
+  .modern-dialog-content {
+    padding: 12px !important;
+  }
+  
+  .modern-dialog-actions {
+    padding: 12px !important;
+  }
+}
+
+/* ========================================
+   SCROLLBAR STYLING
+   ======================================== */
+
+.modern-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.modern-scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.modern-scrollbar::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.modern-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* ========================================
+   PRINT STYLES
+   ======================================== */
+
+@media print {
+  .modern-btn,
+  .modern-dialog-actions,
+  .v-toolbar,
+  .v-navigation-drawer {
+    display: none !important;
+  }
+  
+  .modern-card {
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+    break-inside: avoid !important;
+  }
+  
+  .modern-dialog {
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+  }
+}
+
+/* ========================================
+   ACCESSIBILITY IMPROVEMENTS
+   ======================================== */
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .modern-card {
+    border: 2px solid #000 !important;
+  }
+  
+  .modern-btn {
+    border: 2px solid currentColor !important;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .modern-btn,
+  .modern-card,
+  .modern-dialog,
+  .animate-slide-in-up,
+  .animate-fade-in-up,
+  .animate-slide-in-left,
+  .animate-slide-in-right,
+  .animate-pulse,
+  .animate-bounce {
+    animation: none !important;
+    transition: none !important;
+  }
+  
+  .hover-lift:hover,
+  .hover-scale:hover {
+    transform: none !important;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --afro-grey-50: #1a1a1a;
+    --afro-grey-100: #2d2d2d;
+    --afro-grey-200: #404040;
+    --afro-grey-300: #525252;
+    --afro-grey-400: #737373;
+    --afro-grey-500: #a3a3a3;
+    --afro-grey-600: #d4d4d4;
+    --afro-grey-700: #e5e5e5;
+    --afro-grey-800: #f5f5f5;
+    --afro-grey-900: #ffffff;
+  }
+  
+  .modern-card {
+    background: var(--afro-grey-100) !important;
+    border-color: var(--afro-grey-300) !important;
+  }
+  
+  .modern-dialog-header {
+    background: linear-gradient(135deg, var(--afro-grey-100), var(--afro-grey-200)) !important;
+  }
+  
+  .modern-dialog-content {
+    background: var(--afro-grey-100) !important;
+  }
+  
+  .modern-dialog-actions {
+    background: rgba(45, 45, 45, 0.8) !important;
+  }
+}

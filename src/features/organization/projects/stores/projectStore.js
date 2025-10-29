@@ -20,6 +20,54 @@ export const useProjectStore = defineStore('project', () => {
     return allProjects.value.find(p => p.id === mainProjectId.value);
   });
 
+  // Helper function to map backend project data to frontend format
+  function mapProjectData(project) {
+    return {
+      id: project.id_proyecto,
+      name: project.nombre,
+      description: project.descripcion,
+      objective: project.objetivo,
+      location: project.ubicacion,
+      startDate: project.fecha_inicio,
+      endDate: project.fecha_fin,
+      coverImage: project.imagen_principal || defaultCoverImage,
+      document: project.documento,
+      budget: project.presupuesto_total || 0,
+      statusId: project.id_estado,
+      id_estado: project.id_estado, // Add this for compatibility
+      organizationId: project.id_organizacion,
+      createdAt: project.creado_en,
+      updatedAt: project.actualizado_en,
+      // Relations
+      organization: project.organizacion,
+      estado: project.estado,
+      phases: (project.fases || []).map(phase => ({
+        id: phase.id_fase,
+        nombre: phase.nombre,
+        descripcion: phase.descripcion,
+        orden: phase.orden,
+        fecha_inicio: phase.fecha_inicio,
+        fecha_fin: phase.fecha_fin,
+        id_proyecto: phase.id_proyecto,
+        tareas: (phase.tareas || []).map(task => ({
+          id: task.id_tarea,
+          descripcion: task.descripcion,
+          fecha_inicio: task.fecha_inicio,
+          fecha_fin: task.fecha_fin,
+          prioridad: task.prioridad,
+          complejidad: task.complejidad,
+          id_estado: task.id_estado,
+          id_fase: task.id_fase,
+          observaciones: task.observaciones,
+          creado_en: task.creado_en,
+          actualizado_en: task.actualizado_en
+        }))
+      })),
+      // Legacy fields for compatibility
+      ...project
+    };
+  }
+
   // Actions
   async function fetchProjects() {
     loading.value = true;
@@ -27,10 +75,7 @@ export const useProjectStore = defineStore('project', () => {
     
     try {
       const response = await axios.get('/projects');
-      allProjects.value = response.data.map(project => ({
-        ...project,
-        coverImage: project.coverImage || defaultCoverImage
-      }));
+      allProjects.value = response.data.map(mapProjectData);
     } catch (err) {
       console.error('Error fetching projects:', err);
       error.value = 'Failed to fetch projects. Please try again later.';
@@ -46,10 +91,7 @@ export const useProjectStore = defineStore('project', () => {
     
     try {
       const response = await axios.get(`/projects/${id}`);
-      const project = {
-        ...response.data,
-        coverImage: response.data.coverImage || defaultCoverImage
-      };
+      const project = mapProjectData(response.data);
       
       const index = allProjects.value.findIndex(p => p.id === id);
       if (index !== -1) {
@@ -79,13 +121,10 @@ export const useProjectStore = defineStore('project', () => {
     try {
       const response = await axios.post('/projects', newProjectData, {
         headers: {
-          'Content-Type': 'multipart/form-data'
+          'Content-Type': 'application/json'
         }
       });
-      const project = {
-        ...response.data,
-        coverImage: response.data.coverImage || defaultCoverImage
-      };
+      const project = mapProjectData(response.data);
       allProjects.value.push(project);
       return project;
     } catch (err) {
@@ -323,24 +362,31 @@ export const useProjectStore = defineStore('project', () => {
   }
 
   return {
+    // State
     allProjects,
+    mainProjectId,
+    loading,
+    error,
+    // Getters
     projects,
     getProjectById,
     mainProject,
-    loading,
-    error,
-    setMainProject,
+    // Actions
     fetchProjects,
     fetchProjectById,
+    setMainProject,
     addProject,
     updateProject,
     deleteProject,
+    // Phase management (legacy methods)
     addProjectPhase,
     updateProjectPhase,
     deleteProjectPhase,
+    // Task management (legacy methods)
     addProjectTask,
     updateProjectTask,
     deleteProjectTask,
+    // Volunteer assignment
     assignVolunteerToTask,
     unassignVolunteerFromTask,
   };

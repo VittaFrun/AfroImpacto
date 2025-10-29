@@ -4,7 +4,7 @@ import axios from 'axios';
 const apiClient = axios.create({
   // Lee la URL base de la API desde las variables de entorno de Vite.
   // Esto te permite tener diferentes URLs para desarrollo y producción.
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000',
   headers: {
     'Content-Type': 'application/json',
   }

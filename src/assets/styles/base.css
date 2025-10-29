@@ -71,3 +71,6 @@ h1, h2, h3, h4, h5, h6, .v-card-title, .v-card-subtitle, .text-h1, .text-h2, .te
   letter-spacing: 0.5px !important;
   text-transform: none !important;
 }
+
+/* Import modern UI styles */
+@import './modern-ui.css';

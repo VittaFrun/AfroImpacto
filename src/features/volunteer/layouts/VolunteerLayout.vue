@@ -176,8 +176,9 @@ async function handleLogout() {
 }
 
 .nav-item .v-icon {
-  /* Color de los iconos inactivos */
-  color: #A0AEC0;
+  /* Color de los iconos inactivos - tono más suave */
+  color: #64748b !important;
+  transition: all 0.3s ease;
 }
 
 .nav-item {
@@ -188,24 +189,23 @@ async function handleLogout() {
 
 /* Efecto al pasar el ratón sobre un elemento inactivo */
 .nav-item:not(.v-list-item--active):hover {
-  background-color: rgba(44, 62, 80, 0.15) !important;
-  box-shadow: 0 4px 12px rgba(44, 62, 80, 0.1);
+  background-color: rgba(59, 130, 246, 0.08) !important;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
   transform: translateX(4px);
   transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
 }
 
 .nav-item:not(.v-list-item--active):hover .v-icon,
 .nav-item:not(.v-list-item--active):hover .v-list-item-title {
-  color: #2c3e50 !important;
+  color: rgb(45, 45, 54) !important;
   transition: color 0.3s ease;
 }
 
 /* Estilo para el elemento de navegación activo */
 .nav-item.v-list-item--active {
-  background: #2c3e50 !important;
+  background: linear-gradient(135deg, #2c3e50, rgb(80, 116, 153)) !important;
   color: white !important;
-  box-shadow: 0 6px 20px -4px rgba(44, 62, 80, 0.5) !important;
-
+  box-shadow: 0 6px 20px -4px rgba(37, 99, 235, 0.4) !important;
 }
 
 .nav-item.v-list-item--active .v-icon,
@@ -302,9 +302,7 @@ async function handleLogout() {
     display: none;
   }
 }
-</style>
 
-<style scoped>
 /* Animación de transición para las vistas */
 .slide-fade-enter-active {
   transition: all 0.3s ease-out;
