@@ -138,7 +138,7 @@
         <!-- Project Image -->
         <div class="project-image">
           <v-img
-            :src="project.image"
+            :src="project.image || project.coverImage || '/default-project.jpg'"
             height="200px"
             cover
             class="project-cover"
@@ -394,28 +394,13 @@
           </div>
 
           <!-- Requirements Section -->
-          <div class="project-requirements-section">
+          <div v-if="selectedProject.requisitos" class="project-requirements-section">
             <h3 class="section-title">
               <v-icon class="mr-2" color="purple">mdi-clipboard-list</v-icon>
               Requisitos para Participar
             </h3>
-            <div class="requirements-list">
-              <div class="requirement-item">
-                <v-icon color="success" size="20">mdi-check-circle</v-icon>
-                <span>Ser mayor de 18 años</span>
-              </div>
-              <div class="requirement-item">
-                <v-icon color="success" size="20">mdi-check-circle</v-icon>
-                <span>Disponibilidad de {{ getProjectDuration(selectedProject.startDate, selectedProject.endDate) }}</span>
-              </div>
-              <div class="requirement-item">
-                <v-icon color="success" size="20">mdi-check-circle</v-icon>
-                <span>Compromiso con la causa</span>
-              </div>
-              <div class="requirement-item">
-                <v-icon color="success" size="20">mdi-check-circle</v-icon>
-                <span>Disponibilidad para reuniones semanales</span>
-              </div>
+            <div class="requirements-list" style="white-space: pre-line;">
+              {{ selectedProject.requisitos }}
             </div>
           </div>
 
@@ -529,14 +514,57 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <!-- Enrollment Form Dialog -->
+    <v-dialog v-model="enrollmentDialog" max-width="800px" scrollable persistent>
+      <v-card>
+        <v-card-title class="d-flex align-center">
+          <v-icon class="mr-2" color="primary">mdi-account-plus</v-icon>
+          Inscribirse al Proyecto
+          <v-spacer></v-spacer>
+          <v-btn icon="mdi-close" variant="text" @click="enrollmentDialog = false"></v-btn>
+        </v-card-title>
+        
+        <v-card-text>
+          <div v-if="selectedProject" class="mb-4">
+            <v-alert type="info" variant="tonal" class="mb-4">
+              <strong>{{ selectedProject.name }}</strong><br>
+              {{ selectedProject.description }}
+            </v-alert>
+          </div>
+
+          <VolunteerEnrollmentForm
+            v-if="selectedProject"
+            :project-id="selectedProject.id"
+            @success="onEnrollmentSuccess"
+            @error="onEnrollmentError"
+            @cancel="enrollmentDialog = false"
+          />
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+
+    <!-- Success Snackbar -->
+    <v-snackbar
+      v-model="enrollmentSuccess"
+      color="success"
+      timeout="5000"
+    >
+      ¡Solicitud enviada correctamente! La organización revisará tu solicitud.
+    </v-snackbar>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
+import { usePublicProjectStore } from '@/features/volunteer/stores/publicProjectStore';
+import { storeToRefs } from 'pinia';
+import VolunteerEnrollmentForm from '@/features/volunteer/components/VolunteerEnrollmentForm.vue';
+
+const publicProjectStore = usePublicProjectStore();
+const { loading, publicProjects } = storeToRefs(publicProjectStore);
 
 // Reactive data
-const loading = ref(false);
 const search = ref('');
 const locationFilter = ref('');
 const categoryFilter = ref('');
@@ -544,150 +572,10 @@ const sortBy = ref('name');
 const currentPage = ref(1);
 const itemsPerPage = ref(9);
 const projectDetailDialog = ref(false);
+const enrollmentDialog = ref(false);
 const selectedProject = ref(null);
 const joinedProjects = ref([]);
-
-// Mock data - replace with real data from API
-const publicProjects = ref([
-  {
-    id: 1,
-    name: 'Educación Comunitaria',
-    description: 'Programa de alfabetización para adultos en comunidades afrodescendientes',
-    objective: 'Reducir el analfabetismo en comunidades vulnerables',
-    organization: 'Fundación Esperanza',
-    location: 'Bogotá, Colombia',
-    category: 'Educación',
-    startDate: '2024-01-15',
-    endDate: '2024-06-15',
-    budget: 5000000,
-    volunteersCount: 15,
-    image: '/src/assets/images/education-project.jpg',
-    // Payment Information
-    paymentType: 'stipend',
-    paymentAmount: 800000,
-    paymentFrequency: 'monthly',
-    paymentDescription: 'Estipendio mensual por participación activa en el programa educativo',
-    includesTransport: true,
-    includesMeals: true,
-    includesMaterials: true,
-    includesInsurance: false
-  },
-  {
-    id: 2,
-    name: 'Salud Preventiva',
-    description: 'Campaña de vacunación infantil y educación en salud',
-    objective: 'Mejorar la salud infantil en comunidades rurales',
-    organization: 'Salud para Todos',
-    location: 'Medellín, Colombia',
-    category: 'Salud',
-    startDate: '2024-02-01',
-    endDate: '2024-05-01',
-    budget: 3000000,
-    volunteersCount: 12,
-    image: '/src/assets/images/health-project.jpg',
-    // Payment Information
-    paymentType: 'volunteer',
-    paymentAmount: 0,
-    paymentFrequency: 'none',
-    paymentDescription: 'Proyecto de voluntariado sin remuneración económica',
-    includesTransport: true,
-    includesMeals: false,
-    includesMaterials: true,
-    includesInsurance: true
-  },
-  {
-    id: 3,
-    name: 'Desarrollo Económico',
-    description: 'Talleres de emprendimiento y microfinanzas',
-    objective: 'Fomentar el emprendimiento en comunidades',
-    organization: 'Emprende Juntos',
-    location: 'Cali, Colombia',
-    category: 'Trabajo Social',
-    startDate: '2024-03-01',
-    endDate: '2024-08-31',
-    budget: 8000000,
-    volunteersCount: 20,
-    image: '/src/assets/images/economic-project.jpg',
-    // Payment Information
-    paymentType: 'salary',
-    paymentAmount: 1200000,
-    paymentFrequency: 'monthly',
-    paymentDescription: 'Salario mensual por coordinación de talleres y capacitaciones',
-    includesTransport: true,
-    includesMeals: true,
-    includesMaterials: true,
-    includesInsurance: true
-  },
-  {
-    id: 4,
-    name: 'Cultura y Tradición',
-    description: 'Preservación de tradiciones afrodescendientes',
-    objective: 'Mantener vivas las tradiciones culturales',
-    organization: 'Raíces Culturales',
-    location: 'Cartagena, Colombia',
-    category: 'Cultura',
-    startDate: '2024-04-01',
-    endDate: '2024-12-31',
-    budget: 2000000,
-    volunteersCount: 8,
-    image: '/src/assets/images/culture-project.jpg',
-    // Payment Information
-    paymentType: 'honorarium',
-    paymentAmount: 500000,
-    paymentFrequency: 'project',
-    paymentDescription: 'Honorario por proyecto al finalizar las actividades culturales',
-    includesTransport: false,
-    includesMeals: true,
-    includesMaterials: true,
-    includesInsurance: false
-  },
-  {
-    id: 5,
-    name: 'Medio Ambiente',
-    description: 'Conservación de ecosistemas locales',
-    objective: 'Proteger el medio ambiente local',
-    organization: 'Verde Futuro',
-    location: 'Santa Marta, Colombia',
-    category: 'Medio Ambiente',
-    startDate: '2024-05-01',
-    endDate: '2024-10-31',
-    budget: 4000000,
-    volunteersCount: 18,
-    image: '/src/assets/images/environment-project.jpg',
-    // Payment Information
-    paymentType: 'stipend',
-    paymentAmount: 600000,
-    paymentFrequency: 'monthly',
-    paymentDescription: 'Estipendio mensual por participación en actividades de conservación',
-    includesTransport: true,
-    includesMeals: false,
-    includesMaterials: true,
-    includesInsurance: true
-  },
-  {
-    id: 6,
-    name: 'Tecnología Social',
-    description: 'Capacitación en herramientas digitales',
-    objective: 'Reducir la brecha digital',
-    organization: 'Tech Solidario',
-    location: 'Barranquilla, Colombia',
-    category: 'Tecnología',
-    startDate: '2024-06-01',
-    endDate: '2024-11-30',
-    budget: 6000000,
-    volunteersCount: 25,
-    image: '/src/assets/images/tech-project.jpg',
-    // Payment Information
-    paymentType: 'salary',
-    paymentAmount: 1500000,
-    paymentFrequency: 'monthly',
-    paymentDescription: 'Salario mensual por capacitación en tecnologías digitales',
-    includesTransport: true,
-    includesMeals: true,
-    includesMaterials: true,
-    includesInsurance: true
-  }
-]);
+const enrollmentSuccess = ref(false);
 
 // Computed properties
 const categoryOptions = computed(() => {
@@ -780,22 +668,30 @@ function viewProject(project) {
 
 function joinProject(project) {
   if (!isAlreadyJoined(project)) {
-    joinedProjects.value.push(project.id);
-    console.log('Joined project:', project.name);
-    // Show success message
+    selectedProject.value = project;
+    enrollmentDialog.value = true;
+    enrollmentSuccess.value = false;
   }
+}
+
+function onEnrollmentSuccess() {
+  enrollmentSuccess.value = true;
+  enrollmentDialog.value = false;
+  projectDetailDialog.value = false;
+  // Recargar proyectos para actualizar contadores
+  publicProjectStore.fetchPublicProjects();
+}
+
+function onEnrollmentError(error) {
+  console.error('Enrollment error:', error);
 }
 
 function isAlreadyJoined(project) {
   return project && joinedProjects.value.includes(project.id);
 }
 
-function refreshProjects() {
-  loading.value = true;
-  // Simulate API call
-  setTimeout(() => {
-    loading.value = false;
-  }, 1000);
+async function refreshProjects() {
+  await publicProjectStore.fetchPublicProjects();
 }
 
 function getCategoryColor(category) {
@@ -893,9 +789,9 @@ function getPaymentFrequencyText(frequency) {
   return frequencies[frequency] || '';
 }
 
-onMounted(() => {
-  // Load projects data
-  console.log('ProjectCatalogView mounted');
+onMounted(async () => {
+  // Load projects data from API
+  await publicProjectStore.fetchPublicProjects();
 });
 </script>
 

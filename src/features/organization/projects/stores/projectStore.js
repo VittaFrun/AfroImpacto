@@ -35,16 +35,34 @@ export const useProjectStore = defineStore('project', () => {
       budget: project.presupuesto_total || 0,
       statusId: project.id_estado,
       id_estado: project.id_estado, // Add this for compatibility
+      categoria: project.categoria || null,
+      es_publico: project.es_publico !== undefined ? project.es_publico : false,
+      isPublic: project.es_publico !== undefined ? project.es_publico : false,
+      requisitos: project.requisitos || null,
       organizationId: project.id_organizacion,
       createdAt: project.creado_en,
       updatedAt: project.actualizado_en,
+      // Beneficios del proyecto
+      beneficio: project.beneficio ? {
+        id: project.beneficio.id_proyecto_beneficio,
+        tipo_pago: project.beneficio.tipo_pago,
+        monto: project.beneficio.monto,
+        frecuencia: project.beneficio.frecuencia,
+        descripcion_pago: project.beneficio.descripcion_pago,
+        incluye_transporte: project.beneficio.incluye_transporte,
+        incluye_alimentacion: project.beneficio.incluye_alimentacion,
+        incluye_materiales: project.beneficio.incluye_materiales,
+        incluye_seguro: project.beneficio.incluye_seguro
+      } : null,
       // Relations
       organization: project.organizacion,
       estado: project.estado,
       phases: (project.fases || []).map(phase => ({
         id: phase.id_fase,
-        nombre: phase.nombre,
-        descripcion: phase.descripcion,
+        name: phase.nombre, // Frontend uses 'name'
+        nombre: phase.nombre, // Backend uses 'nombre'
+        description: phase.descripcion, // Frontend uses 'description'
+        descripcion: phase.descripcion, // Backend uses 'descripcion'
         orden: phase.orden,
         fecha_inicio: phase.fecha_inicio,
         fecha_fin: phase.fecha_fin,
@@ -60,12 +78,69 @@ export const useProjectStore = defineStore('project', () => {
           id_fase: task.id_fase,
           observaciones: task.observaciones,
           creado_en: task.creado_en,
-          actualizado_en: task.actualizado_en
+          actualizado_en: task.actualizado_en,
+          // Incluir asignaciones con relaciones
+          asignaciones: (task.asignaciones || []).map(asignacion => ({
+            id_asignacion: asignacion.id_asignacion,
+            id_tarea: asignacion.id_tarea,
+            id_voluntario: asignacion.id_voluntario,
+            id_rol: asignacion.id_rol,
+            voluntario: asignacion.voluntario ? {
+              id_voluntario: asignacion.voluntario.id_voluntario,
+              nombre: asignacion.voluntario.usuario?.nombre || 'Voluntario',
+              email: asignacion.voluntario.usuario?.email || '',
+              usuario: asignacion.voluntario.usuario
+            } : null,
+            rol: asignacion.rol ? {
+              id_rol: asignacion.rol.id_rol,
+              nombre: asignacion.rol.nombre,
+              descripcion: asignacion.rol.descripcion,
+              tipo_rol: asignacion.rol.tipo_rol
+            } : null
+          }))
         }))
       })),
       // Legacy fields for compatibility
       ...project
     };
+  }
+
+  // Helper function to parse error messages
+  function getErrorMessage(err) {
+    if (!err) return 'Error desconocido';
+    
+    // Network errors
+    if (err.code === 'ECONNABORTED' || err.message?.includes('timeout')) {
+      return 'Tiempo de espera agotado. Verifica tu conexión a internet.';
+    }
+    
+    if (err.code === 'ERR_NETWORK' || err.message?.includes('Network Error')) {
+      return 'Error de conexión. Verifica tu conexión a internet e intenta nuevamente.';
+    }
+    
+    // HTTP errors
+    if (err.response) {
+      const status = err.response.status;
+      const message = err.response.data?.message || err.response.data?.error;
+      
+      switch (status) {
+        case 401:
+          return 'No autorizado. Por favor, inicia sesión nuevamente.';
+        case 403:
+          return 'No tienes permisos para acceder a esta información.';
+        case 404:
+          return 'No se encontraron proyectos.';
+        case 500:
+        case 502:
+        case 503:
+          return 'Error del servidor. Por favor, intenta más tarde.';
+        default:
+          return message || `Error ${status}: No se pudieron cargar los proyectos.`;
+      }
+    }
+    
+    // Default error message
+    return err.message || 'Error al cargar los proyectos. Por favor, intenta nuevamente.';
   }
 
   // Actions
@@ -74,12 +149,40 @@ export const useProjectStore = defineStore('project', () => {
     error.value = null;
     
     try {
-      const response = await axios.get('/projects');
-      allProjects.value = response.data.map(mapProjectData);
+      const response = await axios.get('/projects', {
+        timeout: 10000 // 10 seconds timeout
+      });
+      
+      // Validate response data
+      if (!response.data) {
+        throw new Error('Respuesta inválida del servidor');
+      }
+      
+      // Ensure it's an array
+      const projectsData = Array.isArray(response.data) ? response.data : [];
+      
+      // Map and validate each project
+      allProjects.value = projectsData.map(project => {
+        try {
+          return mapProjectData(project);
+        } catch (mapErr) {
+          console.warn('Error mapping project:', mapErr, project);
+          return null;
+        }
+      }).filter(project => project !== null); // Remove invalid projects
+      
+      // Clear error on success
+      error.value = null;
     } catch (err) {
       console.error('Error fetching projects:', err);
-      error.value = 'Failed to fetch projects. Please try again later.';
+      error.value = getErrorMessage(err);
+      
+      // Don't clear projects on error if we have cached data
+      // Only clear if it's a critical error
+      if (err.response?.status === 401 || err.response?.status === 403) {
       allProjects.value = [];
+      }
+      // For other errors, keep existing projects if available
     } finally {
       loading.value = false;
     }
@@ -129,8 +232,12 @@ export const useProjectStore = defineStore('project', () => {
       return project;
     } catch (err) {
       console.error('Error creating project:', err);
-      error.value = 'Failed to create project. Please try again later.';
-      return null;
+      const errorMessage = err.response?.data?.message || 
+                          err.response?.data?.error || 
+                          err.message || 
+                          'Error al crear el proyecto. Por favor, inténtalo de nuevo.';
+      error.value = errorMessage;
+      throw new Error(errorMessage);
     } finally {
       loading.value = false;
     }
@@ -141,26 +248,46 @@ export const useProjectStore = defineStore('project', () => {
     error.value = null;
     
     try {
-      const response = await axios.post(`/projects/${projectId}`, updatedProjectData, {
+      // Convert frontend format to backend format
+      const backendData = {
+        nombre: updatedProjectData.nombre || updatedProjectData.name,
+        descripcion: updatedProjectData.descripcion || updatedProjectData.description,
+        objetivo: updatedProjectData.objetivo || updatedProjectData.objective,
+        ubicacion: updatedProjectData.ubicacion || updatedProjectData.location,
+        fecha_inicio: updatedProjectData.fecha_inicio || updatedProjectData.startDate,
+        fecha_fin: updatedProjectData.fecha_fin || updatedProjectData.endDate,
+        presupuesto_total: updatedProjectData.presupuesto_total || updatedProjectData.budget,
+        id_estado: updatedProjectData.id_estado,
+        es_publico: updatedProjectData.es_publico !== undefined ? updatedProjectData.es_publico : false,
+        categoria: updatedProjectData.categoria || null,
+        requisitos: updatedProjectData.requisitos || null,
+        imagen_principal: updatedProjectData.imagen_principal || null,
+        documento: updatedProjectData.documento || null
+      };
+
+      const response = await axios.patch(`/projects/${projectId}`, backendData, {
         headers: {
-          'Content-Type': 'multipart/form-data'
+          'Content-Type': 'application/json'
         },
       });
-      const project = {
-        ...response.data,
-        coverImage: response.data.coverImage || defaultCoverImage
-      };
       
+      const updatedProject = mapProjectData(response.data);
       const index = allProjects.value.findIndex(p => p.id === projectId);
       if (index !== -1) {
-        allProjects.value[index] = project;
+        allProjects.value[index] = updatedProject;
+      } else {
+        allProjects.value.push(updatedProject);
       }
       
-      return project;
+      return updatedProject;
     } catch (err) {
       console.error(`Error updating project with id ${projectId}:`, err);
-      error.value = 'Failed to update project. Please try again later.';
-      return null;
+      const errorMessage = err.response?.data?.message || 
+                          err.response?.data?.error || 
+                          err.message || 
+                          'Error al actualizar el proyecto. Por favor, inténtalo de nuevo.';
+      error.value = errorMessage;
+      throw new Error(errorMessage);
     } finally {
       loading.value = false;
     }
@@ -188,16 +315,52 @@ export const useProjectStore = defineStore('project', () => {
     error.value = null;
     
     try {
-      const response = await axios.post(`/projects/${projectId}/phases`, phaseData);
+      // Ensure phaseData has required fields
+      const cleanPhaseData = {
+        nombre: phaseData.nombre || phaseData.name || '',
+        descripcion: phaseData.descripcion || phaseData.description || '',
+        orden: phaseData.orden || phaseData.order || 1
+      };
+      
+      console.log(`Adding phase to project ${projectId}:`, cleanPhaseData);
+      
+      const response = await axios.post(`/projects/${projectId}/phases`, cleanPhaseData, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      // Update the project in the store with the new phases
       const project = allProjects.value.find(p => p.id === projectId);
-      if (project) {
-        project.phases = response.data.phases;
+      if (project && response.data) {
+        // If response.data is the full project, update it
+        if (response.data.id_proyecto || response.data.id) {
+          const updatedProject = mapProjectData(response.data);
+          const index = allProjects.value.findIndex(p => p.id === projectId);
+          if (index !== -1) {
+            allProjects.value[index] = updatedProject;
+          }
+        } else if (response.data.phases) {
+          // If response only has phases, update just the phases
+          project.phases = response.data.phases.map(phase => ({
+            id: phase.id_fase,
+            nombre: phase.nombre,
+            descripcion: phase.descripcion,
+            orden: phase.orden,
+            id_proyecto: phase.id_proyecto
+          }));
       }
+      }
+      
       return response.data;
     } catch (err) {
       console.error(`Error adding phase to project with id ${projectId}:`, err);
-      error.value = 'Failed to add project phase. Please try again later.';
-      return null;
+      const errorMessage = err.response?.data?.message || 
+                          err.response?.data?.error || 
+                          err.message || 
+                          'Failed to add project phase. Please try again later.';
+      error.value = errorMessage;
+      throw new Error(errorMessage);
     } finally {
       loading.value = false;
     }
@@ -208,19 +371,35 @@ export const useProjectStore = defineStore('project', () => {
     error.value = null;
     
     try {
-      const response = await axios.put(`/projects/${projectId}/phases/${phaseId}`, updatedPhase);
-      const project = allProjects.value.find(p => p.id === projectId);
-      if (project) {
-        const index = project.phases.findIndex(ph => ph.id === phaseId);
-        if (index !== -1) {
-          project.phases[index] = response.data;
+      // Convert frontend format to backend format
+      const backendData = {
+        nombre: updatedPhase.nombre || updatedPhase.name,
+        descripcion: updatedPhase.descripcion || updatedPhase.description,
+        orden: updatedPhase.orden || updatedPhase.order
+      };
+
+      const response = await axios.put(`/projects/${projectId}/phases/${phaseId}`, backendData, {
+        headers: {
+          'Content-Type': 'application/json'
         }
-      }
-      return response.data;
+      });
+      
+      // Refresh project data to get updated phases
+      const updatedProject = mapProjectData(response.data);
+      const projectIndex = allProjects.value.findIndex(p => p.id === projectId);
+      if (projectIndex !== -1) {
+        allProjects.value[projectIndex] = updatedProject;
+        }
+      
+      return updatedProject;
     } catch (err) {
       console.error(`Error updating phase ${phaseId} in project with id ${projectId}:`, err);
-      error.value = 'Failed to update project phase. Please try again later.';
-      return null;
+      const errorMessage = err.response?.data?.message || 
+                          err.response?.data?.error || 
+                          err.message || 
+                          'Error al actualizar la fase. Por favor, inténtalo de nuevo.';
+      error.value = errorMessage;
+      throw new Error(errorMessage);
     } finally {
       loading.value = false;
     }
@@ -232,36 +411,68 @@ export const useProjectStore = defineStore('project', () => {
     
     try {
       const response = await axios.delete(`/projects/${projectId}/phases/${phaseId}`);
-      const project = allProjects.value.find(p => p.id === projectId);
-      if (project) {
-        project.phases = response.data.phases;
+      
+      // Refresh project data to get updated phases
+      const updatedProject = mapProjectData(response.data);
+      const projectIndex = allProjects.value.findIndex(p => p.id === projectId);
+      if (projectIndex !== -1) {
+        allProjects.value[projectIndex] = updatedProject;
       }
-      return response.data;
+      
+      return updatedProject;
     } catch (err) {
       console.error(`Error deleting phase ${phaseId} from project with id ${projectId}:`, err);
-      error.value = 'Failed to delete project phase. Please try again later.';
-      return null;
+      const errorMessage = err.response?.data?.message || 
+                          err.response?.data?.error || 
+                          err.message || 
+                          'Error al eliminar la fase. Por favor, inténtalo de nuevo.';
+      error.value = errorMessage;
+      throw new Error(errorMessage);
     } finally {
       loading.value = false;
     }
   }
 
-  async function addProjectTask(projectId, phaseId, taskData) {
+  async function addProjectTask(projectId, taskData) {
     loading.value = true;
     error.value = null;
     
     try {
-      const response = await axios.post(`/projects/${projectId}/tasks`, { ...taskData, phaseId });
-      const project = allProjects.value.find(p => p.id === projectId);
-      if (project) {
-        project.tasks = response.data.tasks;
-        project.phases = response.data.phases;
+      // Convert frontend format to backend format
+      const backendData = {
+        descripcion: taskData.descripcion || taskData.description,
+        fecha_inicio: taskData.fecha_inicio || taskData.startDate,
+        fecha_fin: taskData.fecha_fin || taskData.endDate,
+        prioridad: taskData.prioridad || taskData.priority || 'Media',
+        complejidad: taskData.complejidad || taskData.complexity || 'Media',
+        id_estado: taskData.id_estado || taskData.statusId || 1,
+        id_fase: taskData.id_fase || taskData.phaseId
+      };
+
+      const response = await axios.post(`/projects/${projectId}/tasks`, backendData, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      // Refresh project data to get updated tasks
+      const updatedProject = mapProjectData(response.data);
+      const projectIndex = allProjects.value.findIndex(p => p.id === projectId);
+      if (projectIndex !== -1) {
+        allProjects.value[projectIndex] = updatedProject;
+      } else {
+        allProjects.value.push(updatedProject);
       }
-      return response.data;
+      
+      return updatedProject;
     } catch (err) {
       console.error(`Error adding task to project with id ${projectId}:`, err);
-      error.value = 'Failed to add project task. Please try again later.';
-      return null;
+      const errorMessage = err.response?.data?.message || 
+                          err.response?.data?.error || 
+                          err.message || 
+                          'Error al crear la tarea. Por favor, inténtalo de nuevo.';
+      error.value = errorMessage;
+      throw new Error(errorMessage);
     } finally {
       loading.value = false;
     }
@@ -272,20 +483,39 @@ export const useProjectStore = defineStore('project', () => {
     error.value = null;
     
     try {
-      const response = await axios.put(`/projects/${projectId}/tasks/${taskId}`, updatedTask);
-      const project = allProjects.value.find(p => p.id === projectId);
-      if (project) {
-        const index = project.tasks.findIndex(t => t.id === taskId);
-        if (index !== -1) {
-          project.tasks[index] = response.data.task;
+      // Convert frontend format to backend format
+      const backendData = {
+        descripcion: updatedTask.descripcion || updatedTask.description,
+        fecha_inicio: updatedTask.fecha_inicio || updatedTask.startDate,
+        fecha_fin: updatedTask.fecha_fin || updatedTask.endDate,
+        prioridad: updatedTask.prioridad || updatedTask.priority,
+        complejidad: updatedTask.complejidad || updatedTask.complexity,
+        id_estado: updatedTask.id_estado || updatedTask.statusId,
+        id_fase: updatedTask.id_fase || updatedTask.phaseId
+      };
+
+      const response = await axios.put(`/projects/${projectId}/tasks/${taskId}`, backendData, {
+        headers: {
+          'Content-Type': 'application/json'
         }
-        project.phases = response.data.phases;
+      });
+      
+      // Refresh project data to get updated tasks
+      const updatedProject = mapProjectData(response.data);
+      const projectIndex = allProjects.value.findIndex(p => p.id === projectId);
+      if (projectIndex !== -1) {
+        allProjects.value[projectIndex] = updatedProject;
       }
-      return response.data;
+      
+      return updatedProject;
     } catch (err) {
       console.error(`Error updating task ${taskId} in project with id ${projectId}:`, err);
-      error.value = 'Failed to update project task. Please try again later.';
-      return null;
+      const errorMessage = err.response?.data?.message || 
+                          err.response?.data?.error || 
+                          err.message || 
+                          'Error al actualizar la tarea. Por favor, inténtalo de nuevo.';
+      error.value = errorMessage;
+      throw new Error(errorMessage);
     } finally {
       loading.value = false;
     }
@@ -297,16 +527,23 @@ export const useProjectStore = defineStore('project', () => {
     
     try {
       const response = await axios.delete(`/projects/${projectId}/tasks/${taskId}`);
-      const project = allProjects.value.find(p => p.id === projectId);
-      if (project) {
-        project.tasks = response.data.tasks;
-        project.phases = response.data.phases;
+      
+      // Refresh project data to get updated tasks
+      const updatedProject = mapProjectData(response.data);
+      const projectIndex = allProjects.value.findIndex(p => p.id === projectId);
+      if (projectIndex !== -1) {
+        allProjects.value[projectIndex] = updatedProject;
       }
-      return response.data;
+      
+      return updatedProject;
     } catch (err) {
       console.error(`Error deleting task ${taskId} from project with id ${projectId}:`, err);
-      error.value = 'Failed to delete project task. Please try again later.';
-      return null;
+      const errorMessage = err.response?.data?.message || 
+                          err.response?.data?.error || 
+                          err.message || 
+                          'Error al eliminar la tarea. Por favor, inténtalo de nuevo.';
+      error.value = errorMessage;
+      throw new Error(errorMessage);
     } finally {
       loading.value = false;
     }

@@ -10,28 +10,35 @@
       <v-row>
         <v-col cols="12" md="6">
           <v-select
-            v-model="paymentData.paymentType"
+            :model-value="paymentData.paymentType"
+            @update:model-value="(value) => { paymentData.paymentType = value; onPaymentTypeChange(); }"
             :items="paymentTypeOptions"
+            item-title="title"
+            item-value="value"
             label="Tipo de Remuneración"
             variant="outlined"
             prepend-icon="mdi-cash-multiple"
             required
             density="comfortable"
             color="primary"
-            @update:model-value="onPaymentTypeChange"
+            hide-details="auto"
           />
         </v-col>
         
         <v-col cols="12" md="6">
           <v-select
-            v-model="paymentData.paymentFrequency"
+            :model-value="paymentData.paymentFrequency"
+            @update:model-value="paymentData.paymentFrequency = $event"
             :items="paymentFrequencyOptions"
+            item-title="title"
+            item-value="value"
             label="Frecuencia de Pago"
             variant="outlined"
             prepend-icon="mdi-calendar-clock"
             :disabled="paymentData.paymentType === 'volunteer'"
             density="comfortable"
             color="primary"
+            hide-details="auto"
           />
         </v-col>
       </v-row>
@@ -40,7 +47,8 @@
       <v-row v-if="paymentData.paymentType !== 'volunteer'">
         <v-col cols="12" md="6">
           <v-text-field
-            v-model="paymentData.paymentAmount"
+            :model-value="paymentData.paymentAmount"
+            @update:model-value="paymentData.paymentAmount = $event"
             label="Monto de Remuneración"
             variant="outlined"
             prepend-icon="mdi-currency-usd"
@@ -51,12 +59,14 @@
             density="comfortable"
             color="primary"
             @input="formatPaymentAmount"
+            hide-details="auto"
           />
         </v-col>
         
         <v-col cols="12" md="6">
           <v-textarea
-            v-model="paymentData.paymentDescription"
+            :model-value="paymentData.paymentDescription"
+            @update:model-value="paymentData.paymentDescription = $event"
             label="Descripción de la Remuneración"
             variant="outlined"
             :rows="3"
@@ -64,6 +74,7 @@
             density="comfortable"
             color="primary"
             auto-grow
+            hide-details="auto"
           />
         </v-col>
       </v-row>
@@ -74,30 +85,38 @@
         <v-row>
           <v-col cols="12" md="6">
             <v-checkbox
-              v-model="paymentData.includesTransport"
+              :model-value="paymentData.includesTransport"
+              @update:model-value="paymentData.includesTransport = $event"
               label="Transporte incluido"
               color="success"
               hide-details
+              density="comfortable"
             ></v-checkbox>
             <v-checkbox
-              v-model="paymentData.includesMeals"
+              :model-value="paymentData.includesMeals"
+              @update:model-value="paymentData.includesMeals = $event"
               label="Alimentación incluida"
               color="success"
               hide-details
+              density="comfortable"
             ></v-checkbox>
           </v-col>
           <v-col cols="12" md="6">
             <v-checkbox
-              v-model="paymentData.includesMaterials"
+              :model-value="paymentData.includesMaterials"
+              @update:model-value="paymentData.includesMaterials = $event"
               label="Materiales de trabajo incluidos"
               color="success"
               hide-details
+              density="comfortable"
             ></v-checkbox>
             <v-checkbox
-              v-model="paymentData.includesInsurance"
+              :model-value="paymentData.includesInsurance"
+              @update:model-value="paymentData.includesInsurance = $event"
               label="Seguro de accidentes incluido"
               color="success"
               hide-details
+              density="comfortable"
             ></v-checkbox>
           </v-col>
         </v-row>
@@ -149,7 +168,17 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue']);
 
-const paymentData = ref({ ...props.modelValue });
+// Inicializar paymentData con valores por defecto si no existen
+const paymentData = ref({
+  paymentType: props.modelValue?.paymentType || 'volunteer',
+  paymentAmount: props.modelValue?.paymentAmount || 0,
+  paymentFrequency: props.modelValue?.paymentFrequency || 'none',
+  paymentDescription: props.modelValue?.paymentDescription || '',
+  includesTransport: props.modelValue?.includesTransport || false,
+  includesMeals: props.modelValue?.includesMeals || false,
+  includesMaterials: props.modelValue?.includesMaterials || false,
+  includesInsurance: props.modelValue?.includesInsurance || false
+});
 
 const paymentTypeOptions = [
   { title: 'Voluntariado (Sin remuneración)', value: 'volunteer' },
@@ -168,14 +197,77 @@ const paymentFrequencyOptions = [
   { title: 'Por proyecto', value: 'project' }
 ];
 
-// Watch for changes and emit updates
-watch(paymentData, (newValue) => {
-  emit('update:modelValue', newValue);
-}, { deep: true });
+// Función para actualizar el modelo y emitir cambios
+let isUpdatingFromParent = false;
 
-// Watch for prop changes
+function updateModel() {
+  if (!isUpdatingFromParent) {
+    isUpdatingFromParent = true;
+    emit('update:modelValue', { ...paymentData.value });
+    // Resetear el flag después de que Vue procese el update
+    setTimeout(() => {
+      isUpdatingFromParent = false;
+    }, 0);
+  }
+}
+
+// Watch for changes and emit updates
+watch(() => paymentData.value.paymentType, () => {
+  updateModel();
+});
+
+watch(() => paymentData.value.paymentAmount, () => {
+  updateModel();
+});
+
+watch(() => paymentData.value.paymentFrequency, () => {
+  updateModel();
+});
+
+watch(() => paymentData.value.paymentDescription, () => {
+  updateModel();
+});
+
+watch(() => paymentData.value.includesTransport, () => {
+  updateModel();
+});
+
+watch(() => paymentData.value.includesMeals, () => {
+  updateModel();
+});
+
+watch(() => paymentData.value.includesMaterials, () => {
+  updateModel();
+});
+
+watch(() => paymentData.value.includesInsurance, () => {
+  updateModel();
+});
+
+// Watch for prop changes from parent (solo actualizar si realmente cambió)
+
 watch(() => props.modelValue, (newValue) => {
-  paymentData.value = { ...newValue };
+  if (newValue && !isUpdatingFromParent) {
+    // Solo actualizar si los valores realmente cambiaron para evitar loops infinitos
+    const newPaymentType = newValue.paymentType ?? 'volunteer';
+    const newPaymentAmount = newValue.paymentAmount ?? 0;
+    const newPaymentFrequency = newValue.paymentFrequency ?? 'none';
+    const newPaymentDescription = newValue.paymentDescription ?? '';
+    const newIncludesTransport = newValue.includesTransport ?? false;
+    const newIncludesMeals = newValue.includesMeals ?? false;
+    const newIncludesMaterials = newValue.includesMaterials ?? false;
+    const newIncludesInsurance = newValue.includesInsurance ?? false;
+    
+    // Solo actualizar si realmente hay cambios
+    if (paymentData.value.paymentType !== newPaymentType) paymentData.value.paymentType = newPaymentType;
+    if (paymentData.value.paymentAmount !== newPaymentAmount) paymentData.value.paymentAmount = newPaymentAmount;
+    if (paymentData.value.paymentFrequency !== newPaymentFrequency) paymentData.value.paymentFrequency = newPaymentFrequency;
+    if (paymentData.value.paymentDescription !== newPaymentDescription) paymentData.value.paymentDescription = newPaymentDescription;
+    if (paymentData.value.includesTransport !== newIncludesTransport) paymentData.value.includesTransport = newIncludesTransport;
+    if (paymentData.value.includesMeals !== newIncludesMeals) paymentData.value.includesMeals = newIncludesMeals;
+    if (paymentData.value.includesMaterials !== newIncludesMaterials) paymentData.value.includesMaterials = newIncludesMaterials;
+    if (paymentData.value.includesInsurance !== newIncludesInsurance) paymentData.value.includesInsurance = newIncludesInsurance;
+  }
 }, { deep: true });
 
 function onPaymentTypeChange() {

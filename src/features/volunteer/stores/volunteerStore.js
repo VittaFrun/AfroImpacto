@@ -70,38 +70,67 @@ export const useVolunteerStore = defineStore('volunteer', {
       this.loadingProjects = true;
       this.errorProjects = null;
       try {
-        await new Promise(res => setTimeout(res, 600));
-        this.myProjects = [
-          {
-            id: 1,
-            name: 'Campaña de Recaudación Anual',
-            image: 'https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?q=80&w=2070&auto=format&fit=crop',
-            progress: 75,
-            role: 'Coordinador de Donaciones',
-            status: 'Activo',
-            statusColor: 'primary'
-          },
-          {
-            id: 2,
-            name: 'Programa de Alfabetización Infantil',
-            image: 'https://images.unsplash.com/photo-1503919545824-a5c24117532d?q=80&w=2070&auto=format&fit=crop',
-            progress: 40,
-            role: 'Tutor de Lectura',
-            status: 'Activo',
-            statusColor: 'primary'
-          },
-          {
-            id: 3,
-            name: 'Construcción de Centro Comunitario',
-            image: 'https://images.unsplash.com/photo-1517489319231-b6f42a58244a?q=80&w=2070&auto=format&fit=crop',
-            progress: 100,
-            role: 'Ayudante General',
-            status: 'Completado',
-            statusColor: 'success'
-          },
-        ];
+        const response = await api.get('/projects');
+        
+        // Mapear datos del backend al formato del frontend
+        this.myProjects = (response.data || []).map(proyecto => {
+          // Calcular progreso basado en tareas completadas
+          let progress = 0;
+          if (proyecto.fases && proyecto.fases.length > 0) {
+            const allTasks = proyecto.fases.flatMap(fase => fase.tareas || []);
+            if (allTasks.length > 0) {
+              const completedTasks = allTasks.filter(tarea => tarea.id_estado === 3).length; // 3 = completado
+              progress = Math.round((completedTasks / allTasks.length) * 100);
+            }
+          }
+
+          // Obtener estado del proyecto
+          const estadoNombre = proyecto.estado?.nombre?.toLowerCase() || '';
+          let status = 'Activo';
+          let statusColor = 'success';
+          
+          if (estadoNombre.includes('completado') || estadoNombre.includes('finalizado')) {
+            status = 'Completado';
+            statusColor = 'info';
+          } else if (estadoNombre.includes('pausado') || estadoNombre.includes('cancelado')) {
+            status = 'Pausado';
+            statusColor = 'warning';
+          } else if (estadoNombre.includes('inactivo')) {
+            status = 'Inactivo';
+            statusColor = 'error';
+          }
+
+          // Obtener roles asignados
+          const roles = proyecto.rolesAsignados || [];
+          const roleNames = roles.map(r => r.nombre).join(', ') || 'Voluntario';
+
+          return {
+            id: proyecto.id_proyecto,
+            id_proyecto: proyecto.id_proyecto,
+            name: proyecto.nombre,
+            description: proyecto.descripcion,
+            organization: proyecto.organizacion?.nombre || 'Organización',
+            role: roleNames,
+            roles: roles, // Array completo de roles
+            rolesAsignados: roles,
+            status: status,
+            statusColor: statusColor,
+            progress: progress,
+            startDate: proyecto.fecha_inicio,
+            endDate: proyecto.fecha_fin,
+            image: proyecto.imagen_principal || proyecto.coverImage || '/default-project.jpg',
+            ubicacion: proyecto.ubicacion,
+            objetivo: proyecto.objetivo,
+            estado: proyecto.estado,
+            organizacion: proyecto.organizacion,
+            beneficio: proyecto.beneficio,
+            fases: proyecto.fases || []
+          };
+        });
       } catch (error) {
-        this.errorProjects = 'Error fetching projects';
+        console.error('Error fetching my projects:', error);
+        this.errorProjects = error.response?.data?.message || 'Error al cargar tus proyectos';
+        this.myProjects = [];
       } finally {
         this.loadingProjects = false;
       }

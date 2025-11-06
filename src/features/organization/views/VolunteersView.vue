@@ -18,89 +18,68 @@
       </ModernButton>
     </div>
 
-    <!-- Statistics Cards -->
+    <!-- Statistics Cards (MetricStatCard unified with dashboard) -->
     <v-row class="mb-6">
       <v-col cols="12" md="3">
-        <ModernCard
+        <MetricStatCard
           title="Total Voluntarios"
-          subtitle="Registrados en la plataforma"
           icon="mdi-account-group"
-          icon-color="primary"
-          variant="filled"
+          iconColor="primary"
+          :value="totalVolunteers"
+          valueColor="primary"
+          :trendText="`+${volunteerGrowth}%`"
         >
-          <template #content>
-            <div class="text-center py-4">
-              <div class="text-h3 font-weight-bold text-primary mb-2">{{ totalVolunteers }}</div>
-              <v-progress-linear
-                :model-value="volunteerGrowth"
-                color="primary"
-                height="6"
-                rounded
-                class="mb-2"
-              ></v-progress-linear>
-              <div class="text-caption text-grey">+{{ volunteerGrowth }}% este mes</div>
-            </div>
+          <template #detail>
+            <span class="text-primary">{{ activeVolunteers }} activos</span>
+            <span class="text-grey">•</span>
+            <span class="text-grey">{{ totalVolunteers - activeVolunteers }} inactivos</span>
           </template>
-        </ModernCard>
+        </MetricStatCard>
       </v-col>
-      
       <v-col cols="12" md="3">
-        <ModernCard
+        <MetricStatCard
           title="Activos"
-          subtitle="Participando en proyectos"
           icon="mdi-account-check"
-          icon-color="success"
-          variant="tonal"
+          iconColor="success"
+          :value="activeVolunteers"
+          valueColor="success"
         >
-          <template #content>
-            <div class="text-center py-4">
-              <div class="text-h3 font-weight-bold text-success mb-2">{{ activeVolunteers }}</div>
-              <div class="text-caption text-grey">{{ activePercentage }}% del total</div>
-            </div>
+          <template #detail>
+            <span class="text-success">{{ activeVolunteers }} activos</span>
+            <span class="text-grey">•</span>
+            <span class="text-grey">{{ activePercentage }}% del total</span>
           </template>
-        </ModernCard>
+        </MetricStatCard>
       </v-col>
-      
       <v-col cols="12" md="3">
-        <ModernCard
+        <MetricStatCard
           title="Horas Voluntariadas"
-          subtitle="Este mes"
           icon="mdi-clock-outline"
-          icon-color="info"
-          variant="outlined"
+          iconColor="info"
+          :value="monthlyHours"
+          valueColor="info"
         >
-          <template #content>
-            <div class="text-center py-4">
-              <div class="text-h3 font-weight-bold text-info mb-2">{{ monthlyHours }}</div>
-              <div class="text-caption text-grey">Horas registradas</div>
-            </div>
+          <template #detail>
+            <span class="text-info">{{ monthlyHours }} horas</span>
+            <span class="text-grey">•</span>
+            <span class="text-grey">Este mes</span>
           </template>
-        </ModernCard>
+        </MetricStatCard>
       </v-col>
-      
       <v-col cols="12" md="3">
-        <ModernCard
+        <MetricStatCard
           title="Evaluaciones"
-          subtitle="Promedio de calificación"
           icon="mdi-star"
-          icon-color="warning"
-          variant="gradient"
+          iconColor="warning"
+          :value="averageRating"
+          valueColor="warning"
         >
-          <template #content>
-            <div class="text-center py-4">
-              <div class="text-h3 font-weight-bold text-warning mb-2">{{ averageRating }}</div>
-              <div class="d-flex justify-center">
-                <v-rating
-                  :model-value="averageRating"
-                  color="warning"
-                  size="small"
-                  readonly
-                  half-increments
-                ></v-rating>
-              </div>
-            </div>
+          <template #detail>
+            <span class="text-warning">{{ averageRating }} promedio</span>
+            <span class="text-grey">•</span>
+            <span class="text-grey">Calificación</span>
           </template>
-        </ModernCard>
+        </MetricStatCard>
       </v-col>
     </v-row>
 
@@ -383,6 +362,7 @@
 import { ref, computed, onMounted } from 'vue';
 import ModernButton from '@/components/ui/ModernButton.vue';
 import ModernCard from '@/components/ui/ModernCard.vue';
+import MetricStatCard from '@/components/ui/MetricStatCard.vue';
 import ModernDialog from '@/components/ui/ModernDialog.vue';
 
 // Reactive data

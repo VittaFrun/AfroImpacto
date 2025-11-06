@@ -5,71 +5,68 @@
       Registra, visualiza y gestiona todas las donaciones recibidas para tus proyectos.
     </p>
 
-    <!-- Statistics Cards -->
+    <!-- Statistics Cards (MetricStatCard - same style as dashboard) -->
     <v-row class="mb-6">
       <v-col cols="12" md="3">
-        <v-card class="pa-4 rounded-lg elevation-0 stats-card" hover>
-          <v-card-title class="text-h6 font-weight-bold d-flex align-center">
-            <v-icon class="mr-2" color="success">mdi-cash-multiple</v-icon>
-            Total Recibido
-          </v-card-title>
-          <v-card-text>
-            <div class="text-h4 font-weight-bold text-success">
-              {{ formatCurrency(totalAmount) }}
-            </div>
-            <div class="text-caption text-grey">
-              Todas las donaciones
-            </div>
-          </v-card-text>
-        </v-card>
+        <MetricStatCard
+          title="Total Recibido"
+          icon="mdi-cash-multiple"
+          iconColor="success"
+          :value="formatCurrency(totalAmount)"
+          valueColor="success"
+          trendText="+15%"
+        >
+          <template #detail>
+            <span class="text-success">{{ donations.length }} donaciones</span>
+            <span class="text-grey">•</span>
+            <span class="text-grey">Total acumulado</span>
+          </template>
+        </MetricStatCard>
       </v-col>
       <v-col cols="12" md="3">
-        <v-card class="pa-4 rounded-lg elevation-0 stats-card" hover>
-          <v-card-title class="text-h6 font-weight-bold d-flex align-center">
-            <v-icon class="mr-2" color="primary">mdi-check-circle</v-icon>
-            Verificadas
-          </v-card-title>
-          <v-card-text>
-            <div class="text-h4 font-weight-bold text-primary">
-              {{ verifiedCount }}
-            </div>
-            <div class="text-caption text-grey">
-              Donaciones verificadas
-            </div>
-          </v-card-text>
-        </v-card>
+        <MetricStatCard
+          title="Verificadas"
+          icon="mdi-check-circle"
+          iconColor="primary"
+          :value="verifiedCount"
+          valueColor="primary"
+        >
+          <template #detail>
+            <span class="text-primary">{{ verifiedCount }} verificadas</span>
+            <span class="text-grey">•</span>
+            <span class="text-grey">{{ Math.round((verifiedCount / donations.length) * 100) || 0 }}% del total</span>
+          </template>
+        </MetricStatCard>
       </v-col>
       <v-col cols="12" md="3">
-        <v-card class="pa-4 rounded-lg elevation-0 stats-card" hover>
-          <v-card-title class="text-h6 font-weight-bold d-flex align-center">
-            <v-icon class="mr-2" color="warning">mdi-clock-outline</v-icon>
-            Pendientes
-          </v-card-title>
-          <v-card-text>
-            <div class="text-h4 font-weight-bold text-warning">
-              {{ pendingCount }}
-            </div>
-            <div class="text-caption text-grey">
-              Por verificar
-            </div>
-          </v-card-text>
-        </v-card>
+        <MetricStatCard
+          title="Pendientes"
+          icon="mdi-clock-outline"
+          iconColor="warning"
+          :value="pendingCount"
+          valueColor="warning"
+        >
+          <template #detail>
+            <span class="text-warning">{{ pendingCount }} pendientes</span>
+            <span class="text-grey">•</span>
+            <span class="text-grey">Por verificar</span>
+          </template>
+        </MetricStatCard>
       </v-col>
       <v-col cols="12" md="3">
-        <v-card class="pa-4 rounded-lg elevation-0 stats-card" hover>
-          <v-card-title class="text-h6 font-weight-bold d-flex align-center">
-            <v-icon class="mr-2" color="info">mdi-chart-line</v-icon>
-            Este Mes
-          </v-card-title>
-          <v-card-text>
-            <div class="text-h4 font-weight-bold text-info">
-              {{ formatCurrency(monthlyAmount) }}
-            </div>
-            <div class="text-caption text-grey">
-              Donaciones del mes
-            </div>
-          </v-card-text>
-        </v-card>
+        <MetricStatCard
+          title="Este Mes"
+          icon="mdi-chart-line"
+          iconColor="info"
+          :value="formatCurrency(monthlyAmount)"
+          valueColor="info"
+        >
+          <template #detail>
+            <span class="text-info">{{ formatCurrency(monthlyAmount) }} recibidos</span>
+            <span class="text-grey">•</span>
+            <span class="text-grey">Este mes</span>
+          </template>
+        </MetricStatCard>
       </v-col>
     </v-row>
 
@@ -563,6 +560,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
+import MetricStatCard from '@/components/ui/MetricStatCard.vue';
 import { useDonationStore } from '@/features/organization/stores/donationStore';
 import { storeToRefs } from 'pinia';
 
@@ -829,7 +827,8 @@ onMounted(() => {
 /* Modern Card Styles */
 .stats-card {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--afro-border, rgba(0, 0, 0, 0.08));
+  border-radius: var(--afro-radius-lg, 16px) !important;
 }
 
 .stats-card:hover {
@@ -931,8 +930,9 @@ onMounted(() => {
 
 /* Modern Card Styles */
 .modern-card {
-  border-radius: 16px !important;
-  box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1) !important;
+  border-radius: var(--afro-radius-lg, 16px) !important;
+  border: 1px solid var(--afro-border, rgba(0, 0, 0, 0.08)) !important;
+  box-shadow: 0 8px 24px -8px rgba(16, 24, 40, 0.12) !important;
 }
 
 /* Action Button Styles */

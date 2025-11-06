@@ -255,6 +255,33 @@ export const useNotificationStore = defineStore('notifications', () => {
     }
   }
 
+  // Snackbar helper (simple notification)
+  function showSnackbar(message, type = 'success', timeout = 3000) {
+    // Create a simple snackbar notification
+    const snackbar = {
+      id: Date.now() + Math.random(),
+      type: type,
+      message: message,
+      timeout: timeout,
+      visible: true
+    };
+
+    // Add to notifications
+    addNotification({
+      type: type,
+      title: type === 'success' ? 'Éxito' : type === 'error' ? 'Error' : type === 'warning' ? 'Advertencia' : 'Información',
+      message: message,
+      expiresAt: new Date(Date.now() + timeout)
+    });
+
+    // Auto-remove after timeout
+    setTimeout(() => {
+      removeNotification(snackbar.id);
+    }, timeout);
+
+    return snackbar;
+  }
+
   // Initialize
   loadSettings();
   requestNotificationPermission();
@@ -299,6 +326,7 @@ export const useNotificationStore = defineStore('notifications', () => {
     playNotificationSound,
     showDesktopNotification,
     requestNotificationPermission,
+    showSnackbar,
   };
 });
 

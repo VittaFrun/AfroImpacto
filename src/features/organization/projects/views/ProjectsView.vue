@@ -1,19 +1,62 @@
 <template>
   <v-container fluid class="pa-8">
-    <!-- Loading State -->
-    <div v-if="loading" class="d-flex justify-center align-center" style="height: 60vh;">
-      <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
+    <!-- Loading Overlay - Only show if first load with no cached data -->
+    <div v-if="loading && (!projects || projects.length === 0) && !error" class="loading-overlay">
+      <div class="loading-content">
+        <v-progress-circular indeterminate color="primary" size="64" class="mb-4"></v-progress-circular>
+        <p class="text-body-1 text-grey-darken-1">Cargando proyectos...</p>
+      </div>
     </div>
 
-    <!-- Error State -->
-    <div v-else-if="error" class="d-flex justify-center align-center" style="height: 60vh;">
-      <v-alert type="error" prominent>
-        {{ error }}
-      </v-alert>
+    <!-- Skeleton Loader for initial load - Only if no error and loading -->
+    <div v-if="loading && (!projects || projects.length === 0) && !error" class="skeleton-loader-container">
+      <v-row>
+        <v-col cols="12" md="3" v-for="n in 4" :key="n">
+          <v-skeleton-loader type="card" class="mb-4"></v-skeleton-loader>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col cols="12" md="6" lg="4" v-for="n in 6" :key="n">
+          <v-skeleton-loader type="card, article"></v-skeleton-loader>
+        </v-col>
+      </v-row>
     </div>
+
+    <!-- Error Banner (Non-blocking) -->
+    <v-alert
+      v-if="showError && error && !loading"
+      :type="getErrorType(error)"
+      variant="tonal"
+      dismissible
+      class="mb-6 error-banner"
+      @update:model-value="clearError"
+      :icon="getErrorIcon(error)"
+    >
+      <div class="d-flex align-center">
+        <div class="flex-grow-1">
+          <div class="text-subtitle-2 font-weight-bold mb-1">
+            {{ getErrorTitle(error) }}
+          </div>
+          <div class="text-body-2">{{ error }}</div>
+          <div class="text-caption mt-2" v-if="!isCriticalError(error)">
+            Puedes continuar trabajando. Los datos se actualizarán cuando la conexión se restaure.
+          </div>
+        </div>
+        <v-btn
+          v-if="!isCriticalError(error)"
+          icon
+          size="small"
+          variant="text"
+          @click="retryFetch"
+          class="ml-2"
+        >
+          <v-icon>mdi-refresh</v-icon>
+        </v-btn>
+      </div>
+    </v-alert>
 
     <!-- Main Content -->
-    <div v-else>
+    <div :class="{ 'content-blurred': loading }">
       <!-- Header Section -->
       <div class="d-flex justify-space-between align-center mb-6">
         <div>
@@ -70,8 +113,10 @@
           >
             <template #content>
               <div class="text-center py-4">
-                <div class="text-h3 font-weight-bold text-primary">{{ projects.length }}</div>
-                <div class="text-caption text-grey">Proyectos activos</div>
+                <div class="text-h3 font-weight-bold text-primary">
+                  {{ projects && projects.length ? projects.length : 0 }}
+                </div>
+                <div class="text-caption text-grey">Proyectos {{ error ? 'en caché' : 'totales' }}</div>
               </div>
             </template>
           </ModernCard>
@@ -231,20 +276,83 @@
           >
             <template #content>
               <!-- Empty State -->
-              <div v-if="projects.length === 0" class="text-center py-8">
-                <v-icon size="120" color="grey-lighten-1">mdi-folder-open-outline</v-icon>
-                <h3 class="text-h5 text-grey mt-4">No hay proyectos creados</h3>
-                <p class="text-body-1 text-grey mb-4">
-                  Comienza creando tu primer proyecto de impacto social
-                </p>
+              <div v-if="!loading && (!projects || projects.length === 0)" class="empty-state-container">
+                <div class="empty-state-content">
+                  <div class="empty-state-icon mb-4">
+                    <v-icon 
+                      :size="error ? 100 : 120" 
+                      :color="error ? 'error' : 'grey-lighten-1'"
+                    >
+                      {{ error ? 'mdi-cloud-off-outline' : 'mdi-folder-open-outline' }}
+                    </v-icon>
+                  </div>
+                  <h3 class="text-h5 font-weight-bold text-grey-darken-1 mb-2">
+                    {{ error ? 'No se pudieron cargar los proyectos' : 'No hay proyectos creados' }}
+                  </h3>
+                  <p class="text-body-1 text-grey-darken-1 mb-6" style="max-width: 500px;">
+                    {{ error 
+                      ? getEmptyStateMessage(error)
+                      : 'Comienza creando tu primer proyecto de impacto social. Los proyectos te permiten organizar y gestionar tus iniciativas de manera eficiente.'
+                    }}
+                  </p>
+                  <div class="d-flex align-center gap-3 flex-wrap justify-center">
                 <ModernButton
+                      v-if="!error || !isCriticalError(error)"
                   color="primary"
                   variant="flat"
                   prepend-icon="mdi-plus"
                   @click="goToCreateProject"
-                >
-                  Crear Primer Proyecto
+                      size="large"
+                    >
+                      {{ error ? 'Crear Proyecto' : 'Crear Primer Proyecto' }}
+                    </ModernButton>
+                    <ModernButton
+                      v-if="error"
+                      color="grey"
+                      variant="outlined"
+                      prepend-icon="mdi-refresh"
+                      @click="retryFetch"
+                      size="large"
+                      :loading="isRetrying"
+                      :disabled="isRetrying"
+                    >
+                      {{ isRetrying ? 'Reintentando...' : `Reintentar${retryCount > 0 ? ` (${retryCount})` : ''}` }}
+                    </ModernButton>
+                    <ModernButton
+                      v-if="error && isCriticalError(error)"
+                      color="primary"
+                      variant="outlined"
+                      prepend-icon="mdi-login"
+                      @click="handleAuthError"
+                      size="large"
+                    >
+                      Iniciar Sesión
                 </ModernButton>
+                  </div>
+                  <div v-if="!error" class="mt-8 empty-state-features">
+                    <h4 class="text-subtitle-1 font-weight-bold mb-4">¿Qué puedes hacer con los proyectos?</h4>
+                    <v-row>
+                      <v-col cols="12" md="4">
+                        <div class="feature-item">
+                          <v-icon color="primary" size="32" class="mb-2">mdi-account-group</v-icon>
+                          <p class="text-body-2 text-grey-darken-1">Gestiona voluntarios</p>
+                        </div>
+                      </v-col>
+                      <v-col cols="12" md="4">
+                        <div class="feature-item">
+                          <v-icon color="success" size="32" class="mb-2">mdi-calendar-check</v-icon>
+                          <p class="text-body-2 text-grey-darken-1">Organiza actividades</p>
+                        </div>
+                      </v-col>
+                      <v-col cols="12" md="4">
+                        <div class="feature-item">
+                          <v-icon color="info" size="32" class="mb-2">mdi-chart-line</v-icon>
+                          <p class="text-body-2 text-grey-darken-1">Realiza seguimiento</p>
+                        </div>
+                      </v-col>
+                    </v-row>
+                  </div>
+                </div>
               </div>
               
               <!-- No Results State -->
@@ -388,7 +496,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useProjectStore } from '@/features/organization/projects/stores/projectStore';
 import { storeToRefs } from 'pinia';
@@ -401,14 +509,94 @@ const projectStore = useProjectStore();
 
 const { projects, mainProject, loading, error } = storeToRefs(projectStore);
 
+// Local error state to handle dismissal
+const showError = ref(false);
+const retryCount = ref(0);
+const isRetrying = ref(false);
+
+// Watch for errors from store
+watch(error, (newError) => {
+  showError.value = !!newError;
+  if (!newError) {
+    retryCount.value = 0; // Reset retry count on success
+  }
+}, { immediate: true });
+
+function clearError() {
+  showError.value = false;
+  projectStore.error = null;
+  retryCount.value = 0;
+}
+
+// Error type detection
+function getErrorType(errorMessage) {
+  if (!errorMessage) return 'error';
+  
+  const msg = errorMessage.toLowerCase();
+  if (msg.includes('tiempo de espera') || msg.includes('timeout')) return 'warning';
+  if (msg.includes('conexión') || msg.includes('network')) return 'warning';
+  if (msg.includes('no autorizado') || msg.includes('401')) return 'error';
+  if (msg.includes('permisos') || msg.includes('403')) return 'error';
+  if (msg.includes('servidor') || msg.includes('500')) return 'error';
+  
+  return 'error';
+}
+
+function getErrorIcon(errorMessage) {
+  const type = getErrorType(errorMessage);
+  switch (type) {
+    case 'warning':
+      return 'mdi-wifi-off';
+    case 'error':
+      return 'mdi-alert-circle';
+    default:
+      return 'mdi-information';
+  }
+}
+
+function getErrorTitle(errorMessage) {
+  if (!errorMessage) return 'Error';
+  
+  const msg = errorMessage.toLowerCase();
+  if (msg.includes('tiempo de espera') || msg.includes('timeout')) {
+    return 'Tiempo de espera agotado';
+  }
+  if (msg.includes('conexión') || msg.includes('network')) {
+    return 'Problema de conexión';
+  }
+  if (msg.includes('no autorizado') || msg.includes('401')) {
+    return 'Sesión expirada';
+  }
+  if (msg.includes('permisos') || msg.includes('403')) {
+    return 'Sin permisos';
+  }
+  if (msg.includes('servidor') || msg.includes('500')) {
+    return 'Error del servidor';
+  }
+  
+  return 'Error al cargar proyectos';
+}
+
+function isCriticalError(errorMessage) {
+  if (!errorMessage) return false;
+  const msg = errorMessage.toLowerCase();
+  return msg.includes('no autorizado') || 
+         msg.includes('401') || 
+         msg.includes('permisos') || 
+         msg.includes('403');
+}
+
 // Search and filter state
 const searchQuery = ref('');
 const statusFilter = ref(null);
 
-// Status options for filter
+// Status options for filter (Estados del proyecto)
 const statusOptions = [
-  { title: 'No Público', value: 0 },
-  { title: 'Público', value: 1 }
+  { title: 'Planificación', value: 5 },
+  { title: 'En Proceso', value: 1 },
+  { title: 'Pausado', value: 3 },
+  { title: 'Terminado', value: 2 },
+  { title: 'Cancelado', value: 4 }
 ];
 
 onMounted(() => {
@@ -417,28 +605,33 @@ onMounted(() => {
 
 // Computed properties
 const activeProjectsCount = computed(() => {
+  if (!projects.value || projects.value.length === 0) return 0;
   return projects.value.filter(p => p.id_estado === 1).length;
 });
 
 const publicProjectsCount = computed(() => {
-  return projects.value.filter(p => p.id_estado === 1).length;
+  if (!projects.value || projects.value.length === 0) return 0;
+  return projects.value.filter(p => p.es_publico === true).length;
 });
 
 const totalBudget = computed(() => {
-  return projects.value.reduce((sum, p) => sum + (p.budget || 0), 0);
+  if (!projects.value || projects.value.length === 0) return 0;
+  return projects.value.reduce((sum, p) => sum + (Number(p.budget) || 0), 0);
 });
 
 // Filtered projects
 const filteredProjects = computed(() => {
-  let filtered = projects.value;
+  if (!projects.value || projects.value.length === 0) return [];
+  
+  let filtered = [...projects.value];
 
   // Search filter
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase();
     filtered = filtered.filter(project => 
-      project.name.toLowerCase().includes(query) ||
-      project.description.toLowerCase().includes(query) ||
-      project.location.toLowerCase().includes(query)
+      (project.name && project.name.toLowerCase().includes(query)) ||
+      (project.description && project.description.toLowerCase().includes(query)) ||
+      (project.location && project.location.toLowerCase().includes(query))
     );
   }
 
@@ -450,19 +643,25 @@ const filteredProjects = computed(() => {
   return filtered;
 });
 
-// Helper functions
+// Helper functions para estados del proyecto
 function getStatusColor(statusId) {
   switch (statusId) {
-    case 0: return 'warning'; // No Público
-    case 1: return 'success'; // Público
-    default: return 'grey';
+    case 1: return 'info'; // En Proceso
+    case 2: return 'success'; // Terminado
+    case 3: return 'warning'; // Pausado
+    case 4: return 'error'; // Cancelado
+    case 5: return 'primary'; // Planificación
+    default: return 'grey'; // Desconocido
   }
 }
 
 function getStatusText(statusId) {
   switch (statusId) {
-    case 0: return 'No Público';
-    case 1: return 'Público';
+    case 1: return 'En Proceso';
+    case 2: return 'Terminado';
+    case 3: return 'Pausado';
+    case 4: return 'Cancelado';
+    case 5: return 'Planificación';
     default: return 'Desconocido';
   }
 }
@@ -540,6 +739,62 @@ function duplicateProject(projectId) {
       projectStore.fetchProjects();
     });
   }
+}
+
+function getEmptyStateMessage(errorMessage) {
+  if (!errorMessage) return 'No se pudieron cargar los proyectos.';
+  
+  const msg = errorMessage.toLowerCase();
+  if (msg.includes('tiempo de espera') || msg.includes('timeout')) {
+    return 'El servidor tardó demasiado en responder. Verifica tu conexión a internet e intenta nuevamente.';
+  }
+  if (msg.includes('conexión') || msg.includes('network')) {
+    return 'No se pudo establecer conexión con el servidor. Verifica tu conexión a internet.';
+  }
+  if (msg.includes('no autorizado') || msg.includes('401')) {
+    return 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente para continuar.';
+  }
+  if (msg.includes('permisos') || msg.includes('403')) {
+    return 'No tienes permisos para acceder a esta información. Contacta al administrador.';
+  }
+  if (msg.includes('servidor') || msg.includes('500')) {
+    return 'El servidor está experimentando problemas. Por favor, intenta más tarde.';
+  }
+  
+  return 'Hubo un problema al conectar con el servidor. Verifica tu conexión o intenta recargar la página.';
+}
+
+async function retryFetch() {
+  if (isRetrying.value) return;
+  
+  isRetrying.value = true;
+  retryCount.value += 1;
+  
+  // Exponential backoff: wait 1s, 2s, 4s, etc.
+  const delay = Math.min(1000 * Math.pow(2, retryCount.value - 1), 10000);
+  
+  if (retryCount.value > 1) {
+    await new Promise(resolve => setTimeout(resolve, delay));
+  }
+  
+  try {
+    showError.value = false;
+    await projectStore.fetchProjects();
+    
+    // If successful, reset retry count
+    if (!projectStore.error) {
+      retryCount.value = 0;
+    }
+  } catch (err) {
+    console.error('Retry failed:', err);
+  } finally {
+    isRetrying.value = false;
+  }
+}
+
+function handleAuthError() {
+  // Redirect to login
+  router.push('/auth/login');
 }
 </script>
 
@@ -681,6 +936,108 @@ function duplicateProject(projectId) {
   text-transform: none;
 }
 
+/* Loading Overlay */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  backdrop-filter: blur(4px);
+}
+
+.loading-content {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.content-blurred {
+  opacity: 0.6;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+/* Skeleton Loader */
+.skeleton-loader-container {
+  padding: 24px 0;
+}
+
+.skeleton-loader-container .v-skeleton-loader {
+  border-radius: 12px;
+}
+
+/* Empty State */
+.empty-state-container {
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+}
+
+.empty-state-content {
+  text-align: center;
+  max-width: 800px;
+}
+
+.empty-state-icon {
+  animation: fadeInScale 0.5s ease;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.error-banner {
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.empty-state-features {
+  margin-top: 32px;
+  padding-top: 32px;
+  border-top: 1px solid rgba(var(--v-theme-outline), 0.12);
+}
+
+.feature-item {
+  padding: 16px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.feature-item:hover {
+  background: rgba(var(--v-theme-primary-rgb), 0.05);
+  transform: translateY(-2px);
+}
+
+.gap-3 {
+  gap: 12px;
+}
+
 /* Responsive adjustments for header */
 @media (max-width: 1024px) {
   .search-field {
@@ -698,6 +1055,18 @@ function duplicateProject(projectId) {
   .filter-field {
     min-width: auto;
     width: 100%;
+  }
+  
+  .empty-state-content {
+    padding: 24px 16px;
+  }
+  
+  .empty-state-features .v-row {
+    margin: 0;
+  }
+  
+  .empty-state-features .v-col {
+    padding: 8px;
   }
 }
 </style>

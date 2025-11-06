@@ -277,9 +277,8 @@ function handleConfirm() {
 
 /* Hover Effects */
 .modern-card:hover {
-  transform: translateY(-4px) !important;
+  transform: translateY(-1px) !important;
   box-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.15) !important;
-  border-color: rgba(var(--v-theme-primary-rgb), 0.2) !important;
 }
 
 /* Header Styles */

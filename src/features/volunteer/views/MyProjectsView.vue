@@ -153,7 +153,7 @@
         <!-- Project Image -->
         <div class="project-image">
           <v-img
-            :src="project.image"
+            :src="project.image || project.imagen_principal || '/default-project.jpg'"
             height="200px"
             cover
             class="project-cover"
@@ -177,13 +177,26 @@
           <div class="project-header">
             <h3 class="project-title">{{ project.name }}</h3>
             <div class="project-role">
+              <div v-if="project.rolesAsignados && project.rolesAsignados.length > 0" class="d-flex flex-wrap gap-1">
+                <v-chip
+                  v-for="(rol, index) in project.rolesAsignados"
+                  :key="rol.id_rol || index"
+                  color="info"
+                  size="small"
+                  variant="tonal"
+                  prepend-icon="mdi-account-tie"
+                >
+                  {{ rol.nombre }}
+                </v-chip>
+              </div>
               <v-chip
+                v-else
                 color="info"
                 size="small"
                 variant="tonal"
                 prepend-icon="mdi-account-tie"
               >
-                {{ project.role }}
+                {{ project.role || 'Voluntario' }}
               </v-chip>
             </div>
           </div>
@@ -259,97 +272,22 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { useAuthStore } from '@/features/auth/stores/authStore';
+import { useVolunteerStore } from '@/features/volunteer/stores/volunteerStore';
 
 const router = useRouter();
 const authStore = useAuthStore();
+const volunteerStore = useVolunteerStore();
 
 const { user } = storeToRefs(authStore);
+const { myProjects, loadingProjects, errorProjects } = storeToRefs(volunteerStore);
 
 // Reactive data
-const loadingProjects = ref(false);
-const errorProjects = ref(null);
 const searchQuery = ref('');
 const statusFilter = ref(null);
 const roleFilter = ref(null);
 const sortBy = ref('name');
 const currentPage = ref(1);
 const itemsPerPage = ref(6);
-
-// Mock data - replace with real data from stores
-const myProjects = ref([
-  {
-    id: 1,
-    name: 'Educación Comunitaria',
-    description: 'Programa de alfabetización para adultos en comunidades afrodescendientes',
-    organization: 'Fundación Esperanza',
-    role: 'Coordinador',
-    status: 'Activo',
-    progress: 75,
-    startDate: '2024-01-15',
-    endDate: '2024-06-15',
-    image: '/src/assets/images/education-project.jpg'
-  },
-  {
-    id: 2,
-    name: 'Salud Preventiva',
-    description: 'Campaña de vacunación infantil y educación en salud',
-    organization: 'Salud para Todos',
-    role: 'Voluntario',
-    status: 'Activo',
-    progress: 45,
-    startDate: '2024-02-01',
-    endDate: '2024-05-01',
-    image: '/src/assets/images/health-project.jpg'
-  },
-  {
-    id: 3,
-    name: 'Desarrollo Económico',
-    description: 'Talleres de emprendimiento y microfinanzas',
-    organization: 'Emprende Juntos',
-    role: 'Facilitador',
-    status: 'Completado',
-    progress: 100,
-    startDate: '2023-10-01',
-    endDate: '2024-01-31',
-    image: '/src/assets/images/economic-project.jpg'
-  },
-  {
-    id: 4,
-    name: 'Cultura y Tradición',
-    description: 'Preservación de tradiciones afrodescendientes',
-    organization: 'Raíces Culturales',
-    role: 'Investigador',
-    status: 'Activo',
-    progress: 30,
-    startDate: '2024-03-01',
-    endDate: '2024-08-31',
-    image: '/src/assets/images/culture-project.jpg'
-  },
-  {
-    id: 5,
-    name: 'Medio Ambiente',
-    description: 'Conservación de ecosistemas locales',
-    organization: 'Verde Futuro',
-    role: 'Educador',
-    status: 'Pausado',
-    progress: 60,
-    startDate: '2023-12-01',
-    endDate: '2024-04-30',
-    image: '/src/assets/images/environment-project.jpg'
-  },
-  {
-    id: 6,
-    name: 'Tecnología Social',
-    description: 'Capacitación en herramientas digitales',
-    organization: 'Tech Solidario',
-    role: 'Instructor',
-    status: 'Completado',
-    progress: 100,
-    startDate: '2023-08-01',
-    endDate: '2023-12-31',
-    image: '/src/assets/images/tech-project.jpg'
-  }
-]);
 
 // Computed properties
 const statusOptions = computed(() => [
@@ -359,8 +297,18 @@ const statusOptions = computed(() => [
 ]);
 
 const roleOptions = computed(() => {
-  const roles = [...new Set(myProjects.value.map(p => p.role))];
-  return roles.map(role => ({ title: role, value: role }));
+  const allRoles = new Set();
+  myProjects.value.forEach(project => {
+    if (project.rolesAsignados && project.rolesAsignados.length > 0) {
+      project.rolesAsignados.forEach(rol => {
+        allRoles.add(rol.nombre);
+      });
+    } else if (project.role) {
+      // Si hay múltiples roles separados por coma
+      project.role.split(',').forEach(r => allRoles.add(r.trim()));
+    }
+  });
+  return Array.from(allRoles).map(role => ({ title: role, value: role }));
 });
 
 const sortOptions = computed(() => [
@@ -390,7 +338,12 @@ const filteredProjects = computed(() => {
 
   // Role filter
   if (roleFilter.value) {
-    filtered = filtered.filter(project => project.role === roleFilter.value);
+    filtered = filtered.filter(project => {
+      if (project.rolesAsignados && project.rolesAsignados.length > 0) {
+        return project.rolesAsignados.some(rol => rol.nombre === roleFilter.value);
+      }
+      return project.role && project.role.includes(roleFilter.value);
+    });
   }
 
   // Sort
@@ -478,13 +431,9 @@ watch([searchQuery, statusFilter, roleFilter], () => {
   currentPage.value = 1;
 });
 
-onMounted(() => {
-  // Load projects data
-  loadingProjects.value = true;
-  // Simulate API call
-  setTimeout(() => {
-    loadingProjects.value = false;
-  }, 1000);
+onMounted(async () => {
+  // Cargar proyectos reales del voluntario
+  await volunteerStore.fetchMyProjects();
 });
 </script>
 
