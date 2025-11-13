@@ -527,7 +527,7 @@ onMounted(() => {
 <style scoped>
 .afro-org-dashboard {
   padding: var(--afro-space-lg);
-  background: var(--afro-background);
+  background: #ffffff !important;
   min-height: 100vh;
 }
 

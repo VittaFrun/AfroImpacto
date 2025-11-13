@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import api from '@/plugins/axios';
+import defaultCoverImage from '@/assets/images/background_login.png';
 
 export const useVolunteerStore = defineStore('volunteer', {
   state: () => ({
@@ -66,6 +67,26 @@ export const useVolunteerStore = defineStore('volunteer', {
       }
     },
 
+    async fetchProjectTasks(projectId) {
+      try {
+        const response = await api.get(`/asignacion/voluntario/proyecto/${projectId}`);
+        return response.data || [];
+      } catch (error) {
+        console.error('Error fetching project tasks:', error);
+        throw error;
+      }
+    },
+
+    async updateTaskStatus(taskId, newStatus) {
+      try {
+        const response = await api.patch(`/tarea/${taskId}`, { id_estado: newStatus });
+        return response.data;
+      } catch (error) {
+        console.error('Error updating task status:', error);
+        throw error;
+      }
+    },
+
     async fetchMyProjects() {
       this.loadingProjects = true;
       this.errorProjects = null;
@@ -118,7 +139,12 @@ export const useVolunteerStore = defineStore('volunteer', {
             progress: progress,
             startDate: proyecto.fecha_inicio,
             endDate: proyecto.fecha_fin,
-            image: proyecto.imagen_principal || proyecto.coverImage || '/default-project.jpg',
+            image: (proyecto.imagen_principal && proyecto.imagen_principal !== '/assets/images/background_login.png') 
+              ? proyecto.imagen_principal 
+              : defaultCoverImage,
+            imagen_principal: (proyecto.imagen_principal && proyecto.imagen_principal !== '/assets/images/background_login.png') 
+              ? proyecto.imagen_principal 
+              : defaultCoverImage,
             ubicacion: proyecto.ubicacion,
             objetivo: proyecto.objetivo,
             estado: proyecto.estado,

@@ -96,8 +96,8 @@ import { ref, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import AuthLayout from '@/layouts/AuthLayout.vue';
 import InfoCarousel from '@/features/auth/components/InfoCarousel.vue';
-
 import { useAuthStore } from '@/features/auth/stores/authStore';
+import { ROUTES } from '@/constants/routes';
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -144,7 +144,7 @@ const handleLogin = async () => {
     } else if (authStore.userRole === 'voluntario') {
       router.push({ name: 'volunteer-dashboard' });
     } else {
-      router.push('/'); // Fallback por si no hay rol
+      router.push(ROUTES.HOME); // Fallback por si no hay rol
     }
   } else {
     snackbar.value = {

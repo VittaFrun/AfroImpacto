@@ -40,7 +40,7 @@
               <span class="card-title-text font-weight-bold">Nuestra Misión</span>
             </v-card-title>
             <v-card-text class="card-description pt-0">
-              Empoderar a las comunidades afrodescendientes, facilitando el acceso a recursos y oportunidades, y promoviendo su desarrollo integral a través de proyectos sostenibles y alianzas estratégicas.
+              Empoderar a las comunidades vulnerables, facilitando el acceso a recursos y oportunidades, y promoviendo su desarrollo integral a través de proyectos sostenibles y alianzas estratégicas.
             </v-card-text>
           </v-card>
         </v-col>
@@ -51,44 +51,9 @@
               <span class="card-title-text font-weight-bold">Nuestra Visión</span>
             </v-card-title>
             <v-card-text class="card-description pt-0">
-              Ser el referente global en la visibilización y el fortalecimiento de la identidad y el impacto afrodescendiente, construyendo una sociedad más inclusiva, justa y equitativa para todos.
+              Ser el referente global en la visibilización y el fortalecimiento de la identidad y el impacto social, construyendo una sociedad más inclusiva, justa y equitativa para todos.
             </v-card-text>
           </v-card>
-        </v-col>
-      </v-row>
-
-      <v-row justify="center" class="mt-14">
-        <v-col cols="12" md="10" class="text-center">
-          <h3 class="section-heading-small font-weight-bold mb-10">
-            Pilares de <span class="text-accent">Nuestros Valores</span>
-          </h3>
-          <div class="values-grid">
-            <div class="value-item">
-              <v-icon color="primary" size="44" class="mb-3 animate-icon-pop">mdi-account-multiple-check</v-icon>
-              <div class="value-title">Inclusión</div>
-              <p class="value-description">Creemos en un mundo donde todas las voces son valoradas y escuchadas.</p>
-            </div>
-            <div class="value-item">
-              <v-icon color="accent" size="44" class="mb-3 animate-icon-pop">mdi-lightbulb-on-outline</v-icon>
-              <div class="value-title">Innovación</div>
-              <p class="value-description">Buscamos soluciones creativas y adaptables para los desafíos actuales.</p>
-            </div>
-            <div class="value-item">
-              <v-icon color="secondary" size="44" class="mb-3 animate-icon-pop">mdi-handshake</v-icon>
-              <div class="value-title">Colaboración</div>
-              <p class="value-description">Fomentamos alianzas estratégicas para multiplicar nuestro impacto.</p>
-            </div>
-            <div class="value-item">
-              <v-icon color="error" size="44" class="mb-3 animate-icon-pop">mdi-heart-plus</v-icon>
-              <div class="value-title">Compromiso</div>
-              <p class="value-description">Dedicación inquebrantable a nuestra misión y a las comunidades que servimos.</p>
-            </div>
-            <div class="value-item">
-              <v-icon color="info" size="44" class="mb-3 animate-icon-pop">mdi-leaf</v-icon>
-              <div class="value-title">Sostenibilidad</div>
-              <p class="value-description">Diseñamos proyectos con impacto duradero y responsable.</p>
-            </div>
-          </div>
         </v-col>
       </v-row>
     </v-container>

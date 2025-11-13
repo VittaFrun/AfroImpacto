@@ -13,8 +13,12 @@
     <v-app-bar color="primary" class="app-bar-style" flat elevation="2">
       <v-app-bar-nav-icon @click="drawer = !drawer" class="d-md-none"></v-app-bar-nav-icon>
       <div class="d-flex align-center">
-        <v-icon class="mr-2 text-white" size="32">mdi-alpha-a-box</v-icon>
-        <v-toolbar-title class="font-weight-bold text-white">Afro Impacto</v-toolbar-title>
+        <img 
+          src="@/assets/images/logo_afroimpacto2.png" 
+          alt="Afro Impacto Logo" 
+          class="mr-2"
+          style="height: 60px; width: auto;"
+        />
       </div>
       <v-spacer></v-spacer>
       <v-btn 
@@ -87,7 +91,12 @@
     >
       <div class="d-flex align-center pa-2">
         <v-list-item-title class="text-h6 font-weight-bold text-primary ml-2">
-          <v-icon v-if="miniVariant">mdi-alpha-a-box</v-icon>
+          <img 
+            v-if="miniVariant"
+            src="@/assets/images/logo_afroimpacto2.png" 
+            alt="Afro Impacto Logo" 
+            style="height: 24px; width: auto;"
+          />
           <span v-else>Afro Impacto</span>
         </v-list-item-title>
         <v-spacer></v-spacer>
@@ -105,11 +114,113 @@
       <v-divider></v-divider>
 
       <v-list nav density="compact" class="mt-4">
-        <v-list-item v-for="item in items" :key="item.text" :value="item.text" :to="item.route" :active="isActive(item.route)" link class="nav-item mx-2 mb-1">
+        <!-- Dashboard -->
+        <v-list-item 
+          value="dashboard" 
+          to="/organization/dashboard" 
+          :active="isActive('/organization/dashboard')"
+          link 
+          class="nav-item mx-2 mb-1"
+        >
           <template v-slot:prepend>
-            <v-icon :icon="item.icon"></v-icon>
+            <v-icon>mdi-view-dashboard</v-icon>
           </template>
-          <v-list-item-title v-text="item.text"></v-list-item-title>
+          <v-list-item-title>Dashboard</v-list-item-title>
+        </v-list-item>
+
+        <!-- Proyectos con Submenú -->
+        <v-list-group value="projects" class="nav-group mx-2 mb-1">
+          <template v-slot:activator="{ props }">
+            <v-list-item
+              v-bind="props"
+              class="nav-item-parent"
+            >
+              <template v-slot:prepend>
+                <v-icon>mdi-folder-multiple</v-icon>
+              </template>
+              <v-list-item-title>Proyectos</v-list-item-title>
+            </v-list-item>
+          </template>
+
+          <!-- Submenú Items -->
+          <v-list-item
+            value="all-projects"
+            to="/organization/dashboard/projects"
+            :active="isActive('/organization/dashboard/projects')"
+            class="nav-item-child"
+            link
+          >
+            <template v-slot:prepend>
+              <v-icon size="small">mdi-view-list</v-icon>
+            </template>
+            <v-list-item-title>Todos los Proyectos</v-list-item-title>
+          </v-list-item>
+
+          <v-list-item
+            value="create-project"
+            to="/organization/dashboard/projects/create"
+            :active="isActive('/organization/dashboard/projects/create')"
+            class="nav-item-child"
+            link
+          >
+            <template v-slot:prepend>
+              <v-icon size="small">mdi-plus-circle</v-icon>
+            </template>
+            <v-list-item-title>Crear Proyecto</v-list-item-title>
+          </v-list-item>
+        </v-list-group>
+
+        <!-- Otros elementos del menú -->
+        <v-list-item 
+          value="volunteers"
+          to="/organization/dashboard/volunteers" 
+          :active="isActive('/organization/dashboard/volunteers')"
+          link 
+          class="nav-item mx-2 mb-1"
+        >
+          <template v-slot:prepend>
+            <v-icon>mdi-account-group</v-icon>
+          </template>
+          <v-list-item-title>Voluntarios</v-list-item-title>
+        </v-list-item>
+
+        <v-list-item 
+          value="donations"
+          to="/organization/dashboard/donations" 
+          :active="isActive('/organization/dashboard/donations')"
+          link 
+          class="nav-item mx-2 mb-1"
+        >
+          <template v-slot:prepend>
+            <v-icon>mdi-cash-multiple</v-icon>
+          </template>
+          <v-list-item-title>Donaciones</v-list-item-title>
+        </v-list-item>
+
+        <v-list-item 
+          value="reports"
+          to="/organization/dashboard/reports" 
+          :active="isActive('/organization/dashboard/reports')"
+          link 
+          class="nav-item mx-2 mb-1"
+        >
+          <template v-slot:prepend>
+            <v-icon>mdi-file-chart</v-icon>
+          </template>
+          <v-list-item-title>Reportes</v-list-item-title>
+        </v-list-item>
+
+        <v-list-item 
+          value="settings"
+          to="/organization/dashboard/settings" 
+          :active="isActive('/organization/dashboard/settings')"
+          link 
+          class="nav-item mx-2 mb-1"
+        >
+          <template v-slot:prepend>
+            <v-icon>mdi-cog</v-icon>
+          </template>
+          <v-list-item-title>Configuración</v-list-item-title>
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
@@ -122,8 +233,14 @@
     -->
     <v-main>
       <router-view v-slot="{ Component }">
-        <Transition name="slide-fade" mode="out-in">
-          <component :is="Component" :key="router.currentRoute.value.fullPath" />
+        <Transition 
+          name="fade-slide" 
+          mode="out-in" 
+          appear
+          @before-enter="onBeforeEnter"
+          @after-enter="onAfterEnter"
+        >
+          <component :is="Component" :key="router.currentRoute.value.name || router.currentRoute.value.path" />
         </Transition>
       </router-view>
     </v-main>
@@ -142,26 +259,33 @@ import { useAuthStore } from '@/features/auth/stores/authStore';
 const router = useRouter();
 const authStore = useAuthStore();
 
+// --- ESTADO DE TRANSICIÓN ---
+const isTransitioning = ref(false);
+
+function onBeforeEnter() {
+  isTransitioning.value = true;
+}
+
+function onAfterEnter() {
+  // Pequeño delay para asegurar que la animación termine suavemente
+  setTimeout(() => {
+    isTransitioning.value = false;
+  }, 50);
+}
+
 // --- ESTADO DEL LAYOUT ---
 // `drawer`: controla si el menú lateral está visible o no (especialmente en móvil).
 const drawer = ref(null);
 // `miniVariant`: controla si el menú está minimizado.
 const miniVariant = ref(false);
 // `drawerWidth`: calcula el ancho del menú dependiendo de si está minimizado.
-const drawerWidth = computed(() => miniVariant.value ? 100 : 280);
+const drawerWidth = computed(() => miniVariant.value ? 100 : 260);
 
 // --- ELEMENTOS DE NAVEGACIÓN ---
 // `selectedItem`: mantiene el elemento de la lista que está seleccionado.
 const selectedItem = ref(null);
 // `items`: un array de objetos que define los enlaces del menú lateral.
-const items = ref([
-  { text: 'Dashboard', icon: 'mdi-view-dashboard', route: '/organization/dashboard' },
-  { text: 'Proyectos', icon: 'mdi-folder-multiple', route: '/organization/dashboard/projects' },
-  { text: 'Voluntarios', icon: 'mdi-account-group', route: '/organization/dashboard/volunteers' },
-  { text: 'Donaciones', icon: 'mdi-cash-multiple', route: '/organization/dashboard/donations' },
-  { text: 'Reportes', icon: 'mdi-file-chart', route: '/organization/dashboard/reports' },
-  { text: 'Configuración', icon: 'mdi-cog', route: '/organization/dashboard/settings' },
-]);
+// Items array ya no es necesario con la nueva estructura
 
 function createNewProject() {
   router.push('/organization/dashboard/projects/create');
@@ -183,23 +307,48 @@ async function logout() {
 }
 
 const isActive = (routePath) => {
-  const currentRoute = router.currentRoute.value;
-  const currentPath = currentRoute.path;
-
-  // Find all items whose route is a prefix of currentPath
-  const matchingItems = items.value.filter(item => currentPath.startsWith(item.route));
-
-  if (matchingItems.length === 0) {
-    return false;
+  const currentPath = router.currentRoute.value.path;
+  
+  // Caso especial para dashboard - solo exacto
+  if (routePath === '/organization/dashboard') {
+    return currentPath === routePath;
   }
-
-  // Find the item with the longest route prefix match
-  const longestMatch = matchingItems.reduce((prev, curr) => {
-    return curr.route.length > prev.route.length ? curr : prev;
-  });
-
-  // Return true if the routePath matches the longest matching item's route
-  return routePath === longestMatch.route;
+  
+  // Para rutas de proyectos
+  if (routePath === '/organization/dashboard/projects') {
+    // Activo en lista de proyectos y en vistas de detalle (pero no en create)
+    const isProjectsList = currentPath === routePath || currentPath === routePath + '/';
+    const isProjectDetail = /^\/organization\/dashboard\/projects\/\d+/.test(currentPath);
+    const isNotCreate = !currentPath.includes('/create');
+    return (isProjectsList || isProjectDetail) && isNotCreate;
+  }
+  
+  if (routePath === '/organization/dashboard/projects/create') {
+    return currentPath.includes('/projects/create');
+  }
+  
+  // Para voluntarios
+  if (routePath === '/organization/dashboard/volunteers') {
+    return currentPath === routePath || currentPath.startsWith(routePath + '/');
+  }
+  
+  // Para donaciones
+  if (routePath === '/organization/dashboard/donations') {
+    return currentPath === routePath || currentPath.startsWith(routePath + '/');
+  }
+  
+  // Para reportes
+  if (routePath === '/organization/dashboard/reports') {
+    return currentPath === routePath || currentPath.startsWith(routePath + '/');
+  }
+  
+  // Para configuración
+  if (routePath === '/organization/dashboard/settings') {
+    return currentPath === routePath || currentPath.startsWith(routePath + '/');
+  }
+  
+  // Para otras rutas, match exacto
+  return currentPath === routePath;
 };
 
 // Sincronizar selectedItem con la ruta actual al cargar y al cambiar la ruta
@@ -216,8 +365,15 @@ watch(() => router.currentRoute.value, (newRoute) => {
 <style>
 /* --- ESTILOS GLOBALES PARA EL DASHBOARD --- */
 .v-application {
-  /* Cambia el color de fondo de toda la aplicación cuando este componente está activo */
-  background-color: #f6f9ff !important;
+  background-color: #ffffff !important;
+}
+
+.v-main {
+  background-color: #ffffff !important;
+}
+
+.v-main__wrap {
+  background-color: #ffffff !important;
 }
 
 .v-card:hover {
@@ -249,19 +405,33 @@ watch(() => router.currentRoute.value, (newRoute) => {
 
 /* --- ESTILOS MEJORADOS PARA LOS ENLACES DE NAVEGACIÓN --- */
 .nav-item .v-list-item__overlay {
-  /* Color del efecto "ripple" al hacer clic */
   background-color: rgba(var(--v-theme-primary-rgb), 0.15) !important;
 }
 
 .nav-item .v-icon {
-  /* Color de los iconos inactivos */
-  color: #A0AEC0;
+  color: #64748B !important;
+  flex-shrink: 0 !important;
+  transition: color 0.3s ease !important;
+}
+
+.nav-item .v-list-item-title {
+  color: #475569 !important;
+  transition: color 0.3s ease !important;
 }
 
 .nav-item {
   border-radius: 12px !important;
   margin: 4px 8px !important;
+  padding: 8px 12px !important;
+  min-height: 48px !important;
   transition: all 0.2s ease-in-out !important;
+}
+
+.nav-item .v-list-item-title {
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  font-size: 0.9375rem !important;
 }
 
 /* Efecto al pasar el ratón sobre un elemento inactivo */
@@ -283,11 +453,179 @@ watch(() => router.currentRoute.value, (newRoute) => {
   background: #2c3e50 !important;
   color: white !important;
   box-shadow: 0 6px 20px -4px rgba(44, 62, 80, 0.5) !important;
-
 }
 
-.nav-item.v-list-item--active .v-icon,
+.nav-item.v-list-item--active .v-icon {
+  color: white !important;
+}
+
 .nav-item.v-list-item--active .v-list-item-title {
+  color: white !important;
+  font-weight: 600 !important;
+}
+
+/* Estilos para el submenú */
+.nav-group {
+  border-radius: 12px !important;
+  margin: 4px 8px !important;
+  overflow: visible !important;
+}
+
+.nav-group :deep(.v-list-group__items) {
+  background: rgba(0, 0, 0, 0.02) !important;
+  border-radius: 0 0 12px 12px !important;
+  padding: 6px 0 !important;
+  margin-top: 2px !important;
+  overflow: visible !important;
+}
+
+/* Eliminar padding interno de Vuetify que desplaza a la derecha */
+.nav-group :deep(.v-list-group__items .v-list-item) {
+  padding-left: 0 !important;
+}
+
+.nav-item-parent {
+  border-radius: 12px !important;
+  font-weight: 500 !important;
+  min-height: 48px !important;
+  padding: 8px 12px !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.nav-item-parent .v-list-item-title {
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  font-size: 0.9375rem !important;
+  color: #475569 !important;
+  transition: color 0.3s ease !important;
+}
+
+.nav-item-parent .v-icon {
+  color: #64748B !important;
+  flex-shrink: 0 !important;
+  transition: color 0.3s ease !important;
+}
+
+.nav-item-parent:hover {
+  background-color: rgba(44, 62, 80, 0.15) !important;
+  transform: translateX(4px);
+}
+
+.nav-item-parent:hover .v-icon,
+.nav-item-parent:hover .v-list-item-title {
+  color: #2c3e50 !important;
+}
+
+.nav-item-child {
+  border-radius: 8px !important;
+  margin: 2px 8px !important;
+  min-height: 38px !important;
+  padding: 5px 8px !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.nav-item-child .v-list-item-title {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  font-size: 0.8125rem !important;
+  font-weight: 500 !important;
+  color: #475569 !important;
+  transition: color 0.3s ease !important;
+  line-height: 1.3 !important;
+}
+
+.nav-item-child .v-icon {
+  color: #64748B !important;
+  transition: color 0.3s ease !important;
+  font-size: 16px !important;
+}
+
+.nav-item-child .v-list-item__prepend {
+  flex-shrink: 0 !important;
+  margin-right: 8px !important;
+  min-width: 20px !important;
+}
+
+.nav-item-child:hover {
+  background: rgba(var(--v-theme-primary), 0.08) !important;
+  transform: translateX(4px);
+}
+
+.nav-item-child:hover .v-icon {
+  color: rgb(var(--v-theme-primary)) !important;
+}
+
+.nav-item-child:hover .v-list-item-title {
+  color: rgb(var(--v-theme-primary)) !important;
+}
+
+.nav-item-child.v-list-item--active {
+  background: rgba(var(--v-theme-primary), 0.15) !important;
+  font-weight: 600 !important;
+  border-left: 3px solid rgb(var(--v-theme-primary)) !important;
+  padding-left: 5px !important;
+}
+
+.nav-item-child.v-list-item--active .v-icon {
+  color: rgb(var(--v-theme-primary)) !important;
+}
+
+.nav-item-child.v-list-item--active .v-list-item-title {
+  color: rgb(var(--v-theme-primary)) !important;
+}
+
+.v-list-group--active > .v-list-item .v-icon {
+  color: rgb(var(--v-theme-primary)) !important;
+}
+
+.v-list-group--active > .v-list-item .v-list-item-title {
+  color: rgb(var(--v-theme-primary)) !important;
+}
+
+/* Cuando el grupo está expandido, resaltar el activador si algún hijo está activo */
+.v-list-group--active .nav-item-parent {
+  background: rgba(var(--v-theme-primary), 0.05) !important;
+}
+
+/* Asegurar que el menú expandido no se corte */
+.nav-group :deep(.v-list-group__header) {
+  overflow: visible !important;
+}
+
+/* Asegurar espaciado consistente en el drawer */
+.custom-navigation-drawer :deep(.v-list) {
+  padding: 8px 0 !important;
+}
+
+/* Asegurar que todos los elementos tengan el mismo color base */
+.custom-navigation-drawer .v-list-item {
+  color: #475569 !important;
+}
+
+.custom-navigation-drawer .v-list-item .v-icon {
+  color: #64748B !important;
+}
+
+/* Mejorar la visibilidad en modo mini */
+.custom-navigation-drawer.v-navigation-drawer--mini-variant .nav-item .v-list-item-title,
+.custom-navigation-drawer.v-navigation-drawer--mini-variant .nav-group {
+  opacity: 0 !important;
+  width: 0 !important;
+}
+
+.custom-navigation-drawer.v-navigation-drawer--mini-variant .nav-item {
+  justify-content: center !important;
+  padding: 8px !important;
+}
+
+.custom-navigation-drawer.v-navigation-drawer--mini-variant .nav-item .v-icon {
+  color: #64748B !important;
+  margin: 0 !important;
+}
+
+.custom-navigation-drawer.v-navigation-drawer--mini-variant .nav-item.v-list-item--active .v-icon {
   color: white !important;
 }
 
@@ -386,17 +724,33 @@ watch(() => router.currentRoute.value, (newRoute) => {
 
 <style scoped>
 /* Animación de transición para las vistas */
-.slide-fade-enter-active {
-  transition: all 0.3s ease-out;
+/* Transiciones optimizadas para mejor rendimiento */
+.fade-slide-enter-active {
+  transition: opacity 0.2s ease-out, transform 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-.slide-fade-leave-active {
-  transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1);
+.fade-slide-leave-active {
+  transition: opacity 0.15s ease-in, transform 0.2s cubic-bezier(0.4, 0, 0.6, 1);
 }
 
-.slide-fade-enter-from,
-.slide-fade-leave-to {
-  transform: translateY(20px);
+.fade-slide-enter-from {
   opacity: 0;
+  transform: translateY(10px);
+}
+
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-5px);
+}
+
+.fade-slide-enter-to,
+.fade-slide-leave-from {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Optimización para prevenir reflows durante la transición */
+.v-main > * {
+  will-change: opacity, transform;
 }
 </style>

@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import api from '@/plugins/axios';
 import { useNotificationStore } from '@/stores/notificationStore';
+import defaultCoverImage from '@/assets/images/background_login.png';
 
 export const usePublicProjectStore = defineStore('publicProject', () => {
   const notificationStore = useNotificationStore();
@@ -23,8 +24,12 @@ export const usePublicProjectStore = defineStore('publicProject', () => {
       endDate: project.fecha_fin,
       budget: project.presupuesto_total || 0,
       volunteersCount: project.solicitudes?.filter(s => s.estado === 'aprobada').length || 0,
-      image: project.imagen_principal || '/default-project.jpg',
-      coverImage: project.imagen_principal || '/default-project.jpg',
+      image: (project.imagen_principal && project.imagen_principal !== '/assets/images/background_login.png') 
+        ? project.imagen_principal 
+        : defaultCoverImage,
+      coverImage: (project.imagen_principal && project.imagen_principal !== '/assets/images/background_login.png') 
+        ? project.imagen_principal 
+        : defaultCoverImage,
       // Beneficios (objeto completo para compatibilidad)
       beneficio: project.beneficio ? {
         id: project.beneficio.id_proyecto_beneficio,

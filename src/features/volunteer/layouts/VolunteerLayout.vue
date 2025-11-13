@@ -6,8 +6,12 @@
     <v-app-bar color="primary" class="app-bar-style" flat elevation="2">
       <v-app-bar-nav-icon @click="drawer = !drawer" class="d-md-none"></v-app-bar-nav-icon>
       <div class="d-flex align-center">
-        <v-icon class="mr-2 text-white" size="32">mdi-account-heart</v-icon>
-        <v-toolbar-title class="font-weight-bold text-white">Portal del Voluntario</v-toolbar-title>
+        <img 
+          src="@/assets/images/logo_afroimpacto2.png" 
+          alt="Afro Impacto Logo" 
+          class="mr-2"
+          style="height: 60px; width: auto;"
+        />
       </div>
       <v-spacer></v-spacer>
 
@@ -64,7 +68,12 @@
     >
       <div class="d-flex align-center pa-2">
         <v-list-item-title class="text-h6 font-weight-bold text-primary ml-2">
-          <v-icon v-if="miniVariant">mdi-alpha-a-box</v-icon>
+          <img 
+            v-if="miniVariant"
+            src="@/assets/images/logo_afroimpacto2.png" 
+            alt="Afro Impacto Logo" 
+            style="height: 24px; width: auto;"
+          />
           <span v-else>Afro Impacto</span>
         </v-list-item-title>
         <v-spacer></v-spacer>
@@ -138,8 +147,15 @@ async function handleLogout() {
 <style scoped>
 /* --- ESTILOS GLOBALES PARA EL DASHBOARD --- */
 .v-application {
-  /* Cambia el color de fondo de toda la aplicación cuando este componente está activo */
-  background-color: #f6f9ff !important;
+  background-color: #ffffff !important;
+}
+
+.v-main {
+  background-color: #ffffff !important;
+}
+
+.v-main__wrap {
+  background-color: #ffffff !important;
 }
 
 .v-card:hover {

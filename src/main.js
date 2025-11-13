@@ -6,9 +6,15 @@ import router from './router'
 import vuetify from './plugins/vuetify'
 import { useAuthStore } from './features/auth/stores/authStore'
 
+// Import styles in correct order: variables first, then utilities, then components
 import './assets/styles/base.css'
+import './assets/styles/_variables.css'
+import './assets/styles/_utilities.css'
+import './assets/styles/components.css'
 import './assets/styles/design-system.css'
+import './assets/styles/modern-ui.css'
 import './assets/styles/professional-buttons.css'
+import './assets/styles/enterprise-theme.css'
 
 const app = createApp(App)
 

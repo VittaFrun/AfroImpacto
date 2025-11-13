@@ -483,6 +483,7 @@
 import { computed, ref } from 'vue';
 import ModernDialog from '@/components/ui/ModernDialog.vue';
 import MetricStatCard from '@/components/ui/MetricStatCard.vue';
+import { formatDate, formatDateRange } from '@/utils/formatters';
 
 const loading = ref(false);
 const deleting = ref(false);
@@ -624,7 +625,7 @@ const downloadsThisMonth = computed(() => reports.value.reduce((sum, r) => sum +
 const dateRangeLabel = computed(() => {
   if (!form.value.rango || form.value.rango.length !== 2) return '';
   const [start, end] = form.value.rango;
-  return `${start?.toLocaleDateString?.() ?? ''} - ${end?.toLocaleDateString?.() ?? ''}`;
+  return formatDateRange(start, end);
 });
 
 const filteredReports = computed(() => {
@@ -689,13 +690,7 @@ function getStatusIcon(estado) {
   return icons[estado] || 'mdi-help-circle';
 }
 
-function formatDate(dateString) {
-  return new Date(dateString).toLocaleDateString('es-ES', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric'
-  });
-}
+// Función formatDate removida - ahora se usa desde @/utils/formatters
 
 // Event handlers
 function onPickRange() {

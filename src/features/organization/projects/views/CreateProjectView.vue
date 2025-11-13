@@ -89,7 +89,6 @@
                           color="primary"
                           :rules="nameRules"
                           required
-                          prepend-inner-icon="mdi-folder-text"
                           hint="Nombre descriptivo del proyecto"
                           persistent-hint
                           density="comfortable"
@@ -114,7 +113,6 @@
                           :rows="5"
                           :rules="descriptionRules"
                           required
-                          prepend-inner-icon="mdi-text"
                           hint="Describe brevemente el proyecto y su propósito"
                           persistent-hint
                           density="comfortable"
@@ -139,7 +137,6 @@
                           :rows="5"
                           :rules="objectiveRules"
                           required
-                          prepend-inner-icon="mdi-target"
                           hint="Define claramente qué se quiere lograr con este proyecto"
                           persistent-hint
                           density="comfortable"
@@ -164,7 +161,6 @@
                           color="primary"
                           :rules="locationRules"
                           required
-                          prepend-inner-icon="mdi-map-marker"
                           hint="Ciudad, región o área donde se desarrollará"
                           persistent-hint
                           density="comfortable"
@@ -189,7 +185,6 @@
                           color="primary"
                           :rules="budgetRules"
                           required
-                          prepend-inner-icon="mdi-currency-usd"
                           class="modern-input mb-0"
                           hint="Ingresa el presupuesto estimado (solo números)"
                           persistent-hint
@@ -225,7 +220,6 @@
                                   label="Fecha de Inicio *"
                                   variant="outlined"
                                   color="primary"
-                                  prepend-inner-icon="mdi-calendar-start"
                                   class="modern-input date-input"
                                   density="comfortable"
                                   readonly
@@ -299,7 +293,6 @@
                                   label="Fecha de Fin *"
                                   variant="outlined"
                                   color="primary"
-                                  prepend-inner-icon="mdi-calendar-end"
                                   class="modern-input date-input"
                                   density="comfortable"
                                   readonly
@@ -845,6 +838,8 @@ import ModernButton from '@/components/ui/ModernButton.vue';
 import ModernCard from '@/components/ui/ModernCard.vue';
 import DragDropFileUpload from '@/components/ui/DragDropFileUpload.vue';
 import PaymentConfiguration from '@/components/ui/PaymentConfiguration.vue';
+import { formatDate, formatCurrency } from '@/utils/formatters';
+import { ROUTES } from '@/constants/routes';
 
 // Router and Store
 const router = useRouter();
@@ -1183,26 +1178,15 @@ const selectedEndMonthYear = computed(() => {
 });
 
 // Helper Functions
-function formatCurrency(value) {
-  if (!value || value === 0) return '';
-  const numericValue = typeof value === 'number' ? value : parseFloat(value.toString().replace(/[^\d]/g, ''));
-  if (isNaN(numericValue) || numericValue === 0) return '';
-  return numericValue.toLocaleString('es-CO');
-}
+// formatCurrency, formatDateForReview, formatBudgetForReview ahora se usan desde @/utils/formatters
 
+// Wrapper para mantener compatibilidad con el código existente
 function formatDateForReview(dateString) {
   if (!dateString) return 'No especificada';
   try {
-    const dateStr = dateString.includes('T') ? dateString.split('T')[0] : dateString;
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return 'Fecha inválida';
-    const [year, month, day] = dateStr.split('-').map(Number);
-    const date = new Date(year, month - 1, day);
-    if (isNaN(date.getTime())) return 'Fecha inválida';
-    return date.toLocaleDateString('es-CO', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+    // Usar formatDate con formato largo en español
+    const formatted = formatDate(dateString, 'dd \'de\' MMMM \'de\' yyyy');
+    return formatted || 'Fecha inválida';
   } catch (e) {
     return 'Fecha inválida';
   }
@@ -1210,7 +1194,7 @@ function formatDateForReview(dateString) {
 
 function formatBudgetForReview(budget) {
   if (!budget || budget === 0) return 'No especificado';
-  return `$${budget.toLocaleString('es-CO')} COP`;
+  return formatCurrency(budget, 'COP');
 }
 
 function getPhaseKey(phase, index) {
@@ -1735,7 +1719,7 @@ async function submitProject() {
       fecha_fin: formatDateForSubmission(project.endDate),
       presupuesto_total: Number(project.budget) || 0,
       categoria: null, // Can be added later in project edit view
-      imagen_principal: null, // Will be uploaded separately after project creation
+      imagen_principal: '/assets/images/background_login.png', // Imagen predeterminada
       documento: null, // Will be uploaded separately after project creation
       id_estado: 1, // En Proceso por defecto (según diagrama)
       es_publico: false // No visible en catálogo por defecto (según diagrama default: true, pero lo dejamos false para control)
@@ -1812,7 +1796,7 @@ async function submitProject() {
       
     // Redirect after delay
       setTimeout(() => {
-      router.push('/organization/dashboard/projects');
+      router.push(ROUTES.ORGANIZATION.PROJECTS);
       }, 2000);
   } catch (err) {
     console.error('Error creating project:', err);

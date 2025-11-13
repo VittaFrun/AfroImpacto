@@ -101,76 +101,82 @@
         </div>
       </div>
 
-      <!-- Statistics Cards -->
+      <!-- Statistics Cards - Diseño Profesional -->
       <v-row class="mb-6">
         <v-col cols="12" md="3">
-          <ModernCard
-            title="Total Proyectos"
-            subtitle="Proyectos creados"
-            icon="mdi-folder-multiple"
-            icon-color="primary"
-            variant="filled"
-          >
-            <template #content>
-              <div class="text-center py-4">
-                <div class="text-h3 font-weight-bold text-primary">
+          <v-card class="professional-metric-card" variant="outlined" rounded="lg">
+            <v-card-text class="pa-4">
+              <div class="metric-header-professional">
+                <div class="metric-icon-professional primary">
+                  <v-icon color="white" size="24">mdi-folder-multiple</v-icon>
+                </div>
+              </div>
+              <div class="metric-content-professional">
+                <div class="metric-value-professional primary">
                   {{ projects && projects.length ? projects.length : 0 }}
                 </div>
-                <div class="text-caption text-grey">Proyectos {{ error ? 'en caché' : 'totales' }}</div>
+                <div class="metric-label-professional">Total Proyectos</div>
+                <div class="metric-subtitle-professional">Proyectos {{ error ? 'en caché' : 'creados' }}</div>
               </div>
-            </template>
-          </ModernCard>
+            </v-card-text>
+          </v-card>
         </v-col>
         
         <v-col cols="12" md="3">
-          <ModernCard
-            title="Proyectos Activos"
-            subtitle="En desarrollo"
-            icon="mdi-folder-heart"
-            icon-color="success"
-            variant="tonal"
-          >
-            <template #content>
-              <div class="text-center py-4">
-                <div class="text-h3 font-weight-bold text-success">{{ activeProjectsCount }}</div>
-                <div class="text-caption text-grey">En progreso</div>
+          <v-card class="professional-metric-card" variant="outlined" rounded="lg">
+            <v-card-text class="pa-4">
+              <div class="metric-header-professional">
+                <div class="metric-icon-professional success">
+                  <v-icon color="white" size="24">mdi-folder-heart</v-icon>
+                </div>
               </div>
-            </template>
-          </ModernCard>
+              <div class="metric-content-professional">
+                <div class="metric-value-professional success">
+                  {{ activeProjectsCount }}
+                </div>
+                <div class="metric-label-professional">Proyectos Activos</div>
+                <div class="metric-subtitle-professional">En desarrollo</div>
+              </div>
+            </v-card-text>
+          </v-card>
         </v-col>
         
         <v-col cols="12" md="3">
-          <ModernCard
-            title="Proyectos Públicos"
-            subtitle="Disponibles para voluntarios"
-            icon="mdi-eye"
-            icon-color="info"
-            variant="outlined"
-          >
-            <template #content>
-              <div class="text-center py-4">
-                <div class="text-h3 font-weight-bold text-info">{{ publicProjectsCount }}</div>
-                <div class="text-caption text-grey">Visibles públicamente</div>
+          <v-card class="professional-metric-card" variant="outlined" rounded="lg">
+            <v-card-text class="pa-4">
+              <div class="metric-header-professional">
+                <div class="metric-icon-professional info">
+                  <v-icon color="white" size="24">mdi-eye</v-icon>
+                </div>
               </div>
-            </template>
-          </ModernCard>
+              <div class="metric-content-professional">
+                <div class="metric-value-professional info">
+                  {{ publicProjectsCount }}
+                </div>
+                <div class="metric-label-professional">Proyectos Públicos</div>
+                <div class="metric-subtitle-professional">Disponibles para voluntarios</div>
+              </div>
+            </v-card-text>
+          </v-card>
         </v-col>
         
         <v-col cols="12" md="3">
-          <ModernCard
-            title="Presupuesto Total"
-            subtitle="Inversión en proyectos"
-            icon="mdi-currency-usd"
-            icon-color="warning"
-            variant="gradient"
-          >
-            <template #content>
-              <div class="text-center py-4">
-                <div class="text-h3 font-weight-bold text-warning">${{ totalBudget.toLocaleString() }}</div>
-                <div class="text-caption text-grey">COP</div>
+          <v-card class="professional-metric-card" variant="outlined" rounded="lg">
+            <v-card-text class="pa-4">
+              <div class="metric-header-professional">
+                <div class="metric-icon-professional warning">
+                  <v-icon color="white" size="24">mdi-currency-usd</v-icon>
+                </div>
               </div>
-            </template>
-          </ModernCard>
+              <div class="metric-content-professional">
+                <div class="metric-value-professional warning">
+                  ${{ totalBudget.toLocaleString() }}
+                </div>
+                <div class="metric-label-professional">Presupuesto Total</div>
+                <div class="metric-subtitle-professional">Inversión en proyectos</div>
+              </div>
+            </v-card-text>
+          </v-card>
         </v-col>
       </v-row>
 
@@ -503,9 +509,14 @@ import { storeToRefs } from 'pinia';
 import ModernButton from '@/components/ui/ModernButton.vue';
 import ModernCard from '@/components/ui/ModernCard.vue';
 import defaultProjectImage from '@/assets/images/background_login.png';
+import { ROUTES } from '@/constants/routes';
+import { useErrorHandler } from '@/composables/useErrorHandler';
+import LoadingState from '@/components/feedback/LoadingState.vue';
+import ErrorState from '@/components/feedback/ErrorState.vue';
 
 const router = useRouter();
 const projectStore = useProjectStore();
+const { handleError, handleNetworkError, handleAuthError: handleAuthErrorUtil } = useErrorHandler();
 
 const { projects, mainProject, loading, error } = storeToRefs(projectStore);
 
@@ -682,19 +693,19 @@ function truncateText(text, maxLength) {
 }
 
 function goToCreateProject() {
-  router.push('/organization/dashboard/projects/create');
+  router.push(ROUTES.ORGANIZATION.CREATE_PROJECT);
 }
 
 function viewProjectDetails(projectId) {
-  router.push(`/organization/dashboard/projects/${projectId}`);
+  router.push(ROUTES.ORGANIZATION.PROJECT_DETAIL(projectId));
 }
 
 function manageProject(projectId) {
-  router.push(`/organization/dashboard/projects/${projectId}`);
+  router.push(ROUTES.ORGANIZATION.PROJECT_DETAIL(projectId));
 }
 
 function editProject(projectId) {
-  router.push(`/organization/dashboard/projects/create?id=${projectId}`);
+  router.push(`${ROUTES.ORGANIZATION.CREATE_PROJECT}?id=${projectId}`);
 }
 
 function deactivateProject(projectId) {
@@ -786,15 +797,15 @@ async function retryFetch() {
       retryCount.value = 0;
     }
   } catch (err) {
-    console.error('Retry failed:', err);
+    handleNetworkError(err);
   } finally {
     isRetrying.value = false;
   }
 }
 
-function handleAuthError() {
-  // Redirect to login
-  router.push('/auth/login');
+function handleAuthErrorRedirect() {
+  // Redirect to login usando constantes
+  router.push(ROUTES.LOGIN);
 }
 </script>
 
@@ -906,6 +917,96 @@ function handleAuthError() {
 .project-item:nth-child(4) { animation-delay: 0.4s; }
 .project-item:nth-child(5) { animation-delay: 0.5s; }
 .project-item:nth-child(6) { animation-delay: 0.6s; }
+
+/* Professional Metric Cards - Estilo Dashboard */
+.professional-metric-card {
+  height: 100%;
+  background: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+}
+
+.professional-metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+}
+
+.metric-header-professional {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.metric-icon-professional {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.metric-icon-professional.success {
+  background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
+}
+
+.metric-icon-professional.info {
+  background: linear-gradient(135deg, #2196F3 0%, #42A5F5 100%);
+}
+
+.metric-icon-professional.primary {
+  background: linear-gradient(135deg, #9C27B0 0%, #BA68C8 100%);
+}
+
+.metric-icon-professional.warning {
+  background: linear-gradient(135deg, #FF9800 0%, #FFB74D 100%);
+}
+
+.metric-content-professional {
+  text-align: left;
+}
+
+.metric-value-professional {
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 6px;
+  letter-spacing: -0.02em;
+}
+
+.metric-value-professional.success {
+  color: #2E7D32;
+}
+
+.metric-value-professional.info {
+  color: #1565C0;
+}
+
+.metric-value-professional.primary {
+  color: #7B1FA2;
+}
+
+.metric-value-professional.warning {
+  color: #E65100;
+}
+
+.metric-label-professional {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #212121;
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+
+.metric-subtitle-professional {
+  font-size: 0.75rem;
+  color: #757575;
+  line-height: 1.4;
+}
 
 /* Search and Filter Styles */
 .search-field {
@@ -1036,6 +1137,62 @@ function handleAuthError() {
 
 .gap-3 {
   gap: 12px;
+}
+
+/* Responsive adjustments for professional cards */
+@media (max-width: 960px) {
+  .professional-metric-card .v-card-text {
+    padding: 16px !important;
+  }
+  
+  .metric-icon-professional {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .metric-value-professional {
+    font-size: 1.5rem;
+  }
+  
+  .metric-label-professional {
+    font-size: 0.8125rem;
+  }
+  
+  .metric-subtitle-professional {
+    font-size: 0.6875rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .professional-metric-card .v-card-text {
+    padding: 12px !important;
+  }
+  
+  .metric-header-professional {
+    margin-bottom: 12px;
+    justify-content: center;
+  }
+  
+  .metric-icon-professional {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .metric-content-professional {
+    text-align: center;
+  }
+  
+  .metric-value-professional {
+    font-size: 1.35rem;
+  }
+  
+  .metric-label-professional {
+    font-size: 0.75rem;
+  }
+  
+  .metric-subtitle-professional {
+    font-size: 0.6875rem;
+  }
 }
 
 /* Responsive adjustments for header */

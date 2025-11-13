@@ -50,6 +50,7 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import AuthLayout from '@/layouts/AuthLayout.vue';
 import InfoCarousel from '@/features/auth/components/InfoCarousel.vue';
+import { ROUTES } from '@/constants/routes';
 
 const router = useRouter();
 
@@ -70,7 +71,7 @@ const handleForgotPassword = async () => {
   try {
     await new Promise(resolve => setTimeout(resolve, 2000));
     console.log('Enviando enlace de recuperación a...', email.value);
-    router.push('/login'); // Idealmente, a una página de confirmación
+    router.push(ROUTES.LOGIN); // Idealmente, a una página de confirmación
   } catch (error) {
     console.error(error);
   } finally {

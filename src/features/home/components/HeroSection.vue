@@ -41,7 +41,7 @@
             Conectando voluntarios con proyectos que transforman vidas y fortalecen la identidad afrodescendiente.
           </div>
           <div class="d-flex flex-column flex-sm-row align-center justify-center justify-md-start ga-4 mb-4 hero-buttons-container">
-            <router-link to="/register" class="text-decoration-none">
+            <router-link to="/auth/register" class="text-decoration-none">
               <v-btn
                 class="crear-cuenta"
                 size="large"

@@ -7,6 +7,7 @@
           elevation="8"
           hover
           @click="goToRegister('voluntario')"
+          :ripple="true"
         >
           <div class="card-icon-wrapper mb-5">
             <v-icon size="64" color="primary">mdi-handshake</v-icon>
@@ -14,7 +15,7 @@
           <h2 class="user-card-title font-weight-bold mb-3">Voluntariado</h2>
           <div class="user-card-description flex-grow-1">
             <p>
-              Únete a nuestra comunidad de voluntarios y ayuda a empoderar comunidades afro.
+              Únete a nuestra comunidad de voluntarios y ayuda a empoderar comunidades.
             </p>
             <p class="mb-2">
               <span class="font-weight-bold text-primary">¿Qué puedes hacer?</span><br>
@@ -46,6 +47,7 @@
           elevation="8"
           hover
           @click="goToRegister('organizacion')"
+          :ripple="true"
         >
           <div class="card-icon-wrapper mb-5">
             <v-icon size="64" color="accent">mdi-domain</v-icon>
@@ -53,7 +55,7 @@
           <h2 class="user-card-title font-weight-bold mb-3">Organización</h2>
           <div class="user-card-description flex-grow-1">
             <p>
-              Colabora con nosotros para impulsar el desarrollo sostenible en comunidades afro.
+              Colabora con nosotros para impulsar el desarrollo sostenible.
             </p>
             <p class="mb-2">
               <span class="font-weight-bold text-accent">¿Cómo puedes participar?</span><br>
@@ -102,18 +104,20 @@ export default {
 .user-card {
   border-radius: 20px !important;
   background: #ffffff !important;
-  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); /* Transición global más suave */
+  transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1); /* Transición global más suave y lenta */
   min-height: 520px; /* Aumenta ligeramente la altura mínima para más espacio */
   position: relative;
   overflow: hidden;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08) !important;
   border: 1px solid rgba(0, 0, 0, 0.05); /* Borde sutil para definición */
+  cursor: pointer;
 }
 
 .user-card:hover {
-  transform: translateY(-10px) scale(1.01); /* Efecto de elevación y ligero crecimiento */
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2) !important; /* Sombra más pronunciada al hover */
+  transform: translateY(-12px) scale(1.02); /* Efecto de elevación y ligero crecimiento mejorado */
+  box-shadow: 0 28px 60px rgba(0, 0, 0, 0.25) !important; /* Sombra más pronunciada al hover */
   border-color: rgba(0, 0, 0, 0.1);
+  cursor: pointer;
 }
 
 /* Wrapper para el icono para un mejor control de espaciado */

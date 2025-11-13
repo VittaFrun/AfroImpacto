@@ -153,7 +153,7 @@
         <!-- Project Image -->
         <div class="project-image">
           <v-img
-            :src="project.image || project.imagen_principal || '/default-project.jpg'"
+            :src="project.image || project.imagen_principal || defaultProjectImage"
             height="200px"
             cover
             class="project-cover"
@@ -233,22 +233,12 @@
           <div class="project-actions">
             <v-btn
               color="primary"
-              variant="outlined"
+              variant="flat"
               size="small"
-              @click.stop="viewProject(project.id)"
+              @click.stop="goToWorkspace(project.id)"
             >
-              <v-icon start>mdi-eye</v-icon>
-              Ver Detalles
-            </v-btn>
-            <v-btn
-              v-if="project.status === 'Activo'"
-              color="success"
-              variant="outlined"
-              size="small"
-              @click.stop="viewTasks(project.id)"
-            >
-              <v-icon start>mdi-format-list-checks</v-icon>
-              Mis Tareas
+              <v-icon start>mdi-briefcase</v-icon>
+              Área de Trabajo
             </v-btn>
           </div>
         </div>
@@ -273,6 +263,8 @@ import { useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { useAuthStore } from '@/features/auth/stores/authStore';
 import { useVolunteerStore } from '@/features/volunteer/stores/volunteerStore';
+import { ROUTES } from '@/constants/routes';
+import defaultProjectImage from '@/assets/images/background_login.png';
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -391,7 +383,11 @@ const averageProgress = computed(() => {
 
 // Methods
 const browseProjects = () => {
-  router.push('/volunteer/catalog');
+  router.push(ROUTES.VOLUNTEER.CATALOG);
+};
+
+const goToWorkspace = (projectId) => {
+  router.push(ROUTES.VOLUNTEER.PROJECT_WORKSPACE(projectId));
 };
 
 const viewProject = (projectId) => {

@@ -2,7 +2,7 @@
   <div class="project-catalog-preview" v-if="project">
     <v-card elevation="0" class="mb-4">
       <v-img
-        :src="project.coverImage || '/default-project.jpg'"
+        :src="project.coverImage || defaultProjectImage"
         height="200"
         cover
         class="text-white"
@@ -103,6 +103,8 @@
 </template>
 
 <script setup>
+import defaultProjectImage from '@/assets/images/background_login.png';
+
 const props = defineProps({
   project: {
     type: Object,

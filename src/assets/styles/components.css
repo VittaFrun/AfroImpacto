@@ -1,0 +1,507 @@
+/* ========================================
+   AFRO IMPACTO - COMPONENT STYLES
+   Estilos específicos para componentes UI
+   ======================================== */
+
+/* ========================================
+   MODERN BUTTON STYLES
+   ======================================== */
+.modern-btn {
+  font-weight: var(--afro-font-semibold) !important;
+  text-transform: none !important;
+  transition: all var(--afro-transition-normal) !important;
+  position: relative !important;
+  overflow: hidden !important;
+  border-radius: var(--afro-radius-md) !important;
+  box-shadow: var(--afro-shadow-sm) !important;
+}
+
+.modern-btn:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: var(--afro-shadow-md) !important;
+}
+
+.modern-btn:active {
+  transform: translateY(0) !important;
+  box-shadow: var(--afro-shadow-sm) !important;
+}
+
+/* ========================================
+   MODERN CARD STYLES
+   ======================================== */
+.modern-card {
+  transition: all var(--afro-transition-normal) !important;
+  border: 1px solid rgba(0, 0, 0, 0.05) !important;
+  background: var(--afro-surface) !important;
+  border-radius: var(--afro-radius-lg) !important;
+}
+
+.modern-card:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: var(--afro-shadow-lg) !important;
+  border-color: rgba(30, 58, 138, 0.2) !important;
+}
+
+.afro-card {
+  background: var(--afro-surface);
+  border: 1px solid var(--afro-border);
+  border-radius: var(--afro-radius-lg);
+  box-shadow: var(--afro-shadow-sm);
+  transition: all var(--afro-transition-normal);
+  overflow: hidden;
+}
+
+.afro-card:hover {
+  box-shadow: var(--afro-shadow-md);
+  border-color: var(--afro-primary-100);
+}
+
+.afro-card-elevated {
+  box-shadow: var(--afro-shadow-md);
+}
+
+.afro-card-elevated:hover {
+  box-shadow: var(--afro-shadow-lg);
+  transform: translateY(-2px);
+}
+
+/* ========================================
+   MODERN INPUT STYLES
+   ======================================== */
+.modern-input {
+  border-radius: var(--afro-radius-md) !important;
+}
+
+.modern-input :deep(.v-field) {
+  border-radius: var(--afro-radius-md) !important;
+  transition: all var(--afro-transition-normal) !important;
+}
+
+.modern-input :deep(.v-field:hover) {
+  box-shadow: var(--afro-shadow-sm) !important;
+}
+
+.modern-input :deep(.v-field--focused) {
+  box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.2) !important;
+}
+
+.afro-form-group {
+  margin-bottom: var(--afro-space-lg);
+}
+
+.afro-form-label {
+  display: block;
+  font-weight: var(--afro-font-semibold);
+  color: var(--afro-text-primary);
+  margin-bottom: var(--afro-space-sm);
+  font-size: var(--afro-text-sm);
+}
+
+.afro-form-input {
+  width: 100%;
+  padding: var(--afro-space-sm) var(--afro-space-md);
+  border: 1px solid var(--afro-border);
+  border-radius: var(--afro-radius-md);
+  font-size: var(--afro-text-base);
+  transition: all var(--afro-transition-fast);
+  background: var(--afro-surface);
+}
+
+.afro-form-input:focus {
+  outline: none;
+  border-color: var(--afro-primary);
+  box-shadow: 0 0 0 3px var(--afro-primary-50);
+}
+
+/* ========================================
+   MODERN DIALOG STYLES
+   ======================================== */
+.modern-dialog {
+  border-radius: var(--afro-radius-xl) !important;
+  overflow: hidden !important;
+  box-shadow: var(--afro-shadow-xl) !important;
+  animation: slideInUp var(--afro-transition-normal);
+}
+
+.modern-dialog-header {
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
+  padding: var(--afro-space-lg) !important;
+}
+
+.modern-dialog-content {
+  background: var(--afro-surface) !important;
+  transition: all var(--afro-transition-normal) !important;
+}
+
+.modern-dialog-actions {
+  background: rgba(248, 249, 250, 0.8) !important;
+  border-top: 1px solid rgba(0, 0, 0, 0.1) !important;
+  padding: var(--afro-space-lg) !important;
+}
+
+/* ========================================
+   MODERN TABLE STYLES
+   ======================================== */
+.modern-table {
+  border-radius: var(--afro-radius-lg) !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(0, 0, 0, 0.05) !important;
+}
+
+.modern-table :deep(.v-data-table__wrapper) {
+  border-radius: var(--afro-radius-lg) !important;
+}
+
+.modern-table :deep(.v-data-table-header) {
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef) !important;
+}
+
+.modern-table :deep(.v-data-table-header th) {
+  font-weight: var(--afro-font-bold) !important;
+  color: var(--afro-text-primary) !important;
+}
+
+.modern-table :deep(.v-data-table__tr:hover) {
+  background: rgba(30, 58, 138, 0.02) !important;
+}
+
+.afro-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--afro-surface);
+  border-radius: var(--afro-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--afro-shadow-sm);
+}
+
+.afro-table th {
+  background: var(--afro-secondary-50);
+  padding: var(--afro-space-md);
+  text-align: left;
+  font-weight: var(--afro-font-semibold);
+  color: var(--afro-text-primary);
+  border-bottom: 1px solid var(--afro-border);
+}
+
+.afro-table td {
+  padding: var(--afro-space-md);
+  border-bottom: 1px solid var(--afro-border-light);
+  color: var(--afro-text-primary);
+}
+
+.afro-table tr:hover {
+  background: var(--afro-secondary-50);
+}
+
+/* ========================================
+   MODERN CHIP STYLES
+   ======================================== */
+.modern-chip {
+  border-radius: 20px !important;
+  font-weight: var(--afro-font-semibold) !important;
+  transition: all var(--afro-transition-normal) !important;
+}
+
+.modern-chip:hover {
+  transform: scale(1.05) !important;
+}
+
+/* Status Chip Variants */
+.status-verificado {
+  background: linear-gradient(135deg, var(--afro-success), #20c997) !important;
+  color: white !important;
+}
+
+.status-pendiente {
+  background: linear-gradient(135deg, var(--afro-warning), #fd7e14) !important;
+  color: white !important;
+}
+
+.status-rechazado {
+  background: linear-gradient(135deg, var(--afro-error), #e83e8c) !important;
+  color: white !important;
+}
+
+.status-procesando {
+  background: linear-gradient(135deg, var(--afro-info), #17a2b8) !important;
+  color: white !important;
+}
+
+/* ========================================
+   NAVIGATION STYLES
+   ======================================== */
+.afro-nav-item {
+  display: flex;
+  align-items: center;
+  padding: var(--afro-space-sm) var(--afro-space-md);
+  color: var(--afro-text-secondary);
+  text-decoration: none;
+  border-radius: var(--afro-radius-md);
+  transition: all var(--afro-transition-fast);
+  font-weight: var(--afro-font-medium);
+}
+
+.afro-nav-item:hover {
+  background: var(--afro-primary-50);
+  color: var(--afro-primary);
+}
+
+.afro-nav-item.active {
+  background: var(--afro-primary);
+  color: white;
+}
+
+.afro-sidebar {
+  background: var(--afro-surface);
+  border-right: 1px solid var(--afro-border);
+  min-height: 100vh;
+  width: 280px;
+  padding: var(--afro-space-lg);
+}
+
+.afro-sidebar-header {
+  padding-bottom: var(--afro-space-lg);
+  border-bottom: 1px solid var(--afro-border);
+  margin-bottom: var(--afro-space-lg);
+}
+
+.afro-sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--afro-space-xs);
+}
+
+.afro-header {
+  background: var(--afro-surface);
+  border-bottom: 1px solid var(--afro-border);
+  padding: var(--afro-space-md) var(--afro-space-lg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.afro-header-title {
+  font-size: var(--afro-text-xl);
+  font-weight: var(--afro-font-semibold);
+  color: var(--afro-text-primary);
+}
+
+.afro-header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--afro-space-md);
+}
+
+/* ========================================
+   METRIC CARDS
+   ======================================== */
+.afro-metric-card {
+  background: var(--afro-surface);
+  border: 1px solid var(--afro-border);
+  border-radius: var(--afro-radius-lg);
+  padding: var(--afro-space-lg);
+  text-align: center;
+  transition: all var(--afro-transition-normal);
+}
+
+.afro-metric-card:hover {
+  box-shadow: var(--afro-shadow-md);
+  transform: translateY(-2px);
+}
+
+.afro-metric-value {
+  font-size: var(--afro-text-3xl);
+  font-weight: var(--afro-font-bold);
+  color: var(--afro-primary);
+  margin-bottom: var(--afro-space-xs);
+}
+
+.afro-metric-label {
+  font-size: var(--afro-text-sm);
+  color: var(--afro-text-secondary);
+  font-weight: var(--afro-font-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ========================================
+   ANIMATIONS
+   ======================================== */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes bounce {
+  0%, 20%, 53%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40%, 43% {
+    transform: translateY(-10px);
+  }
+  70% {
+    transform: translateY(-5px);
+  }
+  90% {
+    transform: translateY(-2px);
+  }
+}
+
+/* ========================================
+   RESPONSIVE ADJUSTMENTS
+   ======================================== */
+@media (max-width: 768px) {
+  .modern-dialog {
+    margin: var(--afro-space-md) !important;
+    max-width: calc(100vw - 32px) !important;
+  }
+  
+  .modern-dialog-header {
+    padding: var(--afro-space-md) !important;
+  }
+  
+  .modern-dialog-content {
+    padding: var(--afro-space-md) !important;
+  }
+  
+  .modern-dialog-actions {
+    padding: var(--afro-space-md) !important;
+    flex-direction: column !important;
+  }
+  
+  .modern-btn {
+    width: 100% !important;
+    margin-bottom: var(--afro-space-sm) !important;
+  }
+  
+  .modern-card {
+    margin-bottom: var(--afro-space-md) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .modern-dialog {
+    margin: var(--afro-space-sm) !important;
+    max-width: calc(100vw - 16px) !important;
+  }
+  
+  .modern-dialog-header {
+    padding: var(--afro-space-sm) !important;
+  }
+  
+  .modern-dialog-content {
+    padding: var(--afro-space-sm) !important;
+  }
+  
+  .modern-dialog-actions {
+    padding: var(--afro-space-sm) !important;
+  }
+}
+
+/* ========================================
+   PRINT STYLES
+   ======================================== */
+@media print {
+  .modern-btn,
+  .modern-dialog-actions,
+  .v-toolbar,
+  .v-navigation-drawer {
+    display: none !important;
+  }
+  
+  .modern-card {
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+    break-inside: avoid !important;
+  }
+  
+  .modern-dialog {
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+  }
+}
+
+/* ========================================
+   ACCESSIBILITY IMPROVEMENTS
+   ======================================== */
+@media (prefers-contrast: high) {
+  .modern-card {
+    border: 2px solid #000 !important;
+  }
+  
+  .modern-btn {
+    border: 2px solid currentColor !important;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .modern-card {
+    background: var(--afro-grey-100) !important;
+    border-color: var(--afro-grey-300) !important;
+  }
+  
+  .modern-dialog-header {
+    background: linear-gradient(135deg, var(--afro-grey-100), var(--afro-grey-200)) !important;
+  }
+  
+  .modern-dialog-content {
+    background: var(--afro-grey-100) !important;
+  }
+  
+  .modern-dialog-actions {
+    background: rgba(45, 45, 45, 0.8) !important;
+  }
+}
+

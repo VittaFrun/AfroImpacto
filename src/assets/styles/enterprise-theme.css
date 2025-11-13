@@ -1,0 +1,317 @@
+/* ==========================================
+   AFRO IMPACTO - ENTERPRISE THEME
+   Estilos empresariales y profesionales
+   ========================================== */
+
+/* ===== PALETA DE COLORES EMPRESARIAL ===== */
+:root {
+  --enterprise-primary: #1976D2;
+  --enterprise-success: #4CAF50;
+  --enterprise-warning: #FF9800;
+  --enterprise-error: #F44336;
+  --enterprise-info: #2196F3;
+  
+  /* Grises */
+  --enterprise-grey-50: #FAFAFA;
+  --enterprise-grey-100: #F5F5F5;
+  --enterprise-grey-200: #EEEEEE;
+  --enterprise-grey-300: #E0E0E0;
+  --enterprise-grey-600: #757575;
+  --enterprise-grey-900: #212121;
+  
+  /* Sombras */
+  --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.10);
+  --shadow-strong: 0 8px 24px rgba(0, 0, 0, 0.12);
+  
+  /* Bordes */
+  --border-subtle: 1px solid rgba(0, 0, 0, 0.08);
+  --border-medium: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+/* ===== TIPOGRAFÍA ===== */
+.enterprise-heading-1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.enterprise-heading-2 {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.enterprise-heading-3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.enterprise-body {
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.enterprise-body-small {
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.enterprise-caption {
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--enterprise-grey-600);
+}
+
+/* ===== CARDS PROFESIONALES ===== */
+.enterprise-card {
+  background: #ffffff;
+  border: var(--border-subtle);
+  border-radius: 12px;
+  box-shadow: var(--shadow-soft);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.enterprise-card:hover {
+  box-shadow: var(--shadow-medium);
+  border-color: rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.enterprise-card-header {
+  padding: 16px 20px;
+  border-bottom: var(--border-subtle);
+  background: var(--enterprise-grey-50);
+}
+
+.enterprise-card-body {
+  padding: 20px;
+}
+
+/* ===== ICONOS CON GRADIENTE ===== */
+.enterprise-icon-box {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.enterprise-icon-box.primary {
+  background: linear-gradient(135deg, #9C27B0 0%, #BA68C8 100%);
+}
+
+.enterprise-icon-box.success {
+  background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
+}
+
+.enterprise-icon-box.info {
+  background: linear-gradient(135deg, #2196F3 0%, #42A5F5 100%);
+}
+
+.enterprise-icon-box.warning {
+  background: linear-gradient(135deg, #FF9800 0%, #FFB74D 100%);
+}
+
+.enterprise-icon-box.error {
+  background: linear-gradient(135deg, #F44336 0%, #E57373 100%);
+}
+
+/* ===== BOTONES EMPRESARIALES ===== */
+.enterprise-btn {
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 500;
+  border-radius: 8px;
+  padding: 8px 20px;
+  transition: all 0.3s ease;
+}
+
+.enterprise-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-medium);
+}
+
+/* ===== TABS EMPRESARIALES ===== */
+.enterprise-tabs-container {
+  background: #ffffff;
+  border: var(--border-subtle);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.enterprise-tab {
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 500;
+  min-height: 56px;
+  padding: 0 24px;
+  transition: all 0.3s ease;
+}
+
+.enterprise-tab:hover {
+  background: rgba(var(--v-theme-primary), 0.03);
+}
+
+.enterprise-tab--selected {
+  background: rgba(var(--v-theme-primary), 0.05);
+  color: rgb(var(--v-theme-primary));
+  font-weight: 600;
+}
+
+/* ===== MÉTRICAS PROFESIONALES ===== */
+.enterprise-metric-card {
+  background: #ffffff;
+  border: var(--border-subtle);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: var(--shadow-soft);
+  transition: all 0.3s ease;
+}
+
+.enterprise-metric-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-medium);
+}
+
+.enterprise-metric-value {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 8px;
+}
+
+.enterprise-metric-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--enterprise-grey-900);
+  margin-bottom: 4px;
+}
+
+.enterprise-metric-subtitle {
+  font-size: 0.75rem;
+  color: var(--enterprise-grey-600);
+}
+
+/* ===== ESTADOS Y BADGES ===== */
+.enterprise-status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  gap: 6px;
+}
+
+.enterprise-status-badge.success {
+  background: rgba(76, 175, 80, 0.1);
+  color: #2E7D32;
+}
+
+.enterprise-status-badge.warning {
+  background: rgba(255, 152, 0, 0.1);
+  color: #E65100;
+}
+
+.enterprise-status-badge.error {
+  background: rgba(244, 67, 54, 0.1);
+  color: #C62828;
+}
+
+.enterprise-status-badge.info {
+  background: rgba(33, 150, 243, 0.1);
+  color: #1565C0;
+}
+
+/* ===== TABLAS EMPRESARIALES ===== */
+.enterprise-table {
+  background: #ffffff;
+  border: var(--border-subtle);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.enterprise-table thead {
+  background: var(--enterprise-grey-50);
+  border-bottom: var(--border-medium);
+}
+
+.enterprise-table th {
+  font-weight: 600;
+  color: var(--enterprise-grey-900);
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.enterprise-table tbody tr {
+  border-bottom: var(--border-subtle);
+  transition: all 0.2s ease;
+}
+
+.enterprise-table tbody tr:hover {
+  background: rgba(var(--v-theme-primary), 0.03);
+}
+
+/* ===== FORMULARIOS EMPRESARIALES ===== */
+.enterprise-input {
+  background: #ffffff;
+  border-radius: 8px;
+}
+
+.enterprise-input:focus-within {
+  box-shadow: 0 0 0 2px rgba(var(--v-theme-primary), 0.1);
+}
+
+/* ===== ANIMACIONES SUTILES ===== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeInUp 0.4s ease;
+}
+
+.animate-slide-in {
+  animation: slideIn 0.3s ease;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 960px) {
+  .enterprise-metric-card {
+    padding: 16px;
+  }
+  
+  .enterprise-metric-value {
+    font-size: 1.5rem;
+  }
+  
+  .enterprise-tab {
+    padding: 0 12px;
+    min-height: 48px;
+  }
+}
+

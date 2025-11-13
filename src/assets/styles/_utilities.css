@@ -1,0 +1,331 @@
+/* ========================================
+   AFRO IMPACTO - UTILITY CLASSES
+   Clases utilitarias reutilizables
+   ======================================== */
+
+/* ========================================
+   TYPOGRAPHY UTILITIES
+   ======================================== */
+.afro-heading-1 {
+  font-size: var(--afro-text-4xl);
+  font-weight: var(--afro-font-bold);
+  line-height: var(--afro-line-tight);
+  color: var(--afro-text-primary);
+  letter-spacing: -0.025em;
+}
+
+.afro-heading-2 {
+  font-size: var(--afro-text-3xl);
+  font-weight: var(--afro-font-semibold);
+  line-height: var(--afro-line-tight);
+  color: var(--afro-text-primary);
+  letter-spacing: -0.025em;
+}
+
+.afro-heading-3 {
+  font-size: var(--afro-text-2xl);
+  font-weight: var(--afro-font-semibold);
+  line-height: var(--afro-line-normal);
+  color: var(--afro-text-primary);
+}
+
+.afro-heading-4 {
+  font-size: var(--afro-text-xl);
+  font-weight: var(--afro-font-semibold);
+  line-height: var(--afro-line-normal);
+  color: var(--afro-text-primary);
+}
+
+.afro-body-large {
+  font-size: var(--afro-text-lg);
+  font-weight: var(--afro-font-normal);
+  line-height: var(--afro-line-normal);
+  color: var(--afro-text-primary);
+}
+
+.afro-body {
+  font-size: var(--afro-text-base);
+  font-weight: var(--afro-font-normal);
+  line-height: var(--afro-line-normal);
+  color: var(--afro-text-primary);
+}
+
+.afro-body-small {
+  font-size: var(--afro-text-sm);
+  font-weight: var(--afro-font-normal);
+  line-height: var(--afro-line-normal);
+  color: var(--afro-text-secondary);
+}
+
+.afro-caption {
+  font-size: var(--afro-text-xs);
+  font-weight: var(--afro-font-medium);
+  line-height: var(--afro-line-normal);
+  color: var(--afro-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ========================================
+   SPACING UTILITIES
+   ======================================== */
+.afro-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--afro-space-lg);
+}
+
+.afro-section {
+  padding: var(--afro-space-2xl) 0;
+}
+
+/* ========================================
+   GRID UTILITIES
+   ======================================== */
+.afro-grid {
+  display: grid;
+  gap: var(--afro-space-lg);
+}
+
+.afro-grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.afro-grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.afro-grid-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+@media (max-width: 768px) {
+  .afro-grid-2,
+  .afro-grid-3,
+  .afro-grid-4 {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .afro-grid-3,
+  .afro-grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ========================================
+   STATUS INDICATORS
+   ======================================== */
+.afro-status-success {
+  background: var(--afro-success);
+  color: white;
+  padding: var(--afro-space-xs) var(--afro-space-sm);
+  border-radius: var(--afro-radius-sm);
+  font-size: var(--afro-text-xs);
+  font-weight: var(--afro-font-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.afro-status-warning {
+  background: var(--afro-warning);
+  color: white;
+  padding: var(--afro-space-xs) var(--afro-space-sm);
+  border-radius: var(--afro-radius-sm);
+  font-size: var(--afro-text-xs);
+  font-weight: var(--afro-font-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.afro-status-error {
+  background: var(--afro-error);
+  color: white;
+  padding: var(--afro-space-xs) var(--afro-space-sm);
+  border-radius: var(--afro-radius-sm);
+  font-size: var(--afro-text-xs);
+  font-weight: var(--afro-font-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.afro-status-info {
+  background: var(--afro-info);
+  color: white;
+  padding: var(--afro-space-xs) var(--afro-space-sm);
+  border-radius: var(--afro-radius-sm);
+  font-size: var(--afro-text-xs);
+  font-weight: var(--afro-font-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ========================================
+   ANIMATION UTILITIES
+   ======================================== */
+.animate-slide-in-up {
+  animation: slideInUp var(--afro-transition-normal);
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp var(--afro-transition-normal);
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft var(--afro-transition-normal);
+}
+
+.animate-slide-in-right {
+  animation: slideInRight var(--afro-transition-normal);
+}
+
+.animate-pulse {
+  animation: pulse 2s infinite;
+}
+
+.animate-bounce {
+  animation: bounce 1s infinite;
+}
+
+/* ========================================
+   HOVER EFFECTS
+   ======================================== */
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--afro-shadow-lg);
+}
+
+.hover-scale:hover {
+  transform: scale(1.05);
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 20px rgba(30, 58, 138, 0.3);
+}
+
+/* ========================================
+   LOADING STATES
+   ======================================== */
+.afro-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--afro-space-2xl);
+}
+
+.afro-skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--afro-secondary-100) 25%,
+    var(--afro-secondary-50) 50%,
+    var(--afro-secondary-100) 75%
+  );
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: var(--afro-radius-md);
+}
+
+.loading-skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* ========================================
+   EMPTY STATES
+   ======================================== */
+.afro-empty-state {
+  text-align: center;
+  padding: var(--afro-space-3xl);
+  color: var(--afro-text-secondary);
+}
+
+.afro-empty-state-icon {
+  font-size: var(--afro-text-4xl);
+  margin-bottom: var(--afro-space-lg);
+  opacity: 0.5;
+}
+
+.afro-empty-state-title {
+  font-size: var(--afro-text-xl);
+  font-weight: var(--afro-font-semibold);
+  margin-bottom: var(--afro-space-sm);
+  color: var(--afro-text-primary);
+}
+
+.afro-empty-state-description {
+  font-size: var(--afro-text-base);
+  margin-bottom: var(--afro-space-lg);
+}
+
+/* ========================================
+   SCROLLBAR STYLING
+   ======================================== */
+.afro-scrollbar::-webkit-scrollbar,
+.modern-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.afro-scrollbar::-webkit-scrollbar-track,
+.modern-scrollbar::-webkit-scrollbar-track {
+  background: var(--afro-secondary-50);
+  border-radius: 3px;
+}
+
+.afro-scrollbar::-webkit-scrollbar-thumb,
+.modern-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--afro-secondary-400);
+  border-radius: 3px;
+}
+
+.afro-scrollbar::-webkit-scrollbar-thumb:hover,
+.modern-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--afro-secondary-500);
+}
+
+/* ========================================
+   FOCUS STATES
+   ======================================== */
+.focus-ring:focus-visible {
+  outline: 2px solid var(--afro-primary);
+  outline-offset: 2px;
+}
+
+/* ========================================
+   TRUNCATE TEXT
+   ======================================== */
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ========================================
+   REDUCED MOTION SUPPORT
+   ======================================== */
+@media (prefers-reduced-motion: reduce) {
+  .animate-slide-in-up,
+  .animate-fade-in-up,
+  .animate-slide-in-left,
+  .animate-slide-in-right,
+  .animate-pulse,
+  .animate-bounce,
+  .hover-lift:hover,
+  .hover-scale:hover {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+}
+

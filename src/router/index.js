@@ -1,34 +1,35 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { useAuthStore } from '@/features/auth/stores/authStore';
 
-// Layouts
-import OrganizationLayout from '@/features/organization/layouts/OrganizationLayout.vue';
-import VolunteerLayout from '@/features/volunteer/layouts/VolunteerLayout.vue';
+// Layouts - Lazy loaded
+const OrganizationLayout = () => import('@/features/organization/layouts/OrganizationLayout.vue');
+const VolunteerLayout = () => import('@/features/volunteer/layouts/VolunteerLayout.vue');
 
-// General Views
-import HomeView from '@/features/home/views/HomeView.vue';
-import LoginView from '@/features/auth/views/LoginView.vue';
-import RegisterView from '@/features/auth/views/RegisterView.vue';
-import ForgotPasswordView from '@/features/auth/views/ForgotPasswordView.vue';
-import NotFoundView from '@/features/error/views/NotFoundView.vue';
+// General Views - Lazy loaded (except HomeView for faster initial load)
+const HomeView = () => import('@/features/home/views/HomeView.vue');
+const LoginView = () => import('@/features/auth/views/LoginView.vue');
+const RegisterView = () => import('@/features/auth/views/RegisterView.vue');
+const ForgotPasswordView = () => import('@/features/auth/views/ForgotPasswordView.vue');
+const NotFoundView = () => import('@/features/error/views/NotFoundView.vue');
 
-// Organization Views
-import OrganizationDashboard from '@/features/organization/dashboard/views/OrganizationDashboardView.vue';
-import ProjectsView from '@/features/organization/projects/views/ProjectsView.vue';
-import CreateProjectView from '@/features/organization/projects/views/CreateProjectView.vue';
-import ProjectDetailView from '@/features/organization/projects/views/ProjectDetailView.vue';
-import VolunteersView from '@/features/organization/views/VolunteersView.vue';
-import DonationsView from '@/features/organization/views/DonationsView.vue';
-import ReportsView from '@/features/organization/views/ReportsView.vue';
-import OrganizationSettingsView from '@/features/organization/views/SettingsView.vue';
+// Organization Views - Lazy loaded
+const OrganizationDashboard = () => import('@/features/organization/dashboard/views/OrganizationDashboardView.vue');
+const ProjectsView = () => import('@/features/organization/projects/views/ProjectsView.vue');
+const CreateProjectView = () => import('@/features/organization/projects/views/CreateProjectView.vue');
+const ProjectDetailView = () => import('@/features/organization/projects/views/ProjectDetailView.vue');
+const VolunteersView = () => import('@/features/organization/views/VolunteersView.vue');
+const DonationsView = () => import('@/features/organization/views/DonationsView.vue');
+const ReportsView = () => import('@/features/organization/views/ReportsView.vue');
+const OrganizationSettingsView = () => import('@/features/organization/views/SettingsView.vue');
 
-// Volunteer Views
-import VolunteerDashboard from '@/features/volunteer/dashboard/views/VolunteerDashboardView.vue';
-import MyProjectsView from '@/features/volunteer/views/MyProjectsView.vue';
-import VolunteerProfileView from '@/features/volunteer/views/ProfileView.vue';
-import AvailabilityView from '@/features/volunteer/views/AvailabilityView.vue';
-import VolunteerSettingsView from '@/features/volunteer/views/SettingsView.vue';
-import ProjectCatalogView from '@/features/volunteer/views/ProjectCatalogView.vue';
+// Volunteer Views - Lazy loaded
+const VolunteerDashboard = () => import('@/features/volunteer/dashboard/views/VolunteerDashboardView.vue');
+const MyProjectsView = () => import('@/features/volunteer/views/MyProjectsView.vue');
+const VolunteerProfileView = () => import('@/features/volunteer/views/ProfileView.vue');
+const AvailabilityView = () => import('@/features/volunteer/views/AvailabilityView.vue');
+const VolunteerSettingsView = () => import('@/features/volunteer/views/SettingsView.vue');
+const ProjectCatalogView = () => import('@/features/volunteer/views/ProjectCatalogView.vue');
+const VolunteerProjectWorkspaceView = () => import('@/features/volunteer/views/VolunteerProjectWorkspaceView.vue');
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -82,6 +83,7 @@ const router = createRouter({
         { path: 'catalog', name: 'volunteer-catalog', component: ProjectCatalogView },
         { path: 'my-projects', name: 'volunteer-my-projects', component: MyProjectsView },
         { path: 'projects', name: 'volunteer-projects', component: MyProjectsView },
+        { path: 'projects/:id/workspace', name: 'volunteer-project-workspace', component: VolunteerProjectWorkspaceView },
         { path: 'projects/:id', name: 'volunteer-project-detail', component: ProjectCatalogView },
         { path: 'tasks', name: 'volunteer-tasks', component: MyProjectsView },
         { path: 'tasks/:id', name: 'volunteer-task-detail', component: MyProjectsView },
@@ -95,35 +97,35 @@ const router = createRouter({
         { path: 'settings', name: 'volunteer-settings', component: VolunteerSettingsView },
       ],
     },
-    // Common routes for all authenticated users
+    // Common routes for all authenticated users - Lazy loaded
     {
       path: '/messages',
       name: 'messages',
-      component: () => import('@/features/volunteer/views/MyProjectsView.vue'),
+      component: MyProjectsView,
       meta: { requiresAuth: true }
     },
     {
       path: '/notifications',
       name: 'notifications',
-      component: () => import('@/features/volunteer/views/MyProjectsView.vue'),
+      component: MyProjectsView,
       meta: { requiresAuth: true }
     },
     {
       path: '/profile',
       name: 'profile',
-      component: () => import('@/features/volunteer/views/ProfileView.vue'),
+      component: VolunteerProfileView,
       meta: { requiresAuth: true }
     },
     {
       path: '/settings',
       name: 'settings',
-      component: () => import('@/features/volunteer/views/SettingsView.vue'),
+      component: VolunteerSettingsView,
       meta: { requiresAuth: true }
     },
     {
       path: '/auth/register-org',
       name: 'register-org',
-      component: () => import('@/features/auth/views/RegisterView.vue')
+      component: RegisterView
     },
     {
       path: '/:pathMatch(.*)*',

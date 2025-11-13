@@ -138,7 +138,7 @@
         <!-- Project Image -->
         <div class="project-image">
           <v-img
-            :src="project.image || project.coverImage || '/default-project.jpg'"
+            :src="project.image || project.coverImage || defaultProjectImage"
             height="200px"
             cover
             class="project-cover"
@@ -560,6 +560,8 @@ import { ref, computed, onMounted } from 'vue';
 import { usePublicProjectStore } from '@/features/volunteer/stores/publicProjectStore';
 import { storeToRefs } from 'pinia';
 import VolunteerEnrollmentForm from '@/features/volunteer/components/VolunteerEnrollmentForm.vue';
+import { formatDate, formatDateRange } from '@/utils/formatters';
+import defaultProjectImage from '@/assets/images/background_login.png';
 
 const publicProjectStore = usePublicProjectStore();
 const { loading, publicProjects } = storeToRefs(publicProjectStore);
@@ -706,21 +708,7 @@ function getCategoryColor(category) {
   return colorMap[category] || 'grey';
 }
 
-function formatDateRange(startDate, endDate) {
-  if (!startDate || !endDate) return 'Fechas no especificadas';
-  const start = new Date(startDate).toLocaleDateString('es-CO', { month: 'short', day: 'numeric' });
-  const end = new Date(endDate).toLocaleDateString('es-CO', { month: 'short', day: 'numeric' });
-  return `${start} - ${end}`;
-}
-
-function formatDate(date) {
-  if (!date) return 'Fecha no especificada';
-  return new Date(date).toLocaleDateString('es-CO', { 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
-  });
-}
+// Usar utilidades de formateo - funciones removidas, ahora se importan
 
 function getProjectDuration(startDate, endDate) {
   if (!startDate || !endDate) return 'No especificado';

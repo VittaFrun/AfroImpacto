@@ -9,6 +9,8 @@ export const useProjectStore = defineStore('project', () => {
   const mainProjectId = ref(null);
   const loading = ref(false);
   const error = ref(null);
+  const lastFetch = ref(null);
+  const CACHE_TIME = 30000; // 30 segundos de caché
 
   // Getters
   const projects = computed(() => allProjects.value);
@@ -30,7 +32,9 @@ export const useProjectStore = defineStore('project', () => {
       location: project.ubicacion,
       startDate: project.fecha_inicio,
       endDate: project.fecha_fin,
-      coverImage: project.imagen_principal || defaultCoverImage,
+      coverImage: (project.imagen_principal && project.imagen_principal !== '/assets/images/background_login.png') 
+        ? project.imagen_principal 
+        : defaultCoverImage,
       document: project.documento,
       budget: project.presupuesto_total || 0,
       statusId: project.id_estado,
@@ -144,7 +148,16 @@ export const useProjectStore = defineStore('project', () => {
   }
 
   // Actions
-  async function fetchProjects() {
+  async function fetchProjects(forceRefresh = false) {
+    // Verificar si hay datos en caché válidos
+    if (!forceRefresh && allProjects.value.length > 0 && lastFetch.value) {
+      const timeSinceLastFetch = Date.now() - lastFetch.value;
+      if (timeSinceLastFetch < CACHE_TIME) {
+        console.log('📦 Using cached projects data');
+        return allProjects.value;
+      }
+    }
+
     loading.value = true;
     error.value = null;
     
@@ -171,8 +184,14 @@ export const useProjectStore = defineStore('project', () => {
         }
       }).filter(project => project !== null); // Remove invalid projects
       
+      // Actualizar timestamp del último fetch
+      lastFetch.value = Date.now();
+      
       // Clear error on success
       error.value = null;
+      
+      console.log('✅ Projects fetched from API');
+      return allProjects.value;
     } catch (err) {
       console.error('Error fetching projects:', err);
       error.value = getErrorMessage(err);
@@ -180,7 +199,8 @@ export const useProjectStore = defineStore('project', () => {
       // Don't clear projects on error if we have cached data
       // Only clear if it's a critical error
       if (err.response?.status === 401 || err.response?.status === 403) {
-      allProjects.value = [];
+        allProjects.value = [];
+        lastFetch.value = null;
       }
       // For other errors, keep existing projects if available
     } finally {
@@ -229,6 +249,7 @@ export const useProjectStore = defineStore('project', () => {
       });
       const project = mapProjectData(response.data);
       allProjects.value.push(project);
+      invalidateCache(); // Invalidar caché al crear proyecto
       return project;
     } catch (err) {
       console.error('Error creating project:', err);
@@ -279,6 +300,7 @@ export const useProjectStore = defineStore('project', () => {
         allProjects.value.push(updatedProject);
       }
       
+      invalidateCache(); // Invalidar caché al actualizar proyecto
       return updatedProject;
     } catch (err) {
       console.error(`Error updating project with id ${projectId}:`, err);
@@ -300,11 +322,16 @@ export const useProjectStore = defineStore('project', () => {
     try {
       await axios.delete(`/projects/${projectId}`);
       allProjects.value = allProjects.value.filter(p => p.id !== projectId);
+      invalidateCache(); // Invalidar caché al eliminar proyecto
       return true;
     } catch (err) {
       console.error(`Error deleting project with id ${projectId}:`, err);
-      error.value = 'Failed to delete project. Please try again later.';
-      return false;
+      const errorMessage = err.response?.data?.message || 
+                          err.response?.data?.error || 
+                          err.message || 
+                          'Error al eliminar el proyecto. Por favor, inténtalo de nuevo.';
+      error.value = errorMessage;
+      throw new Error(errorMessage);
     } finally {
       loading.value = false;
     }
@@ -598,12 +625,19 @@ export const useProjectStore = defineStore('project', () => {
     }
   }
 
+  // Función para invalidar el caché
+  function invalidateCache() {
+    lastFetch.value = null;
+    console.log('🔄 Cache invalidated');
+  }
+
   return {
     // State
     allProjects,
     mainProjectId,
     loading,
     error,
+    lastFetch,
     // Getters
     projects,
     getProjectById,
@@ -615,6 +649,7 @@ export const useProjectStore = defineStore('project', () => {
     addProject,
     updateProject,
     deleteProject,
+    invalidateCache,
     // Phase management (legacy methods)
     addProjectPhase,
     updateProjectPhase,

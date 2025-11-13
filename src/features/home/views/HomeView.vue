@@ -1,11 +1,10 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import { useUiStore } from '@/stores/uiStore';
-import AppHeader from '../components/home/AppHeader.vue';
-import AppFooter from '../components/home/AppFooter.vue';
+import AppHeader from '../components/AppHeader.vue';
+import AppFooter from '../components/AppFooter.vue';
 import HeroSection from '../components/HeroSection.vue';
 import UserTypes from '../components/UserTypes.vue';
-import PopularProjects from '../components/PopularProjects.vue';
 import Testimonials from '../components/Testimonials.vue';
 import ImpactStats from '../components/ImpactStats.vue';
 import NewsUpdates from '../components/NewsUpdates.vue';
@@ -15,13 +14,11 @@ const uiStore = useUiStore();
 
 // Define refs for each section component
 const inicioRef = ref(null);
-const proyectosRef = ref(null);
 const perfilesRef = ref(null);
 const nosotrosRef = ref(null);
 
 const sectionRefs = {
   inicio: inicioRef,
-  proyectos: proyectosRef,
   perfiles: perfilesRef,
   nosotros: nosotrosRef,
 };
@@ -87,7 +84,6 @@ onBeforeUnmount(() => {
     <AppHeader />
     <HeroSection id="inicio" ref="inicioRef" data-section-id="inicio" />
     <div class="main-content-wrapper">
-      <PopularProjects id="proyectos" ref="proyectosRef" data-section-id="proyectos" />
       <UserTypes id="perfiles" ref="perfilesRef" data-section-id="perfiles" />
       <AboutUs id="nosotros" ref="nosotrosRef" data-section-id="nosotros" />
       <Testimonials />

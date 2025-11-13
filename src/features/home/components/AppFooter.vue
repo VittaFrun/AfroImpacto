@@ -61,12 +61,12 @@ const subscribe = async () => {
       <v-row justify="center">
         <v-col cols="12" md="4" class="text-center text-md-left mb-8 mb-md-0">
           <h3 class="footer-slogan text-h6 text-md-h5 font-weight-bold mb-4">
-            Empoderando comunidades afro a través de proyectos, voluntariado y alianzas.
+            contribuyendo en la sociedad a través de proyectos, voluntariado y alianzas.
           </h3>
           <div class="contact-info">
             <div class="d-flex align-center justify-center justify-md-start mb-3 text-medium-contrast">
               <v-icon size="24" color="primary" class="mr-3">mdi-email-outline</v-icon>
-              <a href="mailto:contacto@afroimpacto.org" class="contact-link">contacto@afroimpacto.org</a>
+              <a href="mailto:contactoafroimpacto@gmail.com" class="contact-link">contactoafroimpacto@gmail.com</a>
             </div>
             <div class="d-flex align-center justify-center justify-md-start mb-3 text-medium-contrast">
               <v-icon size="24" color="primary" class="mr-3">mdi-phone-outline</v-icon>
@@ -86,7 +86,7 @@ const subscribe = async () => {
             <li><a @click="scrollToSection('our-projects')" class="footer-link">Nuestros Proyectos</a></li>
             <li><a @click="scrollToSection('get-involved')" class="footer-link">Hazte Voluntario</a></li>
             <li><a @click="scrollToSection('get-involved')" class="footer-link">Donar</a></li>
-            <li><a @click="scrollToSection('news-updates')" class="footer-link">Noticias</a></li>
+            <li><a @click="scrollToSection('faq')" class="footer-link">Preguntas Frecuentes</a></li>
           </ul>
         </v-col>
 
@@ -121,19 +121,51 @@ const subscribe = async () => {
               <v-icon size="20" class="ml-2">mdi-send</v-icon>
             </v-btn>
           </div>
-          <div class="social-icons">
-            <v-btn icon class="social-icon-btn mx-2" href="https://www.facebook.com/AfroImpacto" target="_blank" size="small">
-              <v-icon size="24">mdi-facebook</v-icon>
-            </v-btn>
-            <v-btn icon class="social-icon-btn mx-2" href="https://www.twitter.com/AfroImpacto" target="_blank" size="small">
-              <v-icon size="24">mdi-twitter</v-icon>
-            </v-btn>
-            <v-btn icon class="social-icon-btn mx-2" href="https://www.instagram.com/AfroImpacto" target="_blank" size="small">
-              <v-icon size="24">mdi-instagram</v-icon>
-            </v-btn>
-            <v-btn icon class="social-icon-btn mx-2" href="https://www.linkedin.com/company/AfroImpacto" target="_blank" size="small">
-              <v-icon size="24">mdi-linkedin</v-icon>
-            </v-btn>
+          
+          <div class="social-section">
+            <p class="text-body-2 text-medium-contrast mb-3 text-center text-md-right">Síguenos en nuestras redes sociales</p>
+            <div class="social-icons d-flex align-center justify-center justify-md-end">
+              <v-btn 
+                icon 
+                class="social-icon-btn" 
+                href="https://www.facebook.com/AfroImpacto" 
+                target="_blank" 
+                size="small"
+                aria-label="Facebook"
+              >
+                <v-icon size="24">mdi-facebook</v-icon>
+              </v-btn>
+              <v-btn 
+                icon 
+                class="social-icon-btn" 
+                href="https://www.twitter.com/AfroImpacto" 
+                target="_blank" 
+                size="small"
+                aria-label="Twitter"
+              >
+                <v-icon size="24">mdi-twitter</v-icon>
+              </v-btn>
+              <v-btn 
+                icon 
+                class="social-icon-btn" 
+                href="https://www.instagram.com/AfroImpacto" 
+                target="_blank" 
+                size="small"
+                aria-label="Instagram"
+              >
+                <v-icon size="24">mdi-instagram</v-icon>
+              </v-btn>
+              <v-btn 
+                icon 
+                class="social-icon-btn" 
+                href="https://www.linkedin.com/company/AfroImpacto" 
+                target="_blank" 
+                size="small"
+                aria-label="LinkedIn"
+              >
+                <v-icon size="24">mdi-linkedin</v-icon>
+              </v-btn>
+            </div>
           </div>
         </v-col>
       </v-row>
@@ -314,21 +346,33 @@ const subscribe = async () => {
 }
 
 
-/* Íconos Sociales */
+/* Sección de Redes Sociales */
+.social-section {
+  margin-top: 24px;
+}
+
+.social-icons {
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 .social-icons .social-icon-btn {
   background-color: #4ec7a5 !important;
-  color: white !important; /* Usar el verde secundario para los íconos por defecto */
+  color: white !important;
   border-radius: 50%;
-  transition: all 0.3s ease;
-  width: 40px !important;
-  height: 40px !important;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
+  width: 44px !important;
+  height: 44px !important;
+  margin: 0 !important;
+  box-shadow: 0 2px 8px rgba(78, 199, 165, 0.3);
 }
 
 .social-icons .social-icon-btn:hover {
   background-color: white !important;
   color: #4ec7a5 !important;
-  transform: translateY(-3px) scale(1.1);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.25);
+  transform: translateY(-4px) scale(1.1);
+  box-shadow: 0 6px 20px rgba(78, 199, 165, 0.5);
+  border: 2px solid #4ec7a5;
 }
 
 /* Responsive Adjustments */
@@ -357,8 +401,17 @@ const subscribe = async () => {
     margin-left: 0 !important;
     margin-top: 15px !important;
   }
+  .social-section {
+    margin-top: 20px;
+  }
+  .social-section p {
+    text-align: center !important;
+  }
+  .social-icons {
+    justify-content: center !important;
+  }
   .social-icons .social-icon-btn {
-    margin: 0 8px !important;
+    margin: 0 6px !important;
   }
 }
 
@@ -383,5 +436,17 @@ const subscribe = async () => {
   .email-input :deep(.v-label) {
     font-size: 0.85rem !important;
   }
+  .social-section {
+    margin-top: 16px;
+  }
+  .social-icons .social-icon-btn {
+    width: 40px !important;
+    height: 40px !important;
+    margin: 0 4px !important;
+  }
+  .social-icons .v-icon {
+    font-size: 20px !important;
+  }
 }
 </style>
+

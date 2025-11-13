@@ -1,77 +1,9 @@
 /* AfroImpacto Design System */
-:root {
-  /* Primary Colors - Professional Blue */
-  --afro-primary: #1e3a8a;
-  --afro-primary-light: #3b82f6;
-  --afro-primary-dark: #1e40af;
-  --afro-primary-50: #eff6ff;
-  --afro-primary-100: #dbeafe;
-  --afro-primary-500: #3b82f6;
-  --afro-primary-900: #1e3a8a;
-
-  /* Secondary Colors - Professional Gray */
-  --afro-secondary: #64748b;
-  --afro-secondary-light: #94a3b8;
-  --afro-secondary-dark: #475569;
-  --afro-secondary-50: #f8fafc;
-  --afro-secondary-100: #f1f5f9;
-  --afro-secondary-500: #64748b;
-  --afro-secondary-900: #0f172a;
-
-  /* Accent Colors */
-  --afro-success: #059669;
-  --afro-success-light: #10b981;
-  --afro-warning: #d97706;
-  --afro-error: #dc2626;
-  --afro-info: #0891b2;
-
-  /* Neutral Colors */
-  --afro-background: #f8fafc;
-  --afro-surface: #ffffff;
-  --afro-surface-variant: #f1f5f9;
-  --afro-text-primary: #1e293b;
-  --afro-text-secondary: #64748b;
-  --afro-text-disabled: #94a3b8;
-  --afro-border: #e2e8f0;
-  --afro-border-light: #f1f5f9;
-
-  /* Spacing Scale */
-  --afro-space-xs: 0.25rem;   /* 4px */
-  --afro-space-sm: 0.5rem;    /* 8px */
-  --afro-space-md: 1rem;      /* 16px */
-  --afro-space-lg: 1.5rem;    /* 24px */
-  --afro-space-xl: 2rem;      /* 32px */
-  --afro-space-2xl: 3rem;     /* 48px */
-  --afro-space-3xl: 4rem;     /* 64px */
-
-  /* Typography Scale */
-  --afro-text-xs: 0.75rem;    /* 12px */
-  --afro-text-sm: 0.875rem;   /* 14px */
-  --afro-text-base: 1rem;     /* 16px */
-  --afro-text-lg: 1.125rem;   /* 18px */
-  --afro-text-xl: 1.25rem;    /* 20px */
-  --afro-text-2xl: 1.5rem;    /* 24px */
-  --afro-text-3xl: 1.875rem;  /* 30px */
-  --afro-text-4xl: 2.25rem;   /* 36px */
-
-  /* Border Radius */
-  --afro-radius-sm: 0.375rem;  /* 6px */
-  --afro-radius-md: 0.5rem;    /* 8px */
-  --afro-radius-lg: 0.75rem;   /* 12px */
-  --afro-radius-xl: 1rem;      /* 16px */
-  --afro-radius-2xl: 1.5rem;   /* 24px */
-
-  /* Shadows */
-  --afro-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --afro-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --afro-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  --afro-shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-
-  /* Transitions */
-  --afro-transition-fast: 150ms ease-in-out;
-  --afro-transition-normal: 250ms ease-in-out;
-  --afro-transition-slow: 350ms ease-in-out;
-}
+/* 
+ * NOTA: Las variables CSS ahora están centralizadas en _variables.css
+ * Este archivo mantiene las clases utilitarias y estilos específicos
+ * que dependen de esas variables.
+ */
 
 /* Professional Typography */
 .afro-heading-1 {
@@ -136,7 +68,7 @@
 
 /* Professional Cards */
 .afro-card {
-  background: var(--afro-surface);
+  background: #ffffff !important;
   border: 1px solid var(--afro-border);
   border-radius: var(--afro-radius-lg);
   box-shadow: var(--afro-shadow-sm);
@@ -150,6 +82,7 @@
 }
 
 .afro-card-elevated {
+  background: #ffffff !important;
   box-shadow: var(--afro-shadow-md);
 }
 
@@ -307,7 +240,7 @@
 
 /* Professional Sidebar */
 .afro-sidebar {
-  background: var(--afro-surface);
+  background: #ffffff !important;
   border-right: 1px solid var(--afro-border);
   min-height: 100vh;
   width: 280px;
@@ -328,7 +261,7 @@
 
 /* Professional Header */
 .afro-header {
-  background: var(--afro-surface);
+  background: #ffffff !important;
   border-bottom: 1px solid var(--afro-border);
   padding: var(--afro-space-md) var(--afro-space-lg);
   display: flex;
@@ -350,7 +283,7 @@
 
 /* Professional Metrics Cards */
 .afro-metric-card {
-  background: var(--afro-surface);
+  background: #ffffff !important;
   border: 1px solid var(--afro-border);
   border-radius: var(--afro-radius-lg);
   padding: var(--afro-space-lg);
@@ -382,7 +315,7 @@
 .afro-table {
   width: 100%;
   border-collapse: collapse;
-  background: var(--afro-surface);
+  background: #ffffff !important;
   border-radius: var(--afro-radius-lg);
   overflow: hidden;
   box-shadow: var(--afro-shadow-sm);
@@ -427,7 +360,7 @@
   border-radius: var(--afro-radius-md);
   font-size: var(--afro-text-base);
   transition: all var(--afro-transition-fast);
-  background: var(--afro-surface);
+  background: #ffffff !important;
 }
 
 .afro-form-input:focus {

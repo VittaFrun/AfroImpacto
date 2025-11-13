@@ -563,10 +563,10 @@ import { ref, computed, onMounted } from 'vue';
 import MetricStatCard from '@/components/ui/MetricStatCard.vue';
 import { useDonationStore } from '@/features/organization/stores/donationStore';
 import { storeToRefs } from 'pinia';
+import { formatDate, formatCurrency } from '@/utils/formatters';
 
 const donationStore = useDonationStore();
 const { donations, loading, error } = storeToRefs(donationStore);
-const { formatCurrency } = donationStore;
 
 // Reactive data
 const search = ref('');
@@ -774,15 +774,21 @@ async function deleteDonation() {
 }
 
 // Helper functions
-function formatDate(date) {
-  return new Date(date).toLocaleDateString('es-CO');
-}
+// formatDate removida - ahora se usa desde @/utils/formatters
 
 function formatTime(date) {
-  return new Date(date).toLocaleTimeString('es-CO', { 
-    hour: '2-digit', 
-    minute: '2-digit' 
-  });
+  if (!date) return '';
+  try {
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    if (isNaN(dateObj.getTime())) return '';
+    return dateObj.toLocaleTimeString('es-CO', { 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    });
+  } catch (error) {
+    console.error('Error formatting time:', error);
+    return '';
+  }
 }
 
 function getStatusIcon(status) {

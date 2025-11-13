@@ -1,0 +1,208 @@
+/* ========================================
+   AFRO IMPACTO - CSS MIXINS
+   Funciones reutilizables para estilos comunes
+   ======================================== */
+
+/* ========================================
+   FLEXBOX UTILITIES
+   ======================================== */
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ========================================
+   CARD STYLES
+   ======================================== */
+@mixin card-base {
+  background: var(--afro-surface);
+  border: 1px solid var(--afro-border);
+  border-radius: var(--afro-radius-lg);
+  box-shadow: var(--afro-shadow-sm);
+  transition: all var(--afro-transition-normal);
+  overflow: hidden;
+}
+
+@mixin card-hover {
+  box-shadow: var(--afro-shadow-md);
+  border-color: var(--afro-primary-100);
+  transform: translateY(-2px);
+}
+
+/* ========================================
+   BUTTON STYLES
+   ======================================== */
+@mixin button-base {
+  font-weight: var(--afro-font-semibold);
+  text-transform: none;
+  transition: all var(--afro-transition-fast);
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--afro-radius-md);
+  box-shadow: var(--afro-shadow-sm);
+  cursor: pointer;
+}
+
+@mixin button-hover {
+  transform: translateY(-1px);
+  box-shadow: var(--afro-shadow-md);
+}
+
+@mixin button-active {
+  transform: translateY(0);
+  box-shadow: var(--afro-shadow-sm);
+}
+
+/* ========================================
+   INPUT STYLES
+   ======================================== */
+@mixin input-base {
+  width: 100%;
+  padding: var(--afro-space-sm) var(--afro-space-md);
+  border: 1px solid var(--afro-border);
+  border-radius: var(--afro-radius-md);
+  font-size: var(--afro-text-base);
+  transition: all var(--afro-transition-fast);
+  background: var(--afro-surface);
+}
+
+@mixin input-focus {
+  outline: none;
+  border-color: var(--afro-primary);
+  box-shadow: 0 0 0 3px var(--afro-primary-50);
+}
+
+/* ========================================
+   TYPOGRAPHY
+   ======================================== */
+@mixin heading-1 {
+  font-size: var(--afro-text-4xl);
+  font-weight: var(--afro-font-bold);
+  line-height: var(--afro-line-tight);
+  color: var(--afro-text-primary);
+  letter-spacing: -0.025em;
+}
+
+@mixin heading-2 {
+  font-size: var(--afro-text-3xl);
+  font-weight: var(--afro-font-semibold);
+  line-height: var(--afro-line-tight);
+  color: var(--afro-text-primary);
+  letter-spacing: -0.025em;
+}
+
+@mixin heading-3 {
+  font-size: var(--afro-text-2xl);
+  font-weight: var(--afro-font-semibold);
+  line-height: var(--afro-line-normal);
+  color: var(--afro-text-primary);
+}
+
+@mixin body-text {
+  font-size: var(--afro-text-base);
+  font-weight: var(--afro-font-normal);
+  line-height: var(--afro-line-normal);
+  color: var(--afro-text-primary);
+}
+
+@mixin body-small {
+  font-size: var(--afro-text-sm);
+  font-weight: var(--afro-font-normal);
+  line-height: var(--afro-line-normal);
+  color: var(--afro-text-secondary);
+}
+
+/* ========================================
+   ANIMATIONS
+   ======================================== */
+@mixin fade-in {
+  animation: fadeIn var(--afro-transition-normal);
+}
+
+@mixin slide-in-up {
+  animation: slideInUp var(--afro-transition-normal);
+}
+
+@mixin slide-in-left {
+  animation: slideInLeft var(--afro-transition-normal);
+}
+
+@mixin slide-in-right {
+  animation: slideInRight var(--afro-transition-normal);
+}
+
+/* ========================================
+   RESPONSIVE BREAKPOINTS
+   ======================================== */
+@mixin mobile {
+  @media (max-width: 768px) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (min-width: 769px) and (max-width: 1024px) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: 1025px) {
+    @content;
+  }
+}
+
+/* ========================================
+   UTILITY MIXINS
+   ======================================== */
+@mixin truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin scrollbar {
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--afro-secondary-50);
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--afro-secondary-300);
+    border-radius: 3px;
+
+    &:hover {
+      background: var(--afro-secondary-400);
+    }
+  }
+}
+
+@mixin loading-skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--afro-secondary-100) 25%,
+    var(--afro-secondary-50) 50%,
+    var(--afro-secondary-100) 75%
+  );
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: var(--afro-radius-md);
+}
+
