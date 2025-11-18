@@ -32,11 +32,7 @@
       </v-btn>
 
       <div class="d-flex align-center ml-6">
-        <v-btn icon class="mr-1" aria-label="Notificaciones" color="white">
-          <v-badge dot color="red-accent-2">
-            <v-icon>mdi-bell</v-icon>
-          </v-badge>
-        </v-btn>
+        <NotificationBell @view-all="goToNotifications" />
         <v-menu offset-y left transition="slide-y-transition">
           <template v-slot:activator="{ props }">
             <v-btn icon v-bind="props" class="ml-1" aria-label="Menú de usuario">
@@ -113,116 +109,8 @@
       </div>
       <v-divider></v-divider>
 
-      <v-list nav density="compact" class="mt-4">
-        <!-- Dashboard -->
-        <v-list-item 
-          value="dashboard" 
-          to="/organization/dashboard" 
-          :active="isActive('/organization/dashboard')"
-          link 
-          class="nav-item mx-2 mb-1"
-        >
-          <template v-slot:prepend>
-            <v-icon>mdi-view-dashboard</v-icon>
-          </template>
-          <v-list-item-title>Dashboard</v-list-item-title>
-        </v-list-item>
-
-        <!-- Proyectos con Submenú -->
-        <v-list-group value="projects" class="nav-group mx-2 mb-1">
-          <template v-slot:activator="{ props }">
-            <v-list-item
-              v-bind="props"
-              class="nav-item-parent"
-            >
-              <template v-slot:prepend>
-                <v-icon>mdi-folder-multiple</v-icon>
-              </template>
-              <v-list-item-title>Proyectos</v-list-item-title>
-            </v-list-item>
-          </template>
-
-          <!-- Submenú Items -->
-          <v-list-item
-            value="all-projects"
-            to="/organization/dashboard/projects"
-            :active="isActive('/organization/dashboard/projects')"
-            class="nav-item-child"
-            link
-          >
-            <template v-slot:prepend>
-              <v-icon size="small">mdi-view-list</v-icon>
-            </template>
-            <v-list-item-title>Todos los Proyectos</v-list-item-title>
-          </v-list-item>
-
-          <v-list-item
-            value="create-project"
-            to="/organization/dashboard/projects/create"
-            :active="isActive('/organization/dashboard/projects/create')"
-            class="nav-item-child"
-            link
-          >
-            <template v-slot:prepend>
-              <v-icon size="small">mdi-plus-circle</v-icon>
-            </template>
-            <v-list-item-title>Crear Proyecto</v-list-item-title>
-          </v-list-item>
-        </v-list-group>
-
-        <!-- Otros elementos del menú -->
-        <v-list-item 
-          value="volunteers"
-          to="/organization/dashboard/volunteers" 
-          :active="isActive('/organization/dashboard/volunteers')"
-          link 
-          class="nav-item mx-2 mb-1"
-        >
-          <template v-slot:prepend>
-            <v-icon>mdi-account-group</v-icon>
-          </template>
-          <v-list-item-title>Voluntarios</v-list-item-title>
-        </v-list-item>
-
-        <v-list-item 
-          value="donations"
-          to="/organization/dashboard/donations" 
-          :active="isActive('/organization/dashboard/donations')"
-          link 
-          class="nav-item mx-2 mb-1"
-        >
-          <template v-slot:prepend>
-            <v-icon>mdi-cash-multiple</v-icon>
-          </template>
-          <v-list-item-title>Donaciones</v-list-item-title>
-        </v-list-item>
-
-        <v-list-item 
-          value="reports"
-          to="/organization/dashboard/reports" 
-          :active="isActive('/organization/dashboard/reports')"
-          link 
-          class="nav-item mx-2 mb-1"
-        >
-          <template v-slot:prepend>
-            <v-icon>mdi-file-chart</v-icon>
-          </template>
-          <v-list-item-title>Reportes</v-list-item-title>
-        </v-list-item>
-
-        <v-list-item 
-          value="settings"
-          to="/organization/dashboard/settings" 
-          :active="isActive('/organization/dashboard/settings')"
-          link 
-          class="nav-item mx-2 mb-1"
-        >
-          <template v-slot:prepend>
-            <v-icon>mdi-cog</v-icon>
-          </template>
-          <v-list-item-title>Configuración</v-list-item-title>
-        </v-list-item>
-      </v-list>
+      <!-- Componente de navegación reutilizable -->
+      <NavigationMenu />
     </v-navigation-drawer>
 
     <!-- 
@@ -251,9 +139,11 @@
 // --- SCRIPT (LÓGICA DEL COMPONENTE) ---
 
 // Importaciones de Vue y Pinia
-import { ref, computed, watch, onMounted } from 'vue';
+import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/features/auth/stores/authStore';
+import NavigationMenu from './components/NavigationMenu.vue';
+import NotificationBell from '@/components/notifications/NotificationBell.vue';
 
 // --- STORES ---
 const router = useRouter();
@@ -279,7 +169,7 @@ const drawer = ref(null);
 // `miniVariant`: controla si el menú está minimizado.
 const miniVariant = ref(false);
 // `drawerWidth`: calcula el ancho del menú dependiendo de si está minimizado.
-const drawerWidth = computed(() => miniVariant.value ? 100 : 260);
+const drawerWidth = computed(() => miniVariant.value ? 100 : 280);
 
 // --- ELEMENTOS DE NAVEGACIÓN ---
 // `selectedItem`: mantiene el elemento de la lista que está seleccionado.
@@ -297,8 +187,13 @@ function goToProfile() {
 }
 
 function goToSettings() {
-  // Navegar a configuración
-  console.log('Ir a configuración');
+  router.push('/organization/dashboard/settings');
+}
+
+function goToNotifications() {
+  // Por ahora, mostrar un mensaje. En el futuro se puede crear una vista dedicada de notificaciones
+  console.log('Ver todas las notificaciones');
+  // router.push('/organization/dashboard/notifications');
 }
 
 async function logout() {
@@ -306,59 +201,7 @@ async function logout() {
   router.push('/auth/login');
 }
 
-const isActive = (routePath) => {
-  const currentPath = router.currentRoute.value.path;
-  
-  // Caso especial para dashboard - solo exacto
-  if (routePath === '/organization/dashboard') {
-    return currentPath === routePath;
-  }
-  
-  // Para rutas de proyectos
-  if (routePath === '/organization/dashboard/projects') {
-    // Activo en lista de proyectos y en vistas de detalle (pero no en create)
-    const isProjectsList = currentPath === routePath || currentPath === routePath + '/';
-    const isProjectDetail = /^\/organization\/dashboard\/projects\/\d+/.test(currentPath);
-    const isNotCreate = !currentPath.includes('/create');
-    return (isProjectsList || isProjectDetail) && isNotCreate;
-  }
-  
-  if (routePath === '/organization/dashboard/projects/create') {
-    return currentPath.includes('/projects/create');
-  }
-  
-  // Para voluntarios
-  if (routePath === '/organization/dashboard/volunteers') {
-    return currentPath === routePath || currentPath.startsWith(routePath + '/');
-  }
-  
-  // Para donaciones
-  if (routePath === '/organization/dashboard/donations') {
-    return currentPath === routePath || currentPath.startsWith(routePath + '/');
-  }
-  
-  // Para reportes
-  if (routePath === '/organization/dashboard/reports') {
-    return currentPath === routePath || currentPath.startsWith(routePath + '/');
-  }
-  
-  // Para configuración
-  if (routePath === '/organization/dashboard/settings') {
-    return currentPath === routePath || currentPath.startsWith(routePath + '/');
-  }
-  
-  // Para otras rutas, match exacto
-  return currentPath === routePath;
-};
-
-// Sincronizar selectedItem con la ruta actual al cargar y al cambiar la ruta
-onMounted(() => {
-  // No es necesario aquí, ya que isActive se encarga de la reactividad
-});
-
-watch(() => router.currentRoute.value, (newRoute) => {
-  // No es necesario aquí, ya que isActive se encarga de la reactividad
-});
+// La lógica de navegación ahora está en el composable useNavigation y NavigationMenu
 </script>
 
 
@@ -475,13 +318,48 @@ watch(() => router.currentRoute.value, (newRoute) => {
   background: rgba(0, 0, 0, 0.02) !important;
   border-radius: 0 0 12px 12px !important;
   padding: 6px 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
   margin-top: 2px !important;
   overflow: visible !important;
 }
 
 /* Eliminar padding interno de Vuetify que desplaza a la derecha */
+.nav-group :deep(.v-list-group__items) {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
 .nav-group :deep(.v-list-group__items .v-list-item) {
   padding-left: 0 !important;
+  padding-right: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  min-width: 0 !important; /* Permitir que el contenido se ajuste */
+}
+
+/* Asegurar que el wrapper del item no agregue padding */
+.nav-group :deep(.v-list-group__items .v-list-item .v-list-item__content) {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+  overflow: visible !important;
+}
+
+/* Forzar que el drawer no trunque el contenido */
+.custom-navigation-drawer :deep(.v-list-group__items) {
+  overflow: visible !important;
+  max-width: 100% !important;
+}
+
+.custom-navigation-drawer :deep(.v-list-item) {
+  overflow: visible !important;
+  max-width: 100% !important;
 }
 
 .nav-item-parent {
@@ -519,21 +397,24 @@ watch(() => router.currentRoute.value, (newRoute) => {
 
 .nav-item-child {
   border-radius: 8px !important;
-  margin: 2px 8px !important;
+  margin: 2px 8px 2px 0 !important; /* Sin margin izquierdo, solo derecho */
   min-height: 38px !important;
   padding: 5px 8px !important;
+  padding-left: 12px !important; /* Padding izquierdo reducido para mejor alineación */
   transition: all 0.2s ease-in-out !important;
 }
 
 .nav-item-child .v-list-item-title {
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
+  white-space: nowrap !important; /* Mantener en una línea */
+  overflow: visible !important; /* No ocultar texto */
+  text-overflow: clip !important; /* No truncar con ellipsis */
   font-size: 0.8125rem !important;
   font-weight: 500 !important;
   color: #475569 !important;
   transition: color 0.3s ease !important;
   line-height: 1.3 !important;
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
 }
 
 .nav-item-child .v-icon {
@@ -545,7 +426,30 @@ watch(() => router.currentRoute.value, (newRoute) => {
 .nav-item-child .v-list-item__prepend {
   flex-shrink: 0 !important;
   margin-right: 8px !important;
+  margin-left: 0 !important;
   min-width: 20px !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  width: auto !important;
+}
+
+/* Asegurar que el contenido del item no tenga padding adicional */
+.nav-item-child :deep(.v-list-item__content) {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  min-width: 0 !important;
+  overflow: visible !important;
+  flex: 1 1 auto !important;
+}
+
+/* Asegurar que el título tenga espacio completo */
+.nav-item-child :deep(.v-list-item-title) {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  overflow: visible !important;
+  white-space: normal !important;
 }
 
 .nav-item-child:hover {
@@ -565,7 +469,7 @@ watch(() => router.currentRoute.value, (newRoute) => {
   background: rgba(var(--v-theme-primary), 0.15) !important;
   font-weight: 600 !important;
   border-left: 3px solid rgb(var(--v-theme-primary)) !important;
-  padding-left: 5px !important;
+  padding-left: 0px !important; /* 3px border + 9px padding = 12px total, igual que no activo */
 }
 
 .nav-item-child.v-list-item--active .v-icon {
@@ -679,7 +583,7 @@ watch(() => router.currentRoute.value, (newRoute) => {
 
 /* Estilos para el menú de usuario */
 .user-menu-list {
-  min-width: 260px !important;
+  min-width: 280px !important;
   border-radius: 16px !important;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12) !important;
 }

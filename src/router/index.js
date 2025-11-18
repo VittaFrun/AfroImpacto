@@ -21,6 +21,12 @@ const VolunteersView = () => import('@/features/organization/views/VolunteersVie
 const DonationsView = () => import('@/features/organization/views/DonationsView.vue');
 const ReportsView = () => import('@/features/organization/views/ReportsView.vue');
 const OrganizationSettingsView = () => import('@/features/organization/views/SettingsView.vue');
+// Settings Components - Lazy loaded
+const ProfileSettings = () => import('@/features/organization/settings/components/ProfileSettings.vue');
+const AccountSettings = () => import('@/features/organization/settings/components/AccountSettings.vue');
+const PreferencesSettings = () => import('@/features/organization/settings/components/PreferencesSettings.vue');
+const SecuritySettings = () => import('@/features/organization/settings/components/SecuritySettings.vue');
+const IntegrationsSettings = () => import('@/features/organization/settings/components/IntegrationsSettings.vue');
 
 // Volunteer Views - Lazy loaded
 const VolunteerDashboard = () => import('@/features/volunteer/dashboard/views/VolunteerDashboardView.vue');
@@ -70,7 +76,39 @@ const router = createRouter({
         { path: 'dashboard/donations/create', name: 'organization-create-donation', component: DonationsView },
         { path: 'dashboard/reports', name: 'organization-reports', component: ReportsView },
         { path: 'dashboard/analytics', name: 'organization-analytics', component: ReportsView },
-        { path: 'dashboard/settings', name: 'organization-settings', component: OrganizationSettingsView },
+        { 
+          path: 'dashboard/settings', 
+          name: 'organization-settings', 
+          component: OrganizationSettingsView,
+          redirect: '/organization/dashboard/settings/profile',
+          children: [
+            {
+              path: 'profile',
+              name: 'organization-settings-profile',
+              component: ProfileSettings
+            },
+            {
+              path: 'account',
+              name: 'organization-settings-account',
+              component: AccountSettings
+            },
+            {
+              path: 'preferences',
+              name: 'organization-settings-preferences',
+              component: PreferencesSettings
+            },
+            {
+              path: 'security',
+              name: 'organization-settings-security',
+              component: SecuritySettings
+            },
+            {
+              path: 'integrations',
+              name: 'organization-settings-integrations',
+              component: IntegrationsSettings
+            }
+          ]
+        },
       ],
     },
     {

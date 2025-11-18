@@ -140,6 +140,11 @@
             />
           </v-tab>
           
+          <v-tab value="history" class="tab-item">
+            <v-icon start>mdi-history</v-icon>
+            <span class="tab-text">Historial</span>
+          </v-tab>
+          
           <v-tab value="settings" class="tab-item">
             <v-icon start>mdi-cog</v-icon>
             <span class="tab-text">Configuración</span>
@@ -244,7 +249,12 @@
           />
         </v-window-item>
 
-        <!-- Tab 5: Configuración -->
+        <!-- Tab 5: Historial -->
+        <v-window-item value="history">
+          <HistoryTab :project-id="project.id" />
+        </v-window-item>
+
+        <!-- Tab 6: Configuración -->
         <v-window-item value="settings">
           <SettingsTab
             :project="project"
@@ -393,12 +403,10 @@
       @confirm="removeAssignmentConfirmed"
     />
 
-    <DeleteConfirmDialog
+    <!-- Diálogo mejorado para eliminar múltiples asignaciones -->
+    <MultipleAssignmentsRemovalDialog
       v-model="confirmRemoveAllAssignmentsDialog"
-      :title="`Confirmar Eliminación de ${getAllAssignments().length} Asignación(es)`"
-      :message="`¿Estás seguro de que quieres eliminar todas las asignaciones (${getAllAssignments().length})?`"
-      sub-message="Todos los voluntarios serán removidos de sus tareas asignadas. Esta acción no se puede deshacer."
-      confirm-text="Eliminar Todas"
+      :assignments="getAllAssignments()"
       :loading="isLoading('removingAllAssignments')"
       @confirm="removeAllAssignmentsConfirmed"
     />
@@ -431,6 +439,16 @@
       confirm-text="Eliminar Todas"
       :loading="isLoading('deletingAllSolicitudes')"
       @confirm="deleteAllActiveConfirmed"
+    />
+
+    <!-- Volunteer Removal Dialog with Validation -->
+    <VolunteerRemovalDialog
+      v-model="volunteerRemovalDialog"
+      :volunteer="volunteerToRemove"
+      :validation-result="volunteerValidationResult"
+      :loading="validationLoading"
+      :removing="isLoading('removingVolunteer')"
+      @confirm="removeVolunteerConfirmed"
     />
 
     <!-- Beneficios Dialog -->
@@ -501,6 +519,7 @@ import TeamTab from '../components/tabs/TeamTab.vue';
 import ApplicationsTab from '../components/tabs/ApplicationsTab.vue';
 import TasksTab from '../components/tabs/TasksTab.vue';
 import SettingsTab from '../components/tabs/SettingsTab.vue';
+import HistoryTab from '../components/tabs/HistoryTab.vue';
 
 // UI Components
 import ModernButton from '@/components/ui/ModernButton.vue';
@@ -516,7 +535,10 @@ import BeneficioDialog from '../components/dialogs/BeneficioDialog.vue';
 import SolicitudesDialog from '../components/dialogs/SolicitudesDialog.vue';
 import HoursDialog from '../components/dialogs/HoursDialog.vue';
 import DeleteConfirmDialog from '../components/dialogs/DeleteConfirmDialog.vue';
+import VolunteerRemovalDialog from '../components/VolunteerRemovalDialog.vue';
+import MultipleAssignmentsRemovalDialog from '../components/MultipleAssignmentsRemovalDialog.vue';
 
+import { useVolunteerValidation } from '../composables/useVolunteerValidation';
 import { formatDate, formatDateRange } from '@/utils/formatters';
 import { ROUTES } from '@/constants/routes';
 
@@ -545,6 +567,11 @@ const {
   handleOperation, 
   isLoading 
 } = useProjectOperations();
+
+const { 
+  validateVolunteerRemoval,
+  loading: validationLoading 
+} = useVolunteerValidation();
 
 const { loading: projectLoading, error: projectError } = storeToRefs(projectStore);
 const { projectRoles } = storeToRefs(roleStore);
@@ -622,6 +649,9 @@ const phaseToDelete = ref(null);
 const taskToDelete = ref(null);
 const assignmentToRemove = ref(null);
 const solicitudToDelete = ref(null);
+const volunteerToRemove = ref(null);
+const volunteerRemovalDialog = ref(false);
+const volunteerValidationResult = ref(null);
 
 // Beneficios y Solicitudes dialogs
 const beneficioDialog = ref(false);
@@ -1904,8 +1934,63 @@ function viewMemberDetails(member) {
   showSnackbar(`Detalles de ${member.name} - Funcionalidad en desarrollo`, 'info');
 }
 
-function removeAllMemberAssignments(member) {
-  showSnackbar(`Eliminar todas las asignaciones de ${member.name}`, 'info');
+async function removeAllMemberAssignments(member) {
+  volunteerToRemove.value = member;
+  volunteerRemovalDialog.value = true;
+  volunteerValidationResult.value = null;
+
+  // Validar asignaciones antes de mostrar el diálogo
+  try {
+    const validation = await validateVolunteerRemoval(
+      member.id_voluntario || member.id,
+      project.value.id
+    );
+    volunteerValidationResult.value = validation;
+  } catch (error) {
+    console.error('Error al validar asignaciones:', error);
+    volunteerValidationResult.value = {
+      canRemove: false,
+      hasAssignments: true,
+      count: 0,
+      assignments: [],
+      message: 'Error al verificar asignaciones. Por favor, intente nuevamente.'
+    };
+  }
+}
+
+async function removeVolunteerConfirmed() {
+  if (!volunteerToRemove.value) return;
+
+  const member = volunteerToRemove.value;
+  const allAssignments = getAllAssignments().filter(
+    a => (a.id_voluntario || a.voluntario?.id_voluntario) === (member.id_voluntario || member.id)
+  );
+
+  if (allAssignments.length === 0) {
+    showSnackbar('El voluntario no tiene asignaciones para eliminar', 'info');
+    volunteerRemovalDialog.value = false;
+    volunteerToRemove.value = null;
+    return;
+  }
+
+  await handleOperation(
+    async () => {
+      await Promise.all(
+        allAssignments.map(asignacion => 
+          axios.delete(`/asignacion/${asignacion.id_asignacion}`)
+        )
+      );
+    },
+    'removingVolunteer',
+    `Se eliminaron todas las asignaciones de ${member.name} correctamente`,
+    'Error al eliminar las asignaciones',
+    async () => {
+      await projectStore.fetchProjectById(project.value.id);
+      volunteerRemovalDialog.value = false;
+      volunteerToRemove.value = null;
+      volunteerValidationResult.value = null;
+    }
+  );
 }
 
 // Additional variables
