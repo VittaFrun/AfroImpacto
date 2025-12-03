@@ -1,44 +1,54 @@
 /**
  * Composable para manejo centralizado de errores
  */
-import { useNotificationStore } from '@/stores/notificationStore';
+import { useNotifications } from './useNotifications';
+import { getErrorMessage, getContextualMessage, classifyError, ERROR_TYPES } from '@/utils/errorMessages';
 
 export function useErrorHandler() {
-  const notificationStore = useNotificationStore();
+  const { showError, showWarning } = useNotifications();
 
   /**
    * Maneja errores de forma consistente
    * @param {Error} error - Error a manejar
    * @param {string} defaultMessage - Mensaje por defecto si no hay mensaje en el error
    * @param {boolean} showNotification - Si se debe mostrar notificación
+   * @param {string} action - Acción que falló (para mensaje contextual)
    */
-  const handleError = (error, defaultMessage = 'Ha ocurrido un error', showNotification = true) => {
-    let message = defaultMessage;
+  const handleError = (error, defaultMessage = null, showNotification = true, action = null) => {
+    const errorInfo = getErrorMessage(error, defaultMessage);
+    let message = errorInfo.message;
 
-    // Extraer mensaje del error
-    if (error?.response?.data?.message) {
-      message = error.response.data.message;
-    } else if (error?.message) {
-      message = error.message;
-    } else if (typeof error === 'string') {
-      message = error;
+    // Usar mensaje contextual si se proporciona una acción
+    if (action) {
+      message = getContextualMessage(action, error);
     }
 
     // Log del error para debugging
+    const errorType = classifyError(error);
     console.error('Error:', {
+      type: errorType,
       message,
       error,
       response: error?.response,
       status: error?.response?.status,
       data: error?.response?.data,
+      stack: error?.stack,
     });
 
     // Mostrar notificación si está habilitado
     if (showNotification) {
-      notificationStore.showSnackbar(message, 'error');
+      if (errorType === ERROR_TYPES.TIMEOUT || errorType === ERROR_TYPES.NETWORK) {
+        showWarning(message);
+      } else {
+        showError(message);
+      }
     }
 
-    return message;
+    return {
+      message,
+      type: errorType,
+      ...errorInfo
+    };
   };
 
   /**
@@ -70,25 +80,30 @@ export function useErrorHandler() {
   /**
    * Maneja errores de red
    * @param {Error} error - Error de red
+   * @param {string} action - Acción que falló
    */
-  const handleNetworkError = (error) => {
-    if (!navigator.onLine) {
+  const handleNetworkError = (error, action = null) => {
+    const errorType = classifyError(error);
+    
+    if (errorType === ERROR_TYPES.NETWORK || !navigator.onLine) {
       return handleError(
-        new Error('No hay conexión a internet. Por favor, verifica tu conexión.'),
-        'Sin conexión',
-        true
+        error,
+        'No hay conexión a internet. Por favor, verifica tu conexión.',
+        true,
+        action
       );
     }
 
-    if (error?.code === 'ECONNABORTED' || error?.message?.includes('timeout')) {
+    if (errorType === ERROR_TYPES.TIMEOUT) {
       return handleError(
-        new Error('La petición tardó demasiado. Por favor, intenta nuevamente.'),
-        'Timeout',
-        true
+        error,
+        'La petición tardó demasiado. Por favor, intenta nuevamente.',
+        true,
+        action
       );
     }
 
-    return handleError(error, 'Error de conexión. Por favor, intenta nuevamente.');
+    return handleError(error, 'Error de conexión. Por favor, intenta nuevamente.', true, action);
   };
 
   /**
@@ -97,27 +112,59 @@ export function useErrorHandler() {
    * @param {Object} router - Instancia del router (opcional)
    */
   const handleAuthError = (error, router = null) => {
-    if (error?.response?.status === 401) {
+    const errorType = classifyError(error);
+    
+    if (errorType === ERROR_TYPES.AUTH || error?.response?.status === 401) {
       // Redirigir al login si no está autenticado
       if (router) {
         router.push('/auth/login');
       }
-      return handleError(
-        new Error('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.'),
-        'Sesión expirada',
-        true
-      );
+      const errorInfo = getErrorMessage(error);
+      return handleError(error, errorInfo.message, true);
     }
 
-    if (error?.response?.status === 403) {
-      return handleError(
-        new Error('No tienes permisos para realizar esta acción.'),
-        'Sin permisos',
-        true
-      );
+    if (errorType === ERROR_TYPES.PERMISSION || error?.response?.status === 403) {
+      const errorInfo = getErrorMessage(error);
+      return handleError(error, errorInfo.message, true);
     }
 
     return handleError(error);
+  };
+
+  /**
+   * Retry con exponential backoff
+   * @param {Function} fn - Función a reintentar
+   * @param {number} maxRetries - Número máximo de reintentos
+   * @param {number} initialDelay - Delay inicial en ms
+   * @returns {Promise} Resultado de la función
+   */
+  const retryWithBackoff = async (fn, maxRetries = 3, initialDelay = 1000) => {
+    let lastError;
+    
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        return await fn();
+      } catch (error) {
+        lastError = error;
+        const errorType = classifyError(error);
+        
+        // No reintentar errores de autenticación o permisos
+        if (errorType === ERROR_TYPES.AUTH || errorType === ERROR_TYPES.PERMISSION) {
+          throw error;
+        }
+        
+        // Si es el último intento, lanzar el error
+        if (attempt === maxRetries) {
+          throw error;
+        }
+        
+        // Calcular delay con exponential backoff
+        const delay = initialDelay * Math.pow(2, attempt);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+    
+    throw lastError;
   };
 
   return {
@@ -125,6 +172,9 @@ export function useErrorHandler() {
     handleValidationError,
     handleNetworkError,
     handleAuthError,
+    retryWithBackoff,
+    classifyError,
+    getErrorMessage,
   };
 }
 

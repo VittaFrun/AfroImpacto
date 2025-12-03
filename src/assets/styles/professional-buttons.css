@@ -192,11 +192,6 @@
   opacity: 0.7 !important;
 }
 
-/* Focus state for accessibility */
-.v-btn:focus-visible {
-  outline: 2px solid #2563eb !important;
-  outline-offset: 2px !important;
-}
 
 /* Quick actions grid styling */
 .quick-actions-grid .v-btn {

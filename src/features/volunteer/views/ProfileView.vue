@@ -99,7 +99,7 @@
         </v-tab>
         <v-tab value="achievements" class="profile-tab">
           <v-icon start color="accent-light">mdi-trophy</v-icon>
-          Logros
+          Logros y Certificados
         </v-tab>
       </v-tabs>
       
@@ -516,19 +516,89 @@
 
         <!-- Achievements Tab -->
         <v-window-item value="achievements">
-            <div class="tab-content">
-              <div class="achievements-section">
-                <div class="section-header-professional">
-                  <div class="header-content">
-                    <h3 class="section-title">
-                      <v-icon class="title-icon" color="primary">mdi-trophy-outline</v-icon>
-                      Mis Logros
-                    </h3>
-                    <p class="section-subtitle">Reconoce tus logros y certificaciones obtenidas</p>
+          <div class="tab-content">
+            <div class="achievements-section">
+              <!-- Points Summary -->
+              <v-card variant="outlined" class="mb-4">
+                <v-card-text>
+                  <div class="d-flex align-center justify-space-between">
+                    <div>
+                      <div class="text-caption text-grey mb-1">Puntos Totales</div>
+                      <div class="text-h4 font-weight-bold text-primary">{{ totalPoints }}</div>
+                    </div>
+                    <v-icon size="64" color="warning">mdi-star-circle</v-icon>
                   </div>
+                </v-card-text>
+              </v-card>
+
+              <!-- Certificates Section -->
+              <div class="section-header-professional mb-4">
+                <div class="header-content">
+                  <h3 class="section-title">
+                    <v-icon class="title-icon" color="primary">mdi-certificate</v-icon>
+                    Mis Certificados
+                  </h3>
+                  <p class="section-subtitle">Certificados obtenidos por tu participación en proyectos</p>
                 </div>
-              
-              <div v-if="achievements.length === 0" class="afro-empty-state">
+              </div>
+
+              <div v-if="loadingCertificados" class="text-center py-8">
+                <v-progress-circular indeterminate color="primary"></v-progress-circular>
+              </div>
+              <div v-else-if="certificados.length === 0" class="afro-empty-state mb-6">
+                <div class="afro-empty-state-icon">
+                  <v-icon size="48" color="grey-lighten-1">mdi-certificate-outline</v-icon>
+                </div>
+                <div class="afro-empty-state-title">Sin certificados</div>
+                <div class="afro-empty-state-description">
+                  Los certificados aparecerán aquí cuando completes proyectos
+                </div>
+              </div>
+              <div v-else class="certificates-grid mb-6">
+                <v-card
+                  v-for="certificado in certificados"
+                  :key="certificado.id_certificado"
+                  variant="outlined"
+                  class="certificate-card"
+                >
+                  <v-card-text>
+                    <div class="d-flex align-start gap-3">
+                      <v-icon size="40" color="primary">mdi-certificate</v-icon>
+                      <div class="flex-grow-1">
+                        <h4 class="text-h6 mb-1">{{ certificado.nombre }}</h4>
+                        <p class="text-body-2 text-grey mb-2">{{ certificado.descripcion }}</p>
+                        <div class="d-flex align-center gap-2 mb-2">
+                          <v-chip size="small" variant="tonal" color="primary">
+                            {{ certificado.tipo }}
+                          </v-chip>
+                          <span class="text-caption text-grey">
+                            Emitido: {{ formatDate(certificado.fecha_emision) }}
+                          </span>
+                        </div>
+                        <div v-if="certificado.codigo_verificacion" class="text-caption text-grey">
+                          Código: {{ certificado.codigo_verificacion }}
+                        </div>
+                      </div>
+                    </div>
+                  </v-card-text>
+                </v-card>
+              </div>
+
+              <!-- Achievements Section -->
+              <div class="section-header-professional mb-4">
+                <div class="header-content">
+                  <h3 class="section-title">
+                    <v-icon class="title-icon" color="warning">mdi-trophy-outline</v-icon>
+                    Mis Logros
+                  </h3>
+                  <p class="section-subtitle">Reconoce tus logros y logros obtenidos</p>
+                </div>
+              </div>
+
+              <div v-if="loadingLogros" class="text-center py-8">
+                <v-progress-circular indeterminate color="primary"></v-progress-circular>
+              </div>
+              <div v-else-if="voluntarioLogros.length === 0" class="afro-empty-state">
                 <div class="afro-empty-state-icon">
                   <v-icon size="48" color="grey-lighten-1">mdi-trophy-outline</v-icon>
                 </div>
@@ -537,29 +607,40 @@
                   Los logros aparecerán aquí conforme completes proyectos
                 </div>
               </div>
-              
               <div v-else class="achievements-grid">
-                <div
-                  v-for="achievement in achievements"
-                  :key="achievement.id"
-                  class="achievement-card afro-card"
+                <v-card
+                  v-for="voluntarioLogro in voluntarioLogros"
+                  :key="voluntarioLogro.id_voluntario_logro"
+                  variant="outlined"
+                  class="achievement-card"
                 >
-                  <div class="achievement-icon">
-                    <v-icon
-                      :color="achievement.color"
-                      size="48"
-                    >
-                      {{ achievement.icon }}
-                    </v-icon>
-                  </div>
-                  <div class="achievement-content">
-                    <h4 class="achievement-title">{{ achievement.title }}</h4>
-                    <p class="achievement-description">{{ achievement.description }}</p>
-                    <div class="achievement-date">
-                      Obtenido el {{ formatDate(achievement.date) }}
+                  <v-card-text>
+                    <div class="d-flex align-start gap-3">
+                      <v-icon
+                        :icon="voluntarioLogro.logro?.icono || 'mdi-trophy'"
+                        size="40"
+                        :color="getLogroColor(voluntarioLogro.logro?.tipo)"
+                      ></v-icon>
+                      <div class="flex-grow-1">
+                        <div class="d-flex align-center justify-space-between mb-1">
+                          <h4 class="text-h6">{{ voluntarioLogro.logro?.nombre }}</h4>
+                          <v-chip size="small" variant="tonal" color="warning" v-if="voluntarioLogro.logro?.puntos">
+                            +{{ voluntarioLogro.logro.puntos }} pts
+                          </v-chip>
+                        </div>
+                        <p class="text-body-2 text-grey mb-2">{{ voluntarioLogro.logro?.descripcion }}</p>
+                        <div class="d-flex align-center gap-2">
+                          <v-chip size="small" variant="tonal" :color="getLogroColor(voluntarioLogro.logro?.tipo)">
+                            {{ voluntarioLogro.logro?.tipo }}
+                          </v-chip>
+                          <span class="text-caption text-grey">
+                            Obtenido: {{ formatDate(voluntarioLogro.fecha_obtenido) }}
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
+                  </v-card-text>
+                </v-card>
               </div>
             </div>
           </div>
@@ -573,9 +654,23 @@
 import { ref, computed, onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useAuthStore } from '@/features/auth/stores/authStore';
+import { useCertificadoStore } from '@/features/volunteer/stores/certificadoStore';
+import { useLogroStore } from '@/features/volunteer/stores/logroStore';
+import { useVolunteerStore } from '@/features/volunteer/stores/volunteerStore';
 
 const authStore = useAuthStore();
 const { user } = storeToRefs(authStore);
+
+const certificadoStore = useCertificadoStore();
+const logroStore = useLogroStore();
+const volunteerStore = useVolunteerStore();
+
+const { certificados, loading: loadingCertificados } = storeToRefs(certificadoStore);
+const { voluntarioLogros, loading: loadingLogros } = storeToRefs(logroStore);
+
+const totalPoints = computed(() => {
+  return voluntarioLogros.value.reduce((total, vl) => total + (vl.logro?.puntos || 0), 0);
+});
 
 // Reactive data
 const activeTab = ref('personal');
@@ -668,33 +763,16 @@ const portfolio = ref([
   }
 ]);
 
-// Achievements data
-const achievements = ref([
-  {
-    id: 1,
-    title: 'Primer Proyecto',
-    description: 'Completaste tu primer proyecto como voluntario',
-    icon: 'mdi-trophy',
-    color: 'warning',
-    date: '2024-01-15'
-  },
-  {
-    id: 2,
-    title: '100 Horas',
-    description: 'Alcanzaste las 100 horas de voluntariado',
-    icon: 'mdi-clock-check',
-    color: 'success',
-    date: '2024-02-10'
-  },
-  {
-    id: 3,
-    title: 'Educador Experto',
-    description: 'Demostraste excelencia en proyectos educativos',
-    icon: 'mdi-school',
-    color: 'info',
-    date: '2024-02-15'
-  }
-]);
+const getLogroColor = (tipo) => {
+  const colorMap = {
+    'proyecto': 'primary',
+    'horas': 'success',
+    'tareas': 'info',
+    'especial': 'warning',
+    'default': 'grey'
+  };
+  return colorMap[tipo] || colorMap.default;
+};
 
 // Options
 const jornadaOptions = [
@@ -903,8 +981,12 @@ const formatDate = (date) => {
   return new Date(date).toLocaleDateString('es-CO');
 };
 
-onMounted(() => {
+onMounted(async () => {
   // Load profile data
+  if (user.value?.voluntario?.id_voluntario) {
+    await certificadoStore.fetchByVolunteer(user.value.voluntario.id_voluntario);
+    await logroStore.fetchVoluntarioLogros(user.value.voluntario.id_voluntario);
+  }
 });
 </script>
 
@@ -1375,6 +1457,21 @@ onMounted(() => {
   padding: var(--afro-space-lg);
 }
 
+.certificates-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--afro-space-lg);
+}
+
+.certificate-card {
+  transition: all 0.3s ease;
+}
+
+.certificate-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
 .achievements-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -1433,7 +1530,8 @@ onMounted(() => {
   
   .skills-grid,
   .portfolio-grid,
-  .achievements-grid {
+  .achievements-grid,
+  .certificates-grid {
     grid-template-columns: 1fr;
   }
   

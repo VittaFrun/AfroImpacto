@@ -30,18 +30,23 @@ export default defineConfig({
         manualChunks(id) {
           // Vendor chunks - librerías de terceros
           if (id.includes('node_modules')) {
+            // Core Vue ecosystem
             if (id.includes('vue') || id.includes('vue-router') || id.includes('pinia')) {
               return 'vendor-vue';
             }
+            // UI Framework
             if (id.includes('vuetify')) {
               return 'vendor-vuetify';
             }
+            // Charts library (pesado, separado)
             if (id.includes('echarts')) {
               return 'vendor-charts';
             }
+            // Utilities
             if (id.includes('axios') || id.includes('date-fns')) {
               return 'vendor-utils';
             }
+            // Drag and drop
             if (id.includes('vuedraggable')) {
               return 'vendor-drag';
             }
@@ -49,7 +54,13 @@ export default defineConfig({
             return 'vendor-other';
           }
           
-          // Feature chunks - código por feature
+          // Feature chunks - código por feature (solo para archivos grandes)
+          if (id.includes('/features/organization/projects/views/ProjectDetailView')) {
+            return 'feature-project-detail';
+          }
+          if (id.includes('/features/volunteer/views/VolunteerProjectWorkspaceView')) {
+            return 'feature-workspace';
+          }
           if (id.includes('/features/organization/')) {
             return 'feature-organization';
           }
@@ -81,6 +92,10 @@ export default defineConfig({
     // Optimizaciones adicionales
     cssCodeSplit: true,
     reportCompressedSize: false, // Mejora velocidad de build
+    // Tree shaking más agresivo
+    treeshake: {
+      moduleSideEffects: false,
+    },
   },
   
   // Optimizaciones de dependencias

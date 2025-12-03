@@ -1,7 +1,7 @@
 <template>
   <div class="error-state">
     <v-alert
-      :type="type"
+      :type="alertType"
       :prominent="prominent"
       :dismissible="dismissible"
       @click:close="$emit('dismiss')"
@@ -11,8 +11,8 @@
       </template>
       
       <div class="error-content">
-        <h3 v-if="title" class="error-title">{{ title }}</h3>
-        <p class="error-message">{{ message }}</p>
+        <h3 v-if="displayTitle" class="error-title">{{ displayTitle }}</h3>
+        <p class="error-message">{{ displayMessage }}</p>
         <div v-if="showDetails && error" class="error-details">
           <details>
             <summary>Detalles técnicos</summary>
@@ -37,6 +37,7 @@
 
 <script setup>
 import { computed } from 'vue';
+import { getErrorMessage, classifyError } from '@/utils/errorMessages';
 
 const props = defineProps({
   error: {
@@ -45,16 +46,16 @@ const props = defineProps({
   },
   message: {
     type: String,
-    default: 'Ha ocurrido un error',
+    default: null,
   },
   title: {
     type: String,
-    default: 'Error',
+    default: null,
   },
   type: {
     type: String,
-    default: 'error',
-    validator: (value) => ['error', 'warning', 'info'].includes(value),
+    default: null,
+    validator: (value) => !value || ['error', 'warning', 'info'].includes(value),
   },
   prominent: {
     type: Boolean,
@@ -66,23 +67,53 @@ const props = defineProps({
   },
   showRetry: {
     type: Boolean,
-    default: false,
+    default: true,
   },
   showDetails: {
     type: Boolean,
     default: false,
   },
+  autoClassify: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 const emit = defineEmits(['retry', 'dismiss']);
 
-const icon = computed(() => {
-  const icons = {
-    error: 'mdi-alert-circle',
-    warning: 'mdi-alert',
-    info: 'mdi-information',
+const errorInfo = computed(() => {
+  if (props.autoClassify && props.error) {
+    return getErrorMessage(props.error, props.message);
+  }
+  return {
+    title: props.title || 'Error',
+    message: props.message || 'Ha ocurrido un error',
+    icon: props.type === 'warning' ? 'mdi-alert' : props.type === 'info' ? 'mdi-information' : 'mdi-alert-circle',
+    type: props.type || 'error'
   };
-  return icons[props.type] || icons.error;
+});
+
+const alertType = computed(() => {
+  if (props.type) return props.type;
+  if (props.autoClassify && props.error) {
+    const errorType = classifyError(props.error);
+    if (errorType === 'timeout' || errorType === 'network') return 'warning';
+    if (errorType === 'auth' || errorType === 'permission') return 'error';
+    return 'error';
+  }
+  return 'error';
+});
+
+const icon = computed(() => {
+  return errorInfo.value.icon;
+});
+
+const displayTitle = computed(() => {
+  return props.title || errorInfo.value.title;
+});
+
+const displayMessage = computed(() => {
+  return props.message || errorInfo.value.message;
 });
 
 const errorDetails = computed(() => {

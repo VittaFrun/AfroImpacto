@@ -192,7 +192,7 @@
                           hide-details="auto"
                         />
                       </v-card>
-                    </v-col>
+                </v-col>
                     
                     <!-- Project Dates - Full Width -->
                     <v-col cols="12">
@@ -274,8 +274,8 @@
                                 </div>
                               </v-card>
                             </v-menu>
-                          </v-col>
-                          <v-col cols="12" md="6">
+                </v-col>
+                <v-col cols="12" md="6">
                             <v-menu
                               v-model="endDateMenu"
                               :close-on-content-click="false"
@@ -313,9 +313,9 @@
                                     >
                                       mdi-close-circle
                                     </v-icon>
-                    </template>
+                      </template>
                                 </v-text-field>
-                              </template>
+                    </template>
                               <v-card class="corporate-date-picker" elevation="4">
                                 <!-- Calendar Grid -->
                                 <div class="corporate-picker-body">
@@ -360,6 +360,30 @@
                         </v-alert>
                       </v-card>
                 </v-col>
+                    
+                    <!-- Requisitos - Full Width -->
+                    <v-col cols="12">
+                      <v-card variant="outlined" class="pa-6 form-section-card">
+                        <div class="d-flex align-center mb-4">
+                          <v-icon class="mr-3" color="warning" size="24">mdi-clipboard-list</v-icon>
+                          <span class="text-subtitle-1 font-weight-bold">Requisitos del Proyecto</span>
+                        </div>
+                        <v-textarea
+                          v-model="project.requisitos"
+                          label="Requisitos para Participar"
+                          variant="outlined"
+                          color="primary"
+                          :rows="4"
+                          placeholder="Describe los requisitos necesarios para que los voluntarios participen en este proyecto (ej: edad mínima, experiencia, habilidades, certificaciones, etc.)"
+                          hint="Opcional - Especifica los requisitos que deben cumplir los voluntarios"
+                          persistent-hint
+                          density="comfortable"
+                          auto-grow
+                          class="modern-input"
+                          hide-details="auto"
+                        />
+                      </v-card>
+                    </v-col>
                     
                     <!-- Cover Image and Documents - Side by Side -->
                 <v-col cols="12" md="6">
@@ -596,6 +620,10 @@
                             <v-list-item-subtitle>{{ project.location || 'No especificada' }}</v-list-item-subtitle>
                 </v-list-item>
                 <v-list-item>
+                  <v-list-item-title class="font-weight-bold">Requisitos:</v-list-item-title>
+                            <v-list-item-subtitle>{{ project.requisitos || 'No especificados' }}</v-list-item-subtitle>
+                </v-list-item>
+                <v-list-item>
                   <v-list-item-title class="font-weight-bold">Fechas:</v-list-item-title>
                             <v-list-item-subtitle>
                               {{ formatDateForReview(project.startDate) }} - {{ formatDateForReview(project.endDate) }}
@@ -689,7 +717,7 @@
                               <span v-if="phase.description || phase.descripcion" class="text-caption text-grey">
                                 {{ phase.description || phase.descripcion }}
                               </span>
-                            </div>
+              </div>
               </div>
               </div>
                       </template>
@@ -840,6 +868,7 @@ import DragDropFileUpload from '@/components/ui/DragDropFileUpload.vue';
 import PaymentConfiguration from '@/components/ui/PaymentConfiguration.vue';
 import { formatDate, formatCurrency } from '@/utils/formatters';
 import { ROUTES } from '@/constants/routes';
+import { VALIDATION_RULES, createDateRangeRules, createStartDateRules } from '@/utils/validationRules';
 
 // Router and Store
 const router = useRouter();
@@ -864,6 +893,7 @@ const project = reactive({
   startDate: '',
   endDate: '',
   budget: 0,
+  requisitos: '',
   coverImage: null,
   files: [],
   phases: []
@@ -951,50 +981,19 @@ const notification = ref({
   icon: 'mdi-check-circle'
 });
 
-// Validation Rules
-const nameRules = [
-  v => !!v || 'El nombre es requerido',
-  v => (v && v.length >= 3) || 'Mínimo 3 caracteres',
-  v => (v && v.length <= 100) || 'Máximo 100 caracteres'
-];
+// Validation Rules - Usando sistema unificado
+const nameRules = VALIDATION_RULES.projectName;
+const descriptionRules = VALIDATION_RULES.description;
+const objectiveRules = VALIDATION_RULES.objective;
+const locationRules = VALIDATION_RULES.location;
+const budgetRules = VALIDATION_RULES.budget;
+const phaseNameRules = VALIDATION_RULES.phaseName;
 
-const descriptionRules = [
-  v => !!v || 'La descripción es requerida',
-  v => (v && v.length >= 10) || 'Mínimo 10 caracteres',
-  v => (v && v.length <= 1000) || 'Máximo 1000 caracteres'
-];
-
-const objectiveRules = [
-  v => !!v || 'El objetivo es requerido',
-  v => (v && v.length >= 10) || 'El objetivo debe tener al menos 10 caracteres',
-  v => (v && v.length <= 500) || 'Máximo 500 caracteres'
-];
-
-const locationRules = [
-  v => !!v || 'La ubicación es requerida',
-  v => (v && v.length >= 3) || 'Mínimo 3 caracteres',
-  v => (v && v.length <= 100) || 'Máximo 100 caracteres'
-];
-
-const budgetRules = [
-  v => !!v || 'El presupuesto es requerido',
-  v => {
-    const numericValue = parseFloat(v?.toString().replace(/[^\d]/g, '') || '0');
-    return numericValue > 0 || 'El presupuesto debe ser mayor a 0';
-  }
-];
-
-const startDateRules = [
-  v => !!v || 'La fecha de inicio es requerida'
-];
-
-const endDateRules = [
-  v => !!v || 'La fecha de fin es requerida'
-];
-
-const phaseNameRules = [
-  v => !!v || 'El nombre es requerido'
-];
+// Reglas de fecha con validación de rango
+const startDateRef = computed(() => project.value.startDate);
+const endDateRef = computed(() => project.value.endDate);
+const startDateRules = computed(() => createStartDateRules(endDateRef));
+const endDateRules = computed(() => createDateRangeRules(startDateRef));
 
 // Computed Properties
 const canProceedToNextStep = computed(() => {
@@ -1718,6 +1717,7 @@ async function submitProject() {
       fecha_inicio: formatDateForSubmission(project.startDate),
       fecha_fin: formatDateForSubmission(project.endDate),
       presupuesto_total: Number(project.budget) || 0,
+      requisitos: project.requisitos?.trim() || null,
       categoria: null, // Can be added later in project edit view
       imagen_principal: '/assets/images/background_login.png', // Imagen predeterminada
       documento: null, // Will be uploaded separately after project creation
@@ -1741,6 +1741,34 @@ async function submitProject() {
     // Create project
     const newProject = await projectStore.addProject(projectData);
     
+    // Create benefits if configured
+    if (newProject && (newProject.id || newProject.id_proyecto) && paymentData.paymentType) {
+      try {
+        const { useProyectoBeneficioStore } = await import('@/features/organization/projects/stores/proyectoBeneficioStore');
+        const beneficioStore = useProyectoBeneficioStore();
+        
+        const projectId = newProject.id || newProject.id_proyecto;
+        
+        const beneficioData = {
+          id_proyecto: projectId,
+          tipo_pago: paymentData.paymentType,
+          monto: paymentData.paymentAmount || 0,
+          frecuencia: paymentData.paymentFrequency || 'none',
+          descripcion_pago: paymentData.paymentDescription || '',
+          incluye_transporte: paymentData.includesTransport || false,
+          incluye_alimentacion: paymentData.includesMeals || false,
+          incluye_materiales: paymentData.includesMaterials || false,
+          incluye_seguro: paymentData.includesInsurance || false
+        };
+        
+        await beneficioStore.createBeneficio(beneficioData);
+        console.log('Benefits created successfully');
+      } catch (beneficioError) {
+        console.error('Error creating benefits:', beneficioError);
+        // No mostrar error al usuario, los beneficios son opcionales
+      }
+    }
+    
     // Create phases if any
     if (newProject && newProject.id && project.phases && project.phases.length > 0) {
       try {
@@ -1753,7 +1781,7 @@ async function submitProject() {
         
         if (validPhases.length === 0) {
           console.log('No valid phases to create');
-        } else {
+  } else {
           console.log(`Creating ${validPhases.length} phase(s) for project ${newProject.id}`);
           
           for (let index = 0; index < validPhases.length; index++) {
@@ -1834,6 +1862,7 @@ onMounted(async () => {
             startDate: existingProject.startDate || '',
             endDate: existingProject.endDate || '',
             budget: existingProject.budget || 0,
+            requisitos: existingProject.requisitos || '',
             coverImage: null,
             files: [],
             phases: existingProject.phases || []
@@ -1996,9 +2025,29 @@ onMounted(async () => {
 }
 
 /* Responsive adjustments */
-@media (max-width: 768px) {
-  .modern-stepper-header {
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .v-container {
     padding: 16px !important;
+  }
+  
+  .form-section-card {
+    padding: 20px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .v-container {
+    padding: 12px !important;
+  }
+  
+  .modern-stepper-header {
+    padding: 12px !important;
+    overflow-x: auto;
+  }
+  
+  .modern-stepper-item {
+    min-width: 120px;
   }
   
   .phase-item {
@@ -2006,7 +2055,48 @@ onMounted(async () => {
   }
   
   .form-section-card {
-    padding: 20px !important;
+    padding: 16px !important;
+  }
+  
+  /* Stack form fields on mobile */
+  .v-row {
+    flex-direction: column;
+  }
+  
+  .v-col {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  
+  /* Make date pickers full width on mobile */
+  .corporate-date-picker {
+    min-width: 100% !important;
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .v-container {
+    padding: 8px !important;
+  }
+  
+  .modern-stepper-header {
+    padding: 8px !important;
+  }
+  
+  .modern-stepper-item {
+    min-width: 100px;
+    font-size: 0.75rem;
+  }
+  
+  .form-section-card {
+    padding: 12px !important;
+  }
+  
+  .corporate-date-picker {
+    min-width: calc(100vw - 32px) !important;
+    max-width: calc(100vw - 32px) !important;
   }
 }
 

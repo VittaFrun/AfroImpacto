@@ -9,6 +9,16 @@ export const usePublicProjectStore = defineStore('publicProject', () => {
   const loading = ref(false);
   const error = ref(null);
   const publicProjects = ref([]);
+  const pagination = ref({
+    total: 0,
+    page: 1,
+    limit: 9,
+    totalPages: 1,
+  });
+  const availableFilters = ref({
+    categories: [],
+    locations: [],
+  });
 
   // Mapear datos del backend al formato del frontend
   function mapProjectData(project) {
@@ -62,28 +72,34 @@ export const usePublicProjectStore = defineStore('publicProject', () => {
     };
   }
 
-  async function fetchPublicProjects() {
+  async function fetchPublicProjects(params = {}) {
     loading.value = true;
     error.value = null;
     
     try {
-      const response = await api.get('/projects/public');
-      console.log('Public projects response:', response.data);
-      
-      if (!response.data || !Array.isArray(response.data)) {
-        console.warn('Expected array but got:', response.data);
-        publicProjects.value = [];
-        return [];
+      const response = await api.get('/projects/public', { params });
+      const payload = response.data || {};
+      const projects = Array.isArray(payload.data) ? payload.data : payload;
+      const metadata = payload.meta || {};
+
+      publicProjects.value = projects.map(mapProjectData);
+
+      pagination.value = {
+        total: metadata.total ?? publicProjects.value.length,
+        page: metadata.page ?? params.page ?? 1,
+        limit: metadata.limit ?? params.limit ?? 9,
+        totalPages: metadata.totalPages ?? 1,
+      };
+
+      availableFilters.value = {
+        categories: metadata.availableCategories ?? [],
+        locations: metadata.availableLocations ?? [],
+      };
+
+      if (publicProjects.value.length === 0) {
+        console.info('No public projects found. Make sure projects tienen es_publico=true y estado activo.');
       }
-      
-      const mappedProjects = response.data.map(mapProjectData);
-      console.log('Mapped projects:', mappedProjects);
-      publicProjects.value = mappedProjects;
-      
-      if (mappedProjects.length === 0) {
-        console.info('No public projects found. Make sure projects have es_publico=true and active state.');
-      }
-      
+
       return publicProjects.value;
     } catch (err) {
       console.error('Error fetching public projects:', err);
@@ -117,6 +133,8 @@ export const usePublicProjectStore = defineStore('publicProject', () => {
     loading,
     error,
     publicProjects,
+    pagination,
+    availableFilters,
     fetchPublicProjects,
     getProjectById
   };

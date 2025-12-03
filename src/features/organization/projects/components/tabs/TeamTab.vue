@@ -6,38 +6,129 @@
         <v-card-text class="pa-4">
           <div class="d-flex align-center justify-space-between flex-wrap gap-3">
             <div>
-              <h2 class="text-h6 font-weight-bold mb-1">
+              <h2 class="text-h6 font-weight-bold mb-1 team-title">
                 <v-icon class="mr-2" color="primary">mdi-account-group</v-icon>
                 Gestión de Equipo
               </h2>
-              <p class="text-body-2 text-grey mb-0">
+              <p class="text-body-2 team-subtitle mb-0">
                 Administra los voluntarios, asigna roles y gestiona tareas del equipo
               </p>
             </div>
             <div class="d-flex gap-2 flex-wrap">
-              <ModernButton
-                color="primary"
-                variant="outlined"
-                prepend-icon="mdi-account-cog"
-                @click="$emit('open-role-management')"
-                size="small"
-              >
-                Gestionar Roles
-              </ModernButton>
-              <ModernButton
-                color="success"
-                variant="flat"
-                prepend-icon="mdi-account-plus"
-                @click="$emit('open-assign-volunteer')"
-                size="small"
-                :disabled="solicitudesAprobadas.length === 0"
-              >
-                Asignar Voluntario
-              </ModernButton>
+              <v-tooltip text="Gestionar roles del proyecto" location="bottom">
+                <template #activator="{ props }">
+                  <ModernButton
+                    v-bind="props"
+                    color="primary"
+                    variant="outlined"
+                    prepend-icon="mdi-account-cog"
+                    @click="$emit('open-role-management')"
+                    size="small"
+                  >
+                    Gestionar Roles
+                  </ModernButton>
+                </template>
+              </v-tooltip>
+              <v-tooltip :text="solicitudesAprobadas.length === 0 ? 'No hay voluntarios aprobados disponibles' : 'Asignar un voluntario a una tarea'" location="bottom">
+                <template #activator="{ props }">
+                  <ModernButton
+                    v-bind="props"
+                    color="success"
+                    variant="flat"
+                    prepend-icon="mdi-account-plus"
+                    @click="$emit('open-assign-volunteer')"
+                    size="small"
+                    :disabled="solicitudesAprobadas.length === 0"
+                  >
+                    Asignar Voluntario
+                  </ModernButton>
+                </template>
+              </v-tooltip>
+              <v-tooltip :text="solicitudesAprobadas.length === 0 ? 'No hay voluntarios aprobados disponibles' : 'Asignar múltiples voluntarios a tareas'" location="bottom">
+                <template #activator="{ props }">
+                  <ModernButton
+                    v-bind="props"
+                    color="primary"
+                    variant="flat"
+                    prepend-icon="mdi-account-multiple-plus"
+                    @click="$emit('open-bulk-assign-volunteers')"
+                    size="small"
+                    :disabled="solicitudesAprobadas.length === 0"
+                  >
+                    Asignación Masiva
+                  </ModernButton>
+                </template>
+              </v-tooltip>
             </div>
           </div>
         </v-card-text>
       </v-card>
+    </v-col>
+
+    <!-- Estadísticas Rápidas del Equipo -->
+    <v-col cols="12">
+      <v-row>
+        <v-col cols="12" sm="6" md="3">
+          <v-card class="stat-card" variant="outlined" rounded="lg">
+            <v-card-text class="pa-4">
+              <div class="d-flex align-center">
+                <v-avatar color="primary" size="48" class="mr-3">
+                  <v-icon color="white">mdi-account-group</v-icon>
+                </v-avatar>
+                <div>
+                  <div class="text-h5 font-weight-bold">{{ getUniqueVolunteersCount() }}</div>
+                  <div class="text-caption text-grey">Miembros Activos</div>
+                </div>
+              </div>
+            </v-card-text>
+          </v-card>
+        </v-col>
+        <v-col cols="12" sm="6" md="3">
+          <v-card class="stat-card" variant="outlined" rounded="lg">
+            <v-card-text class="pa-4">
+              <div class="d-flex align-center">
+                <v-avatar color="info" size="48" class="mr-3">
+                  <v-icon color="white">mdi-clipboard-account</v-icon>
+                </v-avatar>
+                <div>
+                  <div class="text-h5 font-weight-bold">{{ getAllAssignments().length }}</div>
+                  <div class="text-caption text-grey">Asignaciones</div>
+                </div>
+              </div>
+            </v-card-text>
+          </v-card>
+        </v-col>
+        <v-col cols="12" sm="6" md="3">
+          <v-card class="stat-card" variant="outlined" rounded="lg">
+            <v-card-text class="pa-4">
+              <div class="d-flex align-center">
+                <v-avatar color="success" size="48" class="mr-3">
+                  <v-icon color="white">mdi-shield-account</v-icon>
+                </v-avatar>
+                <div>
+                  <div class="text-h5 font-weight-bold">{{ projectRoles.length }}</div>
+                  <div class="text-caption text-grey">Roles Definidos</div>
+                </div>
+              </div>
+            </v-card-text>
+          </v-card>
+        </v-col>
+        <v-col cols="12" sm="6" md="3">
+          <v-card class="stat-card" variant="outlined" rounded="lg">
+            <v-card-text class="pa-4">
+              <div class="d-flex align-center">
+                <v-avatar color="warning" size="48" class="mr-3">
+                  <v-icon color="white">mdi-account-check</v-icon>
+                </v-avatar>
+                <div>
+                  <div class="text-h5 font-weight-bold">{{ solicitudesAprobadas.length }}</div>
+                  <div class="text-caption text-grey">Disponibles</div>
+                </div>
+              </div>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
     </v-col>
 
     <!-- Tabs Secundarias -->
@@ -210,18 +301,40 @@
                         <!-- Estadísticas del miembro -->
                         <v-row dense class="mb-3">
                           <v-col cols="6">
-                            <div class="stat-box">
-                              <div class="stat-value text-primary">{{ member.tasksCount }}</div>
-                              <div class="stat-label">Tareas</div>
-                            </div>
+                            <v-tooltip text="Total de tareas asignadas">
+                              <template v-slot:activator="{ props }">
+                                <div class="stat-box" v-bind="props">
+                                  <div class="stat-value text-primary">{{ member.tasksCount }}</div>
+                                  <div class="stat-label">Tareas</div>
+                                </div>
+                              </template>
+                            </v-tooltip>
                           </v-col>
                           <v-col cols="6">
-                            <div class="stat-box">
-                              <div class="stat-value text-success">{{ member.completedTasks || 0 }}</div>
-                              <div class="stat-label">Completadas</div>
-                            </div>
+                            <v-tooltip text="Tareas completadas">
+                              <template v-slot:activator="{ props }">
+                                <div class="stat-box" v-bind="props">
+                                  <div class="stat-value text-success">{{ member.completedTasks || 0 }}</div>
+                                  <div class="stat-label">Completadas</div>
+                                </div>
+                              </template>
+                            </v-tooltip>
                           </v-col>
                         </v-row>
+                        
+                        <!-- Progreso visual -->
+                        <div v-if="member.tasksCount > 0" class="mb-3">
+                          <v-progress-linear
+                            :model-value="getMemberProgress(member)"
+                            color="success"
+                            height="8"
+                            rounded
+                            class="mb-1"
+                          ></v-progress-linear>
+                          <div class="text-caption text-grey text-center">
+                            {{ getMemberProgress(member) }}% completado
+                          </div>
+                        </div>
                         
                         <!-- Roles asignados -->
                         <div class="mb-2">
@@ -602,8 +715,14 @@ const uniqueRoles = computed(() => {
 
 function getAvatarColor(member) {
   const colors = ['primary', 'success', 'info', 'warning', 'purple', 'indigo', 'teal'];
-  const index = (member.id_voluntario || 0) % colors.length;
+  const index = (member.id_voluntario || member.id || 0) % colors.length;
   return colors[index];
+}
+
+function getMemberProgress(member) {
+  if (!member.tasksCount || member.tasksCount === 0) return 0;
+  const completed = member.completedTasks || 0;
+  return Math.round((completed / member.tasksCount) * 100);
 }
 </script>
 
@@ -618,16 +737,48 @@ function getAvatarColor(member) {
   min-height: 48px;
 }
 
+/* Cards de miembros profesionales */
 .team-member-card {
-  transition: all 0.3s ease;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
   height: 100%;
 }
 
 .team-member-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
-  border-color: rgba(0, 0, 0, 0.12);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15) !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Asegurar contraste en textos de cards de miembros */
+.team-member-card .text-body-1,
+.team-member-card .font-weight-bold {
+  color: rgba(0, 0, 0, 0.87) !important;
+}
+
+.team-member-card .text-caption,
+.team-member-card .text-grey {
+  color: rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Iconos siempre visibles en botones de miembros */
+.team-member-card .v-btn .v-icon {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: inline-flex !important;
+}
+
+.stat-card {
+  transition: all 0.3s ease;
+  height: 100%;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
 }
 
 .stat-box {
@@ -635,6 +786,13 @@ function getAvatarColor(member) {
   padding: 8px;
   background: #fafafa;
   border-radius: 8px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.stat-box:hover {
+  background: #f5f5f5;
+  transform: scale(1.05);
 }
 
 .stat-value {
@@ -686,6 +844,16 @@ function getAvatarColor(member) {
   background: #fafafa !important;
 }
 
+.professional-card-header h3,
+.professional-card-header .text-subtitle-1 {
+  color: rgba(0, 0, 0, 0.87) !important; /* Color oscuro para contraste */
+}
+
+.professional-card-header .text-grey,
+.professional-card-header .text-caption {
+  color: rgba(0, 0, 0, 0.6) !important; /* Color gris oscuro para mejor legibilidad */
+}
+
 .professional-card-icon {
   width: 36px;
   height: 36px;
@@ -703,6 +871,22 @@ function getAvatarColor(member) {
 
 .professional-card-icon.info {
   background: linear-gradient(135deg, #2196F3 0%, #42A5F5 100%);
+}
+
+/* Asegurar contraste en títulos */
+.team-title {
+  color: rgba(0, 0, 0, 0.87) !important;
+}
+
+.team-subtitle {
+  color: rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Asegurar que todos los textos en cards sean visibles */
+.v-card-text h2,
+.v-card-text h3,
+.v-card-text .text-h6 {
+  color: rgba(0, 0, 0, 0.87) !important;
 }
 </style>
 

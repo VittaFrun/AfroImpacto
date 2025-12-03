@@ -1,0 +1,316 @@
+/* ========================================
+   AFRO IMPACTO - GLOBAL VISUAL FIXES
+   Correcciones globales para problemas visuales
+   ======================================== */
+
+/* ========================================
+   TEXT CONTRAST FIXES - GLOBAL
+   ======================================== */
+/* Asegurar que todos los títulos sean visibles en cualquier contexto */
+h1, h2, h3, h4, h5, h6,
+.text-h1, .text-h2, .text-h3, .text-h4, .text-h5, .text-h6,
+.text-subtitle-1, .text-subtitle-2 {
+  color: rgba(0, 0, 0, 0.87) !important;
+}
+
+/* Textos en cards */
+.v-card-text h1,
+.v-card-text h2,
+.v-card-text h3,
+.v-card-text h4,
+.v-card-text h5,
+.v-card-text h6,
+.v-card-text .text-h6,
+.v-card-text .text-subtitle-1,
+.v-card-text .text-subtitle-2 {
+  color: rgba(0, 0, 0, 0.87) !important;
+}
+
+.v-card-text .text-grey,
+.v-card-text .text-body-2,
+.v-card-text .text-caption,
+.v-card-text p {
+  color: rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Textos en v-card-title */
+.v-card-title h1,
+.v-card-title h2,
+.v-card-title h3,
+.v-card-title h4,
+.v-card-title h5,
+.v-card-title h6,
+.v-card-title .text-h6,
+.v-card-title .text-subtitle-1 {
+  color: rgba(0, 0, 0, 0.87) !important;
+}
+
+.v-card-title .text-grey,
+.v-card-title .text-caption {
+  color: rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Textos en v-col */
+.v-col h1,
+.v-col h2,
+.v-col h3,
+.v-col h4,
+.v-col h5,
+.v-col h6,
+.v-col .text-h6 {
+  color: rgba(0, 0, 0, 0.87) !important;
+}
+
+/* ========================================
+   BUTTON ICONS FIXES - GLOBAL
+   ======================================== */
+/* Asegurar que los iconos en botones siempre sean visibles */
+.v-btn .v-icon,
+.v-btn__prepend .v-icon,
+.v-btn__append .v-icon {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: inline-flex !important;
+}
+
+/* Botones con iconos */
+.v-btn--icon .v-icon,
+.v-btn[icon] .v-icon {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: inline-flex !important;
+}
+
+/* Botones con prepend-icon */
+.v-btn__prepend {
+  margin-inline-end: 8px !important;
+}
+
+.v-btn__prepend .v-icon {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: inline-flex !important;
+}
+
+/* Botones con variant text */
+.v-btn.variant--text .v-icon,
+.v-btn[data-variant="text"] .v-icon {
+  opacity: 1 !important;
+  visibility: visible !important;
+  color: inherit !important;
+}
+
+/* Botones elevados */
+.v-btn--elevated .v-icon {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Asegurar que el contenido del botón sea visible */
+.v-btn__content {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* ========================================
+   KANBAN BOARD FIXES
+   ======================================== */
+.kanban-column {
+  background: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+}
+
+.kanban-column h3 {
+  color: rgba(0, 0, 0, 0.87) !important;
+  font-weight: 600 !important;
+}
+
+.kanban-card {
+  background: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+.kanban-card .font-weight-bold {
+  color: rgba(0, 0, 0, 0.87) !important;
+}
+
+.kanban-card .text-caption,
+.kanban-card .text-grey {
+  color: rgba(0, 0, 0, 0.6) !important;
+}
+
+/* ========================================
+   PROJECT CARDS FIXES
+   ======================================== */
+.project-card,
+.project-item,
+.main-project-card {
+  background: #ffffff !important;
+}
+
+.project-card .v-card-title,
+.project-item .v-card-title,
+.main-project-card .v-card-title {
+  color: rgba(0, 0, 0, 0.87) !important;
+}
+
+.project-card .v-card-text,
+.project-item .v-card-text,
+.main-project-card .v-card-text {
+  color: rgba(0, 0, 0, 0.87) !important;
+}
+
+.project-card .text-grey,
+.project-item .text-grey,
+.main-project-card .text-grey {
+  color: rgba(0, 0, 0, 0.6) !important;
+}
+
+.project-card .v-btn .v-icon,
+.project-item .v-btn .v-icon,
+.main-project-card .v-btn .v-icon {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* ========================================
+   MODERN BUTTON FIXES
+   ======================================== */
+.modern-button .v-icon,
+.modern-btn .v-icon {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: inline-flex !important;
+}
+
+.modern-button .v-btn__prepend .v-icon,
+.modern-btn .v-btn__prepend .v-icon {
+  opacity: 1 !important;
+  visibility: visible !important;
+  margin-inline-end: 8px !important;
+}
+
+/* ========================================
+   CARD HEADERS FIXES
+   ======================================== */
+.professional-card-header,
+.modern-card-header,
+.phase-header {
+  background: #fafafa !important;
+}
+
+.professional-card-header h2,
+.professional-card-header h3,
+.professional-card-header .text-h6,
+.professional-card-header .text-subtitle-1,
+.modern-card-header h2,
+.modern-card-header h3,
+.modern-card-header .text-h6,
+.modern-card-header .text-subtitle-1,
+.phase-header h2,
+.phase-header h3,
+.phase-header .text-h6 {
+  color: rgba(0, 0, 0, 0.87) !important;
+}
+
+.professional-card-header .text-grey,
+.professional-card-header .text-caption,
+.modern-card-header .text-grey,
+.modern-card-header .text-caption,
+.phase-header .text-grey,
+.phase-header .text-caption {
+  color: rgba(0, 0, 0, 0.6) !important;
+}
+
+/* ========================================
+   SPECIFIC COMPONENT FIXES
+   ======================================== */
+/* History Tab */
+.history-title {
+  color: rgba(0, 0, 0, 0.87) !important;
+}
+
+.history-subtitle {
+  color: rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Team Tab */
+.team-title {
+  color: rgba(0, 0, 0, 0.87) !important;
+}
+
+.team-subtitle {
+  color: rgba(0, 0, 0, 0.6) !important;
+}
+
+/* ========================================
+   OVERRIDE VUETIFY DEFAULTS
+   ======================================== */
+/* Asegurar que los textos no sean blancos por defecto */
+.v-theme--afroImpactoTheme .v-card-title,
+.v-theme--afroImpactoTheme .v-card-text {
+  color: rgba(0, 0, 0, 0.87) !important;
+}
+
+.v-theme--afroImpactoTheme .text-grey {
+  color: rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Asegurar que los botones siempre muestren iconos */
+.v-theme--afroImpactoTheme .v-btn .v-icon {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* ========================================
+   TOOLTIPS GLOBALES
+   ======================================== */
+/* Asegurar que los tooltips sean visibles */
+.v-tooltip {
+  z-index: 9999 !important;
+}
+
+.v-tooltip .v-overlay__content {
+  background: rgba(0, 0, 0, 0.87) !important;
+  color: white !important;
+  padding: 8px 12px !important;
+  border-radius: 6px !important;
+  font-size: 0.75rem !important;
+  font-weight: 500 !important;
+}
+
+/* ========================================
+   HOVER STATES MEJORADOS
+   ======================================== */
+/* Mejorar estados hover en botones */
+.v-btn:hover {
+  transform: scale(1.02);
+  transition: transform 0.2s ease;
+}
+
+.v-btn:active {
+  transform: scale(0.98);
+}
+
+/* Mejorar hover en cards */
+.v-card:hover {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* ========================================
+   INPUT FIELDS FIXES
+   ======================================== */
+/* Asegurar que los textos en inputs sean visibles */
+.v-text-field input,
+.v-select .v-select__selection,
+.v-textarea textarea {
+  color: rgba(0, 0, 0, 0.87) !important;
+}
+
+.v-text-field label,
+.v-select label,
+.v-textarea label {
+  color: rgba(0, 0, 0, 0.6) !important;
+}
+

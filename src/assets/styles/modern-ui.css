@@ -264,11 +264,6 @@
   box-shadow: 0 0 20px rgba(var(--v-theme-primary-rgb), 0.3) !important;
 }
 
-/* Focus States */
-.focus-ring:focus-visible {
-  outline: 2px solid rgba(var(--v-theme-primary-rgb), 0.5) !important;
-  outline-offset: 2px !important;
-}
 
 /* Loading States */
 .loading-skeleton {
@@ -390,36 +385,6 @@
    ======================================== */
 
 /* High contrast mode support */
-@media (prefers-contrast: high) {
-  .modern-card {
-    border: 2px solid #000 !important;
-  }
-  
-  .modern-btn {
-    border: 2px solid currentColor !important;
-  }
-}
-
-/* Reduced motion support */
-@media (prefers-reduced-motion: reduce) {
-  .modern-btn,
-  .modern-card,
-  .modern-dialog,
-  .animate-slide-in-up,
-  .animate-fade-in-up,
-  .animate-slide-in-left,
-  .animate-slide-in-right,
-  .animate-pulse,
-  .animate-bounce {
-    animation: none !important;
-    transition: none !important;
-  }
-  
-  .hover-lift:hover,
-  .hover-scale:hover {
-    transform: none !important;
-  }
-}
 
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {

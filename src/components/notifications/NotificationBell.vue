@@ -117,7 +117,7 @@
             variant="text"
             size="small"
             block
-            @click="$emit('view-all')"
+            @click="openNotificationCenter"
           >
             Ver todas las notificaciones
           </v-btn>
@@ -131,8 +131,11 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import axios from '@/plugins/axios';
 import { formatDate } from '@/utils/formatters';
+import { useNotificationStore } from '@/stores/notificationStore';
 
 const emit = defineEmits(['view-all']);
+
+const notificationStore = useNotificationStore();
 
 const loading = ref(false);
 const notifications = ref([]);
@@ -214,6 +217,10 @@ onMounted(() => {
   // Refrescar cada 30 segundos
   refreshInterval.value = setInterval(loadNotifications, 30000);
 });
+
+const openNotificationCenter = () => {
+  emit('view-all');
+};
 
 onUnmounted(() => {
   if (refreshInterval.value) {

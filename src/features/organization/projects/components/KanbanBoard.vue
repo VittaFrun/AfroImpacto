@@ -152,21 +152,64 @@ const openTaskDetails = (task) => {
 .kanban-board {
   display: flex;
   gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 8px;
 }
+
 .kanban-column {
   flex: 1;
-  padding: 16px;
-  background-color: #f5f5f5;
-  border-radius: 8px;
+  min-width: 280px;
+  padding: 20px;
+  background: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
+
+.kanban-column:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+  transform: translateY(-2px);
+}
+
+.kanban-column h3 {
+  color: rgba(0, 0, 0, 0.87) !important;
+  font-weight: 600 !important;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.08);
+}
+
 .kanban-drag-area {
   min-height: 200px;
 }
+
 .kanban-card {
   cursor: pointer;
-  transition: box-shadow 0.2s ease-in-out;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  background: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  border-radius: 8px !important;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
 }
+
 .kanban-card:hover {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15) !important;
+  transform: translateY(-3px);
+  border-color: rgba(var(--v-theme-primary-rgb), 0.4) !important;
+}
+
+.kanban-card .v-card-text {
+  padding: 16px !important;
+}
+
+.kanban-card .font-weight-bold {
+  color: rgba(0, 0, 0, 0.87) !important;
+}
+
+.kanban-card .text-caption {
+  color: rgba(0, 0, 0, 0.6) !important;
 }
 </style>

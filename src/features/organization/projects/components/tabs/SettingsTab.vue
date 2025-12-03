@@ -37,18 +37,34 @@
             <v-divider class="my-3"></v-divider>
 
             <v-list-item class="mb-2">
-              <div class="d-flex align-center justify-space-between w-100">
-                <div>
+              <div class="d-flex align-center justify-space-between w-100 flex-wrap">
+                <div class="flex-grow-1 mb-2">
                   <div class="text-body-1 font-weight-medium">Estado del Proyecto</div>
-                  <div class="text-caption text-grey">Estado actual: {{ getStatusText(project.id_estado) }}</div>
+                  <div class="text-caption text-grey">Cambia el estado del proyecto</div>
                 </div>
-                <v-chip 
-                  :color="getStatusColor(project.id_estado)" 
-                  size="small"
-                >
-                  <v-icon start size="16">{{ getStatusIcon(project.id_estado) }}</v-icon>
-                  {{ getStatusText(project.id_estado) }}
-                </v-chip>
+                <div class="d-flex align-center gap-2">
+                  <v-select
+                    :model-value="project.id_estado"
+                    @update:model-value="handleStatusChange"
+                    :items="statusOptions"
+                    variant="outlined"
+                    density="compact"
+                    hide-details
+                    style="min-width: 150px;"
+                    :loading="isLoading('updatingStates')"
+                  >
+                    <template #selection="{ item }">
+                      <v-chip 
+                        :color="getStatusColor(item.value)" 
+                        size="small"
+                        variant="flat"
+                      >
+                        <v-icon start size="16">{{ getStatusIcon(item.value) }}</v-icon>
+                        {{ item.title }}
+                      </v-chip>
+                    </template>
+                  </v-select>
+                </div>
               </div>
             </v-list-item>
 
@@ -287,6 +303,16 @@ const props = defineProps({
   isLoading: {
     type: Function,
     required: true
+  },
+  statusOptions: {
+    type: Array,
+    default: () => [
+      { title: 'Pendiente', value: 0 },
+      { title: 'Activo', value: 1 },
+      { title: 'En Proceso', value: 2 },
+      { title: 'Completado', value: 3 },
+      { title: 'Cancelado', value: 4 }
+    ]
   }
 });
 
@@ -296,8 +322,15 @@ const emit = defineEmits([
   'open-beneficio-dialog',
   'open-reports',
   'export-data',
-  'delete-project'
+  'delete-project',
+  'update-status'
 ]);
+
+const handleStatusChange = (newStatus) => {
+  if (newStatus !== props.project.id_estado) {
+    emit('update-status', newStatus);
+  }
+};
 
 const hasAnyBenefit = computed(() => {
   if (!props.project?.beneficio) return false;
@@ -339,10 +372,30 @@ const hasAnyBenefit = computed(() => {
   background: #fafafa !important;
 }
 
+.professional-card-header h3,
+.professional-card-header .text-subtitle-1 {
+  color: rgba(0, 0, 0, 0.87) !important; /* Color oscuro para contraste */
+}
+
+.professional-card-header .text-grey,
+.professional-card-header .text-caption {
+  color: rgba(0, 0, 0, 0.6) !important; /* Color gris oscuro para mejor legibilidad */
+}
+
 .danger-card-header {
   padding: 16px 20px !important;
   border-bottom: 2px solid rgba(244, 67, 54, 0.2) !important;
   background: rgba(244, 67, 54, 0.05) !important;
+}
+
+.danger-card-header h3,
+.danger-card-header .text-subtitle-1 {
+  color: rgba(0, 0, 0, 0.87) !important; /* Color oscuro para contraste */
+}
+
+.danger-card-header .text-grey,
+.danger-card-header .text-caption {
+  color: rgba(0, 0, 0, 0.6) !important; /* Color gris oscuro para mejor legibilidad */
 }
 
 .professional-card-icon {

@@ -10,17 +10,16 @@ const mapRoleFromBackend = (rol) => ({
   nombre: rol.nombre,
   description: rol.descripcion || '',
   descripcion: rol.descripcion || '',
-  tipo_rol: rol.tipo_rol || 'sistema',
+  tipo_rol: rol.tipo_rol || 'organizacion',
   id_organizacion: rol.id_organizacion || null,
   id_proyecto: rol.id_proyecto || null,
   activo: rol.activo !== undefined ? rol.activo : true,
-  color: '#2196F3' // Color por defecto (no se guarda en BD pero se usa en UI)
+  color: rol.color || '#2196F3' // Color desde BD o por defecto
 });
 
 export const useRoleStore = defineStore('roleStore', {
   state: () => ({
     customRoles: [],
-    systemRoles: [],
     organizationRoles: [],
     projectRoles: [],
     loading: false,
@@ -47,24 +46,6 @@ export const useRoleStore = defineStore('roleStore', {
         const notificationStore = useNotificationStore();
         notificationStore.showSnackbar(this.error, 'error');
         this.customRoles = [];
-      } finally {
-        this.loading = false;
-      }
-    },
-    async fetchSystemRoles() {
-      this.loading = true;
-      this.error = null;
-      try {
-        const response = await apiClient.get('/roles/sistema');
-        this.systemRoles = response.data.map(mapRoleFromBackend);
-        return this.systemRoles;
-      } catch (err) {
-        console.error('Error fetching system roles:', err);
-        this.error = err.response?.data?.message || 'Error al cargar los roles del sistema.';
-        const notificationStore = useNotificationStore();
-        notificationStore.showSnackbar(this.error, 'error');
-        this.systemRoles = [];
-        return [];
       } finally {
         this.loading = false;
       }
@@ -115,8 +96,9 @@ export const useRoleStore = defineStore('roleStore', {
         const roleData = {
           nombre: role.name || role.nombre,
           descripcion: role.description || role.descripcion || '',
-          tipo_rol: role.tipo_rol || 'sistema',
-          activo: role.activo !== undefined ? role.activo : true
+          tipo_rol: role.tipo_rol || 'organizacion',
+          activo: role.activo !== undefined ? role.activo : true,
+          color: role.color || '#2196F3'
         };
 
         // Agregar campos condicionales solo si son necesarios y tienen valor
@@ -131,14 +113,11 @@ export const useRoleStore = defineStore('roleStore', {
           }
           roleData.id_proyecto = role.id_proyecto;
         }
-        // Para tipo 'sistema', no incluimos id_organizacion ni id_proyecto en absoluto
 
         // Remover campos undefined/null que no son necesarios
         Object.keys(roleData).forEach(key => {
           if (roleData[key] === undefined || roleData[key] === null) {
-            if (roleData.tipo_rol === 'sistema' && (key === 'id_organizacion' || key === 'id_proyecto')) {
-              delete roleData[key];
-            } else if (roleData.tipo_rol === 'organizacion' && key === 'id_proyecto') {
+            if (roleData.tipo_rol === 'organizacion' && key === 'id_proyecto') {
               delete roleData[key];
             } else if (roleData.tipo_rol === 'proyecto' && key === 'id_organizacion') {
               delete roleData[key];
@@ -152,7 +131,11 @@ export const useRoleStore = defineStore('roleStore', {
         
         // Mapear respuesta del backend al formato del frontend
         const newRole = mapRoleFromBackend(response.data);
-        newRole.color = role.color || '#2196F3';
+        
+        // Actualizar roles del proyecto si es un rol de proyecto
+        if (roleData.tipo_rol === 'proyecto' && role.id_proyecto) {
+          await this.fetchProjectRoles(role.id_proyecto);
+        }
         
         this.customRoles.push(newRole);
         notificationStore.showSnackbar('Rol creado correctamente', 'success');
@@ -183,7 +166,8 @@ export const useRoleStore = defineStore('roleStore', {
         const roleData = {
           nombre: updatedRole.name || updatedRole.nombre,
           descripcion: updatedRole.description || updatedRole.descripcion || '',
-          activo: updatedRole.activo !== undefined ? updatedRole.activo : true
+          activo: updatedRole.activo !== undefined ? updatedRole.activo : true,
+          color: updatedRole.color || '#2196F3'
         };
 
         // Usar PATCH en lugar de PUT
@@ -191,11 +175,17 @@ export const useRoleStore = defineStore('roleStore', {
         
         // Mapear respuesta del backend al formato del frontend
         const updated = mapRoleFromBackend(response.data);
-        updated.color = updatedRole.color || '#2196F3';
         
+        // Actualizar en el array correspondiente
         const index = this.customRoles.findIndex(r => r.id === roleId || r.id_rol === roleId);
         if (index !== -1) {
           this.customRoles[index] = updated;
+        }
+        
+        // Actualizar en projectRoles si es un rol de proyecto
+        const projectIndex = this.projectRoles.findIndex(r => r.id === roleId || r.id_rol === roleId);
+        if (projectIndex !== -1) {
+          this.projectRoles[projectIndex] = updated;
         }
         
         notificationStore.showSnackbar('Rol actualizado correctamente', 'success');

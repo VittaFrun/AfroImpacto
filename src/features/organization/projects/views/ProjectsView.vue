@@ -253,14 +253,19 @@
                         Ver Detalles
                       </ModernButton>
                       
-                      <v-btn
-                        color="success"
-                        variant="flat"
-                        prepend-icon="mdi-cog"
-                        @click="manageProject(mainProject.id)"
-                      >
-                        Gestionar Proyecto
-                      </v-btn>
+                      <v-tooltip text="Gestionar proyecto completo">
+                        <template v-slot:activator="{ props }">
+                          <v-btn
+                            v-bind="props"
+                            color="success"
+                            variant="flat"
+                            prepend-icon="mdi-cog"
+                            @click="manageProject(mainProject.id)"
+                          >
+                            Gestionar Proyecto
+                          </v-btn>
+                        </template>
+                      </v-tooltip>
                     </div>
                   </div>
                 </v-col>
@@ -282,101 +287,71 @@
           >
             <template #content>
               <!-- Empty State -->
-              <div v-if="!loading && (!projects || projects.length === 0)" class="empty-state-container">
-                <div class="empty-state-content">
-                  <div class="empty-state-icon mb-4">
-                    <v-icon 
-                      :size="error ? 100 : 120" 
-                      :color="error ? 'error' : 'grey-lighten-1'"
-                    >
-                      {{ error ? 'mdi-cloud-off-outline' : 'mdi-folder-open-outline' }}
-                    </v-icon>
-                  </div>
-                  <h3 class="text-h5 font-weight-bold text-grey-darken-1 mb-2">
-                    {{ error ? 'No se pudieron cargar los proyectos' : 'No hay proyectos creados' }}
-                  </h3>
-                  <p class="text-body-1 text-grey-darken-1 mb-6" style="max-width: 500px;">
-                    {{ error 
-                      ? getEmptyStateMessage(error)
-                      : 'Comienza creando tu primer proyecto de impacto social. Los proyectos te permiten organizar y gestionar tus iniciativas de manera eficiente.'
-                    }}
-                  </p>
-                  <div class="d-flex align-center gap-3 flex-wrap justify-center">
-                <ModernButton
-                      v-if="!error || !isCriticalError(error)"
-                  color="primary"
-                  variant="flat"
-                  prepend-icon="mdi-plus"
-                  @click="goToCreateProject"
-                      size="large"
-                    >
-                      {{ error ? 'Crear Proyecto' : 'Crear Primer Proyecto' }}
-                    </ModernButton>
-                    <ModernButton
-                      v-if="error"
-                      color="grey"
-                      variant="outlined"
-                      prepend-icon="mdi-refresh"
-                      @click="retryFetch"
-                      size="large"
-                      :loading="isRetrying"
-                      :disabled="isRetrying"
-                    >
-                      {{ isRetrying ? 'Reintentando...' : `Reintentar${retryCount > 0 ? ` (${retryCount})` : ''}` }}
-                    </ModernButton>
-                    <ModernButton
-                      v-if="error && isCriticalError(error)"
-                      color="primary"
-                      variant="outlined"
-                      prepend-icon="mdi-login"
-                      @click="handleAuthError"
-                      size="large"
-                    >
-                      Iniciar Sesión
-                </ModernButton>
-                  </div>
-                  <div v-if="!error" class="mt-8 empty-state-features">
-                    <h4 class="text-subtitle-1 font-weight-bold mb-4">¿Qué puedes hacer con los proyectos?</h4>
-                    <v-row>
-                      <v-col cols="12" md="4">
-                        <div class="feature-item">
-                          <v-icon color="primary" size="32" class="mb-2">mdi-account-group</v-icon>
-                          <p class="text-body-2 text-grey-darken-1">Gestiona voluntarios</p>
-                        </div>
-                      </v-col>
-                      <v-col cols="12" md="4">
-                        <div class="feature-item">
-                          <v-icon color="success" size="32" class="mb-2">mdi-calendar-check</v-icon>
-                          <p class="text-body-2 text-grey-darken-1">Organiza actividades</p>
-                        </div>
-                      </v-col>
-                      <v-col cols="12" md="4">
-                        <div class="feature-item">
-                          <v-icon color="info" size="32" class="mb-2">mdi-chart-line</v-icon>
-                          <p class="text-body-2 text-grey-darken-1">Realiza seguimiento</p>
-                        </div>
-                      </v-col>
-                    </v-row>
-                  </div>
-                </div>
-              </div>
+              <EmptyState
+                v-if="!loading && (!projects || projects.length === 0)"
+                :icon="error ? 'mdi-cloud-off-outline' : 'mdi-folder-open-outline'"
+                :title="error ? 'No se pudieron cargar los proyectos' : 'No hay proyectos creados'"
+                :description="error ? getEmptyStateMessage(error) : 'Comienza creando tu primer proyecto de impacto social. Los proyectos te permiten organizar y gestionar tus iniciativas de manera eficiente.'"
+                :variant="error ? 'error' : 'no-data'"
+                :icon-size="error ? 100 : 120"
+                :icon-color="error ? 'error' : 'grey-lighten-1'"
+              >
+                <template #actions>
+                  <ModernButton
+                    v-if="!error || !isCriticalError(error)"
+                    color="primary"
+                    variant="flat"
+                    prepend-icon="mdi-plus"
+                    @click="goToCreateProject"
+                    size="large"
+                  >
+                    {{ error ? 'Crear Proyecto' : 'Crear Primer Proyecto' }}
+                  </ModernButton>
+                  <ModernButton
+                    v-if="error"
+                    color="grey"
+                    variant="outlined"
+                    prepend-icon="mdi-refresh"
+                    @click="retryFetch"
+                    size="large"
+                    :loading="isRetrying"
+                    :disabled="isRetrying"
+                  >
+                    {{ isRetrying ? 'Reintentando...' : `Reintentar${retryCount > 0 ? ` (${retryCount})` : ''}` }}
+                  </ModernButton>
+                  <ModernButton
+                    v-if="error && isCriticalError(error)"
+                    color="primary"
+                    variant="outlined"
+                    prepend-icon="mdi-login"
+                    @click="handleAuthError"
+                    size="large"
+                  >
+                    Iniciar Sesión
+                  </ModernButton>
+                </template>
+              </EmptyState>
               
               <!-- No Results State -->
-              <div v-else-if="filteredProjects.length === 0" class="text-center py-8">
-                <v-icon size="120" color="grey-lighten-1">mdi-magnify</v-icon>
-                <h3 class="text-h5 text-grey mt-4">No se encontraron proyectos</h3>
-                <p class="text-body-1 text-grey mb-4">
-                  Intenta ajustar los filtros de búsqueda
-                </p>
-                <ModernButton
-                  color="primary"
-                  variant="outlined"
-                  prepend-icon="mdi-refresh"
-                  @click="clearFilters"
-                >
-                  Limpiar Filtros
-                </ModernButton>
-              </div>
+              <EmptyState
+                v-else-if="filteredProjects.length === 0"
+                icon="mdi-magnify"
+                title="No se encontraron proyectos"
+                description="Intenta ajustar los filtros de búsqueda"
+                variant="search"
+                :icon-size="120"
+              >
+                <template #actions>
+                  <ModernButton
+                    color="primary"
+                    variant="outlined"
+                    prepend-icon="mdi-refresh"
+                    @click="clearFilters"
+                  >
+                    Limpiar Filtros
+                  </ModernButton>
+                </template>
+              </EmptyState>
               
               <!-- Projects Grid -->
               <div v-else class="projects-grid">
@@ -422,16 +397,21 @@
                           
                           <!-- Main Project Star -->
                           <div class="main-project-star">
-                            <v-btn
-                              icon
-                              size="small"
-                              variant="text"
-                              @click="projectStore.setMainProject(project.id)"
+                            <v-tooltip text="Marcar como proyecto principal">
+                              <template v-slot:activator="{ props }">
+                                <v-btn
+                                  v-bind="props"
+                                  icon
+                                  size="small"
+                                  variant="text"
+                                  @click="projectStore.setMainProject(project.id)"
                             >
                               <v-icon :color="mainProject && project.id === mainProject.id ? 'warning' : 'grey'">
                                 {{ mainProject && project.id === mainProject.id ? 'mdi-star' : 'mdi-star-outline' }}
                               </v-icon>
                             </v-btn>
+                              </template>
+                            </v-tooltip>
                           </div>
                         </div>
 
@@ -478,15 +458,20 @@
                             Ver
                           </ModernButton>
                           
-                          <v-btn
-                            color="success"
-                            variant="flat"
-                            prepend-icon="mdi-cog"
-                            @click="manageProject(project.id)"
-                            size="small"
-                          >
-                            Gestionar
-                          </v-btn>
+                          <v-tooltip text="Gestionar proyecto">
+                            <template v-slot:activator="{ props }">
+                              <v-btn
+                                v-bind="props"
+                                color="success"
+                                variant="flat"
+                                prepend-icon="mdi-cog"
+                                @click="manageProject(project.id)"
+                                size="small"
+                              >
+                                Gestionar
+                              </v-btn>
+                            </template>
+                          </v-tooltip>
                         </div>
                       </template>
                     </ModernCard>
@@ -513,6 +498,7 @@ import { ROUTES } from '@/constants/routes';
 import { useErrorHandler } from '@/composables/useErrorHandler';
 import LoadingState from '@/components/feedback/LoadingState.vue';
 import ErrorState from '@/components/feedback/ErrorState.vue';
+import EmptyState from '@/components/feedback/EmptyState.vue';
 
 const router = useRouter();
 const projectStore = useProjectStore();
@@ -914,6 +900,41 @@ function handleAuthErrorRedirect() {
 .project-item:nth-child(1) { animation-delay: 0.1s; }
 .project-item:nth-child(2) { animation-delay: 0.2s; }
 .project-item:nth-child(3) { animation-delay: 0.3s; }
+
+/* Asegurar contraste en textos de cards de proyectos */
+.project-item .v-card-title,
+.project-item h3,
+.project-item .text-h6 {
+  color: rgba(0, 0, 0, 0.87) !important;
+}
+
+.project-item .text-grey,
+.project-item .text-body-2,
+.project-item .text-caption {
+  color: rgba(0, 0, 0, 0.6) !important;
+}
+
+.project-item .text-grey-darken-1 {
+  color: rgba(0, 0, 0, 0.7) !important;
+}
+
+/* Asegurar que los botones en cards de proyectos se vean */
+.project-item .v-btn,
+.project-item .modern-button {
+  opacity: 1 !important;
+}
+
+.project-item .v-btn .v-icon,
+.project-item .modern-button .v-icon {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.project-item .v-btn__prepend .v-icon {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: inline-flex !important;
+}
 .project-item:nth-child(4) { animation-delay: 0.4s; }
 .project-item:nth-child(5) { animation-delay: 0.5s; }
 .project-item:nth-child(6) { animation-delay: 0.6s; }

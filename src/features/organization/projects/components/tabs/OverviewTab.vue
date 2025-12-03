@@ -200,72 +200,11 @@
           </div>
         </v-card-text>
       </v-card>
+
     </v-col>
 
     <!-- Sidebar -->
     <v-col cols="12" lg="4">
-      <!-- Beneficios y Pago -->
-      <v-card class="professional-sidebar-card mb-4" variant="outlined" rounded="lg">
-        <v-card-title class="professional-card-header">
-          <div class="d-flex align-center">
-            <div class="professional-card-icon success">
-              <v-icon color="white" size="20">mdi-cash-multiple</v-icon>
-            </div>
-            <div class="ml-3">
-              <h3 class="text-subtitle-1 font-weight-bold mb-0">Beneficios</h3>
-              <p class="text-caption text-grey mb-0">Remuneración</p>
-            </div>
-          </div>
-        </v-card-title>
-        <v-card-text class="pa-4">
-          <div v-if="project?.beneficio" class="beneficio-info">
-            <v-chip color="success" class="mb-2">
-              {{ getTipoPagoText(project.beneficio.tipo_pago) }}
-            </v-chip>
-            <div v-if="project.beneficio.monto > 0" class="mt-2">
-              <strong>Monto:</strong> ${{ formatCurrency(project.beneficio.monto) }} 
-              <span v-if="project.beneficio.frecuencia !== 'none'">
-                ({{ getFrecuenciaText(project.beneficio.frecuencia) }})
-              </span>
-            </div>
-            <div v-if="project.beneficio.descripcion_pago" class="mt-2 text-body-2">
-              {{ project.beneficio.descripcion_pago }}
-            </div>
-            <div class="mt-3 d-flex flex-wrap gap-2">
-              <v-chip v-if="project.beneficio.incluye_transporte" size="small" color="info">
-                <v-icon start size="small">mdi-bus</v-icon>
-                Transporte
-              </v-chip>
-              <v-chip v-if="project.beneficio.incluye_alimentacion" size="small" color="info">
-                <v-icon start size="small">mdi-food</v-icon>
-                Alimentación
-              </v-chip>
-              <v-chip v-if="project.beneficio.incluye_materiales" size="small" color="info">
-                <v-icon start size="small">mdi-toolbox</v-icon>
-                Materiales
-              </v-chip>
-              <v-chip v-if="project.beneficio.incluye_seguro" size="small" color="info">
-                <v-icon start size="small">mdi-shield-check</v-icon>
-                Seguro
-              </v-chip>
-            </div>
-          </div>
-          <div v-else class="text-body-2 text-grey">
-            No se han configurado beneficios aún
-          </div>
-          <ModernButton
-            color="success"
-            variant="outlined"
-            prepend-icon="mdi-cash-multiple"
-            @click="$emit('open-beneficio-dialog')"
-            block
-            class="mt-3"
-          >
-            {{ project?.beneficio ? 'Editar Beneficios' : 'Configurar Beneficios' }}
-          </ModernButton>
-        </v-card-text>
-      </v-card>
-
       <!-- Horas Voluntariadas -->
       <v-card class="professional-sidebar-card mb-4" variant="outlined" rounded="lg">
         <v-card-title class="professional-card-header">
@@ -316,6 +255,35 @@
           </div>
         </v-card-text>
       </v-card>
+
+      <!-- Timeline del Proyecto -->
+      <ProjectTimeline
+        :phases="project?.phases || []"
+        :project-start-date="project?.startDate || project?.fecha_inicio"
+        :project-end-date="project?.endDate || project?.fecha_fin"
+        :get-phase-status="getPhaseStatus"
+        :get-phase-status-color="getPhaseStatusColor"
+        :get-phase-status-icon="getPhaseStatusIcon"
+        :get-phase-tasks-count="getPhaseTasksCount"
+        :get-phase-progress="getPhaseProgress"
+        :get-completed-tasks-by-phase="getCompletedTasksByPhase"
+        @phase-click="handlePhaseClick"
+        class="mb-4"
+      />
+
+      <!-- Gráficos de Progreso por Fase -->
+      <PhaseProgressChart
+        v-if="project?.phases && project.phases.length > 0"
+        :phases="project.phases"
+        :project-start-date="project?.startDate || project?.fecha_inicio"
+        :project-end-date="project?.endDate || project?.fecha_fin"
+        :get-phase-status="getPhaseStatus"
+        :get-phase-status-color="getPhaseStatusColor"
+        :get-phase-progress="getPhaseProgress"
+        :get-phase-tasks-count="getPhaseTasksCount"
+        :loading="false"
+        class="mb-4"
+      />
 
       <!-- Acciones Rápidas -->
       <v-card class="professional-sidebar-card mb-4" variant="outlined" rounded="lg">
@@ -377,6 +345,8 @@
 <script setup>
 import { computed } from 'vue';
 import ModernButton from '@/components/ui/ModernButton.vue';
+import ProjectTimeline from '../ProjectTimeline.vue';
+import PhaseProgressChart from '../charts/PhaseProgressChart.vue';
 import { formatDate, formatDateRange } from '@/utils/formatters';
 
 const props = defineProps({
@@ -431,6 +401,59 @@ const props = defineProps({
   getFrecuenciaText: {
     type: Function,
     required: true
+  },
+  getPhaseStatus: {
+    type: Function,
+    default: (phase) => {
+      if (!phase?.tareas || phase.tareas.length === 0) return 'Sin tareas';
+      const completed = phase.tareas.filter(task => task.id_estado === 3).length;
+      const total = phase.tareas.length;
+      if (completed === total) return 'Completada';
+      if (completed > 0) return 'En progreso';
+      return 'Pendiente';
+    }
+  },
+  getPhaseStatusColor: {
+    type: Function,
+    default: (phase) => {
+      if (!phase?.tareas || phase.tareas.length === 0) return 'grey';
+      const completed = phase.tareas.filter(task => task.id_estado === 3).length;
+      const total = phase.tareas.length;
+      if (completed === total) return 'success';
+      if (completed > 0) return 'info';
+      return 'warning';
+    }
+  },
+  getPhaseStatusIcon: {
+    type: Function,
+    default: (phase) => {
+      // No usar props aquí, implementar la lógica directamente
+      if (!phase?.tareas || phase.tareas.length === 0) return 'mdi-clock-outline';
+      const completed = phase.tareas.filter(task => task.id_estado === 3).length;
+      const total = phase.tareas.length;
+      if (completed === total) return 'mdi-check-circle';
+      if (completed > 0) return 'mdi-progress-clock';
+      return 'mdi-clock-outline';
+    }
+  },
+  getPhaseTasksCount: {
+    type: Function,
+    default: (phase) => phase?.tareas?.length || 0
+  },
+  getPhaseProgress: {
+    type: Function,
+    default: (phase) => {
+      if (!phase?.tareas || phase.tareas.length === 0) return 0;
+      const completed = phase.tareas.filter(t => t.id_estado === 3).length;
+      return Math.round((completed / phase.tareas.length) * 100);
+    }
+  },
+  getCompletedTasksByPhase: {
+    type: Function,
+    default: () => {
+      // Esta función requiere acceso a project, así que retornamos una función que se completará después
+      return () => 0;
+    }
   }
 });
 
@@ -439,7 +462,8 @@ const emit = defineEmits([
   'open-hours-dialog',
   'open-reports',
   'export-data',
-  'toggle-visibility'
+  'toggle-visibility',
+  'phase-click'
 ]);
 
 const totalHoras = computed(() => {
@@ -457,6 +481,62 @@ const horasPendientes = computed(() => {
     .filter(h => !h.verificada)
     .reduce((sum, h) => sum + parseFloat(h.horas_trabajadas || 0), 0).toFixed(2);
 });
+
+// Funciones auxiliares para el timeline
+const getPhaseStatus = (phase) => {
+  return props.getPhaseStatus ? props.getPhaseStatus(phase) : (() => {
+    if (!phase?.tareas || phase.tareas.length === 0) return 'Sin tareas';
+    const completed = phase.tareas.filter(task => task.id_estado === 3).length;
+    const total = phase.tareas.length;
+    if (completed === total) return 'Completada';
+    if (completed > 0) return 'En progreso';
+    return 'Pendiente';
+  })();
+};
+
+const getPhaseStatusColor = (phase) => {
+  return props.getPhaseStatusColor ? props.getPhaseStatusColor(phase) : (() => {
+    if (!phase?.tareas || phase.tareas.length === 0) return 'grey';
+    const completed = phase.tareas.filter(task => task.id_estado === 3).length;
+    const total = phase.tareas.length;
+    if (completed === total) return 'success';
+    if (completed > 0) return 'info';
+    return 'warning';
+  })();
+};
+
+const getPhaseStatusIcon = (phase) => {
+  if (props.getPhaseStatusIcon) return props.getPhaseStatusIcon(phase);
+  const status = getPhaseStatus(phase);
+  if (status.includes('Completada')) return 'mdi-check-circle';
+  if (status.includes('progreso')) return 'mdi-progress-clock';
+  return 'mdi-clock-outline';
+};
+
+const getPhaseTasksCount = (phase) => {
+  return props.getPhaseTasksCount ? props.getPhaseTasksCount(phase) : (phase?.tareas?.length || 0);
+};
+
+const getPhaseProgress = (phase) => {
+  return props.getPhaseProgress ? props.getPhaseProgress(phase) : (() => {
+    if (!phase?.tareas || phase.tareas.length === 0) return 0;
+    const completed = phase.tareas.filter(t => t.id_estado === 3).length;
+    return Math.round((completed / phase.tareas.length) * 100);
+  })();
+};
+
+const getCompletedTasksByPhase = (phaseId) => {
+  return props.getCompletedTasksByPhase ? props.getCompletedTasksByPhase(phaseId) : (() => {
+    const phase = props.project?.phases?.find(p => (p.id || p.id_fase) === phaseId);
+    if (!phase || !phase.tareas) return 0;
+    return phase.tareas.filter(task => task.id_estado === 3).length;
+  })();
+};
+
+const handlePhaseClick = (phase) => {
+  // Emitir evento para que el padre maneje la navegación
+  emit('phase-click', phase);
+};
 </script>
 
 <style scoped>
@@ -581,6 +661,16 @@ const horasPendientes = computed(() => {
   padding: 16px 20px !important;
   border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
   background: #fafafa !important;
+}
+
+.professional-card-header h3,
+.professional-card-header .text-subtitle-1 {
+  color: rgba(0, 0, 0, 0.87) !important; /* Color oscuro para contraste */
+}
+
+.professional-card-header .text-grey,
+.professional-card-header .text-caption {
+  color: rgba(0, 0, 0, 0.6) !important; /* Color gris oscuro para mejor legibilidad */
 }
 
 .professional-card-icon {

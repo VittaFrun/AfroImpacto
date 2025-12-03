@@ -66,6 +66,46 @@
 }
 
 /* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+/* Global responsive adjustments */
+@media (max-width: 768px) {
+  /* Full screen dialogs on mobile */
+  .v-dialog {
+    margin: 0 !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    border-radius: 0 !important;
+  }
+  
+  /* Stack form fields */
+  .v-row {
+    flex-direction: column;
+  }
+  
+  /* Make tables scrollable */
+  .v-table {
+    overflow-x: auto;
+    display: block;
+  }
+  
+  /* Adjust card padding */
+  .v-card {
+    padding: 12px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .v-dialog {
+    margin: 0 !important;
+  }
+  
+  .v-card {
+    padding: 8px !important;
+  }
+}
+
+/* ========================================
    MODERN INPUT STYLES
    ======================================== */
 .modern-input {
@@ -326,6 +366,159 @@
 }
 
 /* ========================================
+   CARD HEADERS - FIX CONTRAST ISSUES
+   ======================================== */
+/* Asegurar contraste adecuado en todos los headers de cards */
+.professional-card-header h2,
+.professional-card-header h3,
+.professional-card-header .text-h6,
+.professional-card-header .text-subtitle-1,
+.professional-card-header .text-h5 {
+  color: rgba(0, 0, 0, 0.87) !important;
+}
+
+.professional-card-header .text-grey,
+.professional-card-header .text-caption,
+.professional-card-header p {
+  color: rgba(0, 0, 0, 0.6) !important;
+}
+
+.modern-card-header h2,
+.modern-card-header h3,
+.modern-card-header .text-h6,
+.modern-card-header .text-subtitle-1 {
+  color: rgba(0, 0, 0, 0.87) !important;
+}
+
+.modern-card-header .text-grey,
+.modern-card-header .text-caption {
+  color: rgba(0, 0, 0, 0.6) !important;
+}
+
+.phase-header h2,
+.phase-header h3,
+.phase-header .text-h6 {
+  color: rgba(0, 0, 0, 0.87) !important;
+}
+
+.phase-header .text-grey,
+.phase-header .text-caption {
+  color: rgba(0, 0, 0, 0.6) !important;
+}
+
+/* ========================================
+   GLOBAL TEXT CONTRAST FIXES
+   ======================================== */
+/* Asegurar que todos los títulos sean visibles */
+h1, h2, h3, h4, h5, h6,
+.text-h1, .text-h2, .text-h3, .text-h4, .text-h5, .text-h6,
+.text-subtitle-1, .text-subtitle-2 {
+  color: rgba(0, 0, 0, 0.87) !important;
+}
+
+/* Asegurar que los textos en cards sean visibles */
+.v-card-text h1,
+.v-card-text h2,
+.v-card-text h3,
+.v-card-text h4,
+.v-card-text h5,
+.v-card-text h6,
+.v-card-text .text-h6,
+.v-card-text .text-subtitle-1 {
+  color: rgba(0, 0, 0, 0.87) !important;
+}
+
+.v-card-text .text-grey,
+.v-card-text .text-body-2,
+.v-card-text .text-caption {
+  color: rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Asegurar contraste en v-card-title */
+.v-card-title h1,
+.v-card-title h2,
+.v-card-title h3,
+.v-card-title h4,
+.v-card-title h5,
+.v-card-title h6,
+.v-card-title .text-h6,
+.v-card-title .text-subtitle-1 {
+  color: rgba(0, 0, 0, 0.87) !important;
+}
+
+/* ========================================
+   BUTTON ICONS FIXES
+   ======================================== */
+/* Asegurar que los iconos en botones se muestren correctamente */
+.v-btn[icon] .v-icon,
+.v-btn .v-icon,
+.v-btn__prepend .v-icon,
+.v-btn__append .v-icon {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: inline-flex !important;
+}
+
+.v-btn[icon]:deep(.v-icon),
+.v-btn:deep(.v-icon) {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Asegurar visibilidad de botones con variant text */
+.v-btn.variant--text,
+.v-btn[data-variant="text"] {
+  opacity: 1 !important;
+}
+
+.v-btn.variant--text .v-icon,
+.v-btn[data-variant="text"] .v-icon {
+  color: inherit !important;
+  opacity: 1 !important;
+}
+
+/* Botones con iconos siempre visibles */
+.v-btn--icon .v-icon,
+.v-btn--elevated .v-icon {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Asegurar que los botones con prepend-icon muestren el icono */
+.v-btn__prepend {
+  margin-inline-end: 8px !important;
+}
+
+.v-btn__prepend .v-icon {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* ========================================
+   PROJECT CARDS FIXES
+   ======================================== */
+/* Asegurar que las cards de proyectos tengan buen contraste */
+.project-card,
+.project-item {
+  background: #ffffff !important;
+}
+
+.project-card .v-card-title,
+.project-item .v-card-title {
+  color: rgba(0, 0, 0, 0.87) !important;
+}
+
+.project-card .v-card-text,
+.project-item .v-card-text {
+  color: rgba(0, 0, 0, 0.87) !important;
+}
+
+.project-card .text-grey,
+.project-item .text-grey {
+  color: rgba(0, 0, 0, 0.6) !important;
+}
+
+/* ========================================
    ANIMATIONS
    ======================================== */
 @keyframes slideInUp {
@@ -473,18 +666,6 @@
   }
 }
 
-/* ========================================
-   ACCESSIBILITY IMPROVEMENTS
-   ======================================== */
-@media (prefers-contrast: high) {
-  .modern-card {
-    border: 2px solid #000 !important;
-  }
-  
-  .modern-btn {
-    border: 2px solid currentColor !important;
-  }
-}
 
 @media (prefers-color-scheme: dark) {
   .modern-card {

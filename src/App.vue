@@ -1,8 +1,12 @@
 <script setup>
 import { ref } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useUiStore } from '@/stores/uiStore';
 import { useScrollToSection } from '@/composables/useScrollToSection';
+import NotificationSnackbar from '@/components/notifications/NotificationSnackbar.vue';
+import GlobalSearch from '@/components/search/GlobalSearch.vue';
+
+const router = useRouter();
 
 const uiStore = useUiStore();
 const route = useRoute();
@@ -31,6 +35,8 @@ const goToRegister = () => {
   router.push('/register');
   uiStore.toggleDrawer();
 };
+
+const globalSearchOpen = ref(false);
 </script>
 
 <template>
@@ -44,6 +50,10 @@ const goToRegister = () => {
         </transition>
       </router-view>
     </v-main>
+    <!-- Componente global de notificaciones -->
+    <NotificationSnackbar />
+    <!-- Búsqueda Global -->
+    <GlobalSearch v-model="globalSearchOpen" />
     <v-navigation-drawer
       v-model="uiStore.drawer"
       temporary

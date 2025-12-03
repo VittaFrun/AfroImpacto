@@ -13,13 +13,16 @@
             <v-select
               v-model="localForm.tipo_pago"
               :items="[
-                { title: 'Voluntariado', value: 'volunteer' },
+                { title: 'Voluntariado (Sin remuneración)', value: 'volunteer' },
                 { title: 'Estipendio', value: 'stipend' },
                 { title: 'Salario', value: 'salary' },
-                { title: 'Honorarios', value: 'honorarium' }
+                { title: 'Honorario', value: 'honorarium' },
+                { title: 'Comisión', value: 'commission' },
+                { title: 'Bono', value: 'bonus' }
               ]"
               label="Tipo de Remuneración"
               variant="outlined"
+              prepend-inner-icon="mdi-cash-multiple"
             ></v-select>
           </v-col>
           
@@ -28,12 +31,15 @@
               v-model="localForm.frecuencia"
               :items="[
                 { title: 'Sin frecuencia', value: 'none' },
-                { title: 'Mensual', value: 'monthly' },
+                { title: 'Por hora', value: 'hourly' },
+                { title: 'Diario', value: 'daily' },
                 { title: 'Semanal', value: 'weekly' },
+                { title: 'Mensual', value: 'monthly' },
                 { title: 'Por proyecto', value: 'project' }
               ]"
               label="Frecuencia de Pago"
               variant="outlined"
+              prepend-inner-icon="mdi-calendar-clock"
               :disabled="localForm.tipo_pago === 'volunteer'"
             ></v-select>
           </v-col>

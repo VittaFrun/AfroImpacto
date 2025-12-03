@@ -15,6 +15,8 @@ import './assets/styles/design-system.css'
 import './assets/styles/modern-ui.css'
 import './assets/styles/professional-buttons.css'
 import './assets/styles/enterprise-theme.css'
+import './assets/styles/professional-hover.css' // Professional hover states
+import './assets/styles/global-fixes.css' // Global visual fixes - must be last to override
 
 const app = createApp(App)
 

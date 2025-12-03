@@ -11,11 +11,14 @@
       - El ícono de navegación (`v-app-bar-nav-icon`) solo aparece en pantallas pequeñas (`d-md-none`) para abrir/cerrar el menú lateral.
     -->
     <v-app-bar color="primary" class="app-bar-style" flat elevation="2">
-      <v-app-bar-nav-icon @click="drawer = !drawer" class="d-md-none"></v-app-bar-nav-icon>
+      <v-app-bar-nav-icon 
+        @click="drawer = !drawer" 
+        class="d-md-none"
+      ></v-app-bar-nav-icon>
       <div class="d-flex align-center">
         <img 
           src="@/assets/images/logo_afroimpacto2.png" 
-          alt="Afro Impacto Logo" 
+          alt="Afro Impacto - Plataforma de voluntariado" 
           class="mr-2"
           style="height: 60px; width: auto;"
         />
@@ -35,7 +38,7 @@
         <NotificationBell @view-all="goToNotifications" />
         <v-menu offset-y left transition="slide-y-transition">
           <template v-slot:activator="{ props }">
-            <v-btn icon v-bind="props" class="ml-1" aria-label="Menú de usuario">
+            <v-btn icon v-bind="props" class="ml-1">
               <v-icon size="large" color="white">mdi-account-circle</v-icon>
             </v-btn>
           </template>
@@ -84,6 +87,7 @@
       :width="drawerWidth"
       :mini-variant="miniVariant"
       class="custom-navigation-drawer"
+      id="main-navigation"
     >
       <div class="d-flex align-center pa-2">
         <v-list-item-title class="text-h6 font-weight-bold text-primary ml-2">
@@ -119,7 +123,7 @@
       - Muestra un indicador de carga (`v-progress-circular`) mientras los datos se están obteniendo.
       - Una vez cargados los datos, muestra los diferentes componentes del dashboard (WelcomeCard, MetricCards, etc.).
     -->
-    <v-main>
+    <v-main id="main-content">
       <router-view v-slot="{ Component }">
         <Transition 
           name="fade-slide" 
@@ -132,6 +136,13 @@
         </Transition>
       </router-view>
     </v-main>
+
+    <!-- Notification Center -->
+    <NotificationCenter
+      v-model="notificationCenterOpen"
+      @notification-click="handleNotificationClick"
+      @action="handleNotificationAction"
+    />
   </v-app>
 </template>
 
@@ -142,8 +153,10 @@
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/features/auth/stores/authStore';
+import { useNotificationStore } from '@/stores/notificationStore';
 import NavigationMenu from './components/NavigationMenu.vue';
 import NotificationBell from '@/components/notifications/NotificationBell.vue';
+import NotificationCenter from '@/components/notifications/NotificationCenter.vue';
 
 // --- STORES ---
 const router = useRouter();
@@ -170,6 +183,8 @@ const drawer = ref(null);
 const miniVariant = ref(false);
 // `drawerWidth`: calcula el ancho del menú dependiendo de si está minimizado.
 const drawerWidth = computed(() => miniVariant.value ? 100 : 280);
+// `notificationCenterOpen`: controla si el centro de notificaciones está abierto.
+const notificationCenterOpen = ref(false);
 
 // --- ELEMENTOS DE NAVEGACIÓN ---
 // `selectedItem`: mantiene el elemento de la lista que está seleccionado.
@@ -191,9 +206,43 @@ function goToSettings() {
 }
 
 function goToNotifications() {
-  // Por ahora, mostrar un mensaje. En el futuro se puede crear una vista dedicada de notificaciones
-  console.log('Ver todas las notificaciones');
-  // router.push('/organization/dashboard/notifications');
+  notificationCenterOpen.value = true;
+}
+
+function handleNotificationClick(notificationId) {
+  const notificationStore = useNotificationStore();
+  const notification = notificationStore.allNotifications.find(n => 
+    n.id === notificationId || n.id_notificacion === notificationId
+  );
+  
+  if (notification) {
+    if (notification.tipo_entidad === 'proyecto' && notification.id_proyecto) {
+      router.push(`/organization/dashboard/projects/${notification.id_proyecto}`);
+    } else if (notification.tipo_entidad === 'tarea' && notification.id_proyecto && notification.id_entidad) {
+      router.push(`/organization/dashboard/projects/${notification.id_proyecto}?tab=tasks&task=${notification.id_entidad}`);
+    } else if (notification.tipo_entidad === 'asignacion' && notification.id_proyecto && notification.id_entidad) {
+      router.push(`/organization/dashboard/projects/${notification.id_proyecto}?tab=team`);
+    }
+  }
+}
+
+function handleNotificationAction({ notificationId, action }) {
+  const notificationStore = useNotificationStore();
+  const notification = notificationStore.allNotifications.find(n => 
+    n.id === notificationId || n.id_notificacion === notificationId
+  );
+  
+  if (!notification) return;
+  
+  if (action.action === 'view-project' && action.data?.id_proyecto) {
+    router.push(`/organization/dashboard/projects/${action.data.id_proyecto}`);
+  } else if (action.action === 'view-task' && action.data?.id_proyecto && action.data?.id_tarea) {
+    router.push(`/organization/dashboard/projects/${action.data.id_proyecto}?tab=tasks&task=${action.data.id_tarea}`);
+  } else if (action.action === 'view-comments' && action.data?.id_proyecto) {
+    router.push(`/organization/dashboard/projects/${action.data.id_proyecto}?tab=tasks`);
+  } else if (action.action === 'view-catalog') {
+    router.push('/volunteer/organizations');
+  }
 }
 
 async function logout() {
@@ -617,6 +666,37 @@ async function logout() {
 }
 
 /* Ajustes responsivos */
+/* Responsive Design Improvements */
+@media (max-width: 960px) {
+  .app-bar-style {
+    padding: 0 12px !important;
+  }
+  
+  .custom-navigation-drawer {
+    margin: 0 !important;
+    border-radius: 0 !important;
+    max-height: 100% !important;
+  }
+  
+  .main-content {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-bar-style {
+    padding: 0 8px !important;
+  }
+  
+  .main-content {
+    padding: 12px;
+  }
+  
+  .nav-item {
+    margin: 2px 4px !important;
+  }
+}
+
 @media (max-width: 599px) {
   .new-project-btn {
     display: none;

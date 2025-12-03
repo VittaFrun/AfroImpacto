@@ -1,14 +1,24 @@
 <!--
   Este es el componente principal para el Dashboard del Voluntario.
+  Está construido con Vuetify y sigue una estructura de layout moderna con una barra de navegación lateral y un área de contenido principal.
 -->
 <template>
   <v-app>
+    <!-- 
+      BARRA DE NAVEGACIÓN SUPERIOR (App Bar)
+      - Es fija (`app`) y transparente (`flat`, `color="transparent"`) con un borde inferior.
+      - Contiene el título, un campo de búsqueda, notificaciones y un menú de usuario.
+      - El ícono de navegación (`v-app-bar-nav-icon`) solo aparece en pantallas pequeñas (`d-md-none`) para abrir/cerrar el menú lateral.
+    -->
     <v-app-bar color="primary" class="app-bar-style" flat elevation="2">
-      <v-app-bar-nav-icon @click="drawer = !drawer" class="d-md-none"></v-app-bar-nav-icon>
+      <v-app-bar-nav-icon 
+        @click="drawer = !drawer" 
+        class="d-md-none"
+      ></v-app-bar-nav-icon>
       <div class="d-flex align-center">
         <img 
           src="@/assets/images/logo_afroimpacto2.png" 
-          alt="Afro Impacto Logo" 
+          alt="Afro Impacto - Plataforma de voluntariado" 
           class="mr-2"
           style="height: 60px; width: auto;"
         />
@@ -16,48 +26,51 @@
       <v-spacer></v-spacer>
 
       <div class="d-flex align-center ml-6">
-        <v-btn icon class="mr-1" aria-label="Notificaciones" color="white">
-          <v-badge dot color="red-accent-2">
-            <v-icon>mdi-bell</v-icon>
-          </v-badge>
-        </v-btn>
+        <NotificationBell @view-all="goToNotifications" />
         <v-menu offset-y left transition="slide-y-transition">
           <template v-slot:activator="{ props }">
-            <v-btn icon v-bind="props" class="ml-1" aria-label="Menú de usuario">
+            <v-btn icon v-bind="props" class="ml-1">
               <v-icon size="large" color="white">mdi-account-circle</v-icon>
             </v-btn>
           </template>
-          <v-list density="compact" class="user-menu-list pa-2">
-            <v-list-item class="mb-2" v-if="authStore.user">
-              <template v-slot:prepend>
-                <v-avatar color="primary" size="40" class="mr-3">
-                  <v-icon>mdi-account</v-icon>
-                </v-avatar>
-              </template>
-              <v-list-item-title class="font-weight-bold">{{ authStore.user.nombre }}</v-list-item-title>
-              <v-list-item-subtitle>{{ authStore.user.correo }}</v-list-item-subtitle>
+        <v-list density="compact" class="user-menu-list pa-2">
+          <v-list-item class="mb-2" v-if="authStore.user">
+            <template v-slot:prepend>
+              <v-avatar color="primary" size="40" class="mr-3">
+                <v-icon>mdi-account</v-icon>
+              </v-avatar>
+            </template>
+            <v-list-item-title class="font-weight-bold">{{ authStore.user.nombre || 'Usuario' }}</v-list-item-title>
+            <v-list-item-subtitle>{{ authStore.user.email || authStore.user.correo }}</v-list-item-subtitle>
+          </v-list-item>
+          <v-divider></v-divider>
+          <div class="mt-2">
+            <v-list-item link @click="goToProfile" class="user-menu-item">
+              <template v-slot:prepend><v-icon>mdi-account-cog-outline</v-icon></template>
+              <v-list-item-title>Mi Perfil</v-list-item-title>
             </v-list-item>
-            <v-divider></v-divider>
-            <div class="mt-2">
-              <v-list-item link @click="goToProfile" class="user-menu-item">
-                <template v-slot:prepend><v-icon>mdi-account-cog-outline</v-icon></template>
-                <v-list-item-title>Mi Perfil</v-list-item-title>
-              </v-list-item>
-              <v-list-item link @click="goToSettings" class="user-menu-item">
-                <template v-slot:prepend><v-icon>mdi-cog-outline</v-icon></template>
-                <v-list-item-title>Configuración</v-list-item-title>
-              </v-list-item>
-            </div>
-            <v-divider></v-divider>
-            <v-list-item link @click="handleLogout" class="logout-item mt-2">
-              <template v-slot:prepend><v-icon>mdi-logout</v-icon></template>
-              <v-list-item-title>Cerrar Sesión</v-list-item-title>
+            <v-list-item link @click="goToSettings" class="user-menu-item">
+              <template v-slot:prepend><v-icon>mdi-cog-outline</v-icon></template>
+              <v-list-item-title>Configuración</v-list-item-title>
             </v-list-item>
-          </v-list>
-        </v-menu>
+          </div>
+          <v-divider></v-divider>
+          <v-list-item link @click="logout" class="logout-item mt-2">
+            <template v-slot:prepend><v-icon>mdi-logout</v-icon></template>
+            <v-list-item-title>Cerrar Sesión</v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-menu>
       </div>
     </v-app-bar>
 
+    <!-- 
+      MENÚ DE NAVEGACIÓN LATERAL (Navigation Drawer)
+      - Es flotante (`floating`) y permanente en pantallas grandes (`permanent="$vuetify.display.mdAndUp"`).
+      - Puede minimizarse (`mini-variant`) para ahorrar espacio.
+      - El ancho (`width`) se ajusta dinámicamente si está minimizado o no.
+      - Contiene la lista de enlaces de navegación del dashboard.
+    -->
     <v-navigation-drawer
       v-model="drawer"
       :permanent="$vuetify.display.mdAndUp"
@@ -65,6 +78,7 @@
       :width="drawerWidth"
       :mini-variant="miniVariant"
       class="custom-navigation-drawer"
+      id="main-navigation"
     >
       <div class="d-flex align-center pa-2">
         <v-list-item-title class="text-h6 font-weight-bold text-primary ml-2">
@@ -90,45 +104,78 @@
       </div>
       <v-divider></v-divider>
 
-      <v-list nav density="compact" class="mt-4">
-        <v-list-item v-for="item in items" :key="item.text" :to="item.route" link class="nav-item mx-2 mb-1">
-          <template v-slot:prepend>
-            <v-icon :icon="item.icon"></v-icon>
-          </template>
-          <v-list-item-title v-text="item.text"></v-list-item-title>
-        </v-list-item>
-      </v-list>
+      <!-- Componente de navegación reutilizable -->
+      <NavigationMenu />
     </v-navigation-drawer>
 
-    <v-main>
+    <!-- 
+      CONTENIDO PRINCIPAL (Main Content)
+      - Aquí es donde se renderiza el contenido principal del dashboard.
+      - Muestra un indicador de carga (`v-progress-circular`) mientras los datos se están obteniendo.
+      - Una vez cargados los datos, muestra los diferentes componentes del dashboard.
+    -->
+    <v-main id="main-content">
       <router-view v-slot="{ Component }">
-        <Transition name="slide-fade" mode="out-in">
-          <component :is="Component" :key="router.currentRoute.value.fullPath" />
+        <Transition 
+          name="fade-slide" 
+          mode="out-in" 
+          appear
+          @before-enter="onBeforeEnter"
+          @after-enter="onAfterEnter"
+        >
+          <component :is="Component" :key="router.currentRoute.value.name || router.currentRoute.value.path" />
         </Transition>
       </router-view>
     </v-main>
+
+    <!-- Notification Center -->
+    <NotificationCenter
+      v-model="notificationCenterOpen"
+      @notification-click="handleNotificationClick"
+      @action="handleNotificationAction"
+    />
   </v-app>
 </template>
 
 <script setup>
+// --- SCRIPT (LÓGICA DEL COMPONENTE) ---
+
+// Importaciones de Vue y Pinia
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/features/auth/stores/authStore';
+import { useNotificationStore } from '@/stores/notificationStore';
+import NavigationMenu from './components/NavigationMenu.vue';
+import NotificationBell from '@/components/notifications/NotificationBell.vue';
+import NotificationCenter from '@/components/notifications/NotificationCenter.vue';
 
-const drawer = ref(null);
-const miniVariant = ref(false);
-const drawerWidth = computed(() => miniVariant.value ? 100 : 280);
-
-const items = ref([
-  { text: 'Dashboard', icon: 'mdi-view-dashboard', route: '/volunteer/dashboard' },
-  { text: 'Mis Proyectos', icon: 'mdi-folder-heart', route: '/volunteer/projects' },
-  { text: 'Mi Perfil', icon: 'mdi-account-star', route: '/volunteer/profile' },
-  { text: 'Disponibilidad', icon: 'mdi-calendar-clock', route: '/volunteer/availability' },
-  { text: 'Configuración', icon: 'mdi-cog', route: '/volunteer/settings' },
-]);
-
+// --- STORES ---
 const router = useRouter();
 const authStore = useAuthStore();
+
+// --- ESTADO DE TRANSICIÓN ---
+const isTransitioning = ref(false);
+
+function onBeforeEnter() {
+  isTransitioning.value = true;
+}
+
+function onAfterEnter() {
+  // Pequeño delay para asegurar que la animación termine suavemente
+  setTimeout(() => {
+    isTransitioning.value = false;
+  }, 50);
+}
+
+// --- ESTADO DEL LAYOUT ---
+// `drawer`: controla si el menú lateral está visible o no (especialmente en móvil).
+const drawer = ref(null);
+// `miniVariant`: controla si el menú está minimizado.
+const miniVariant = ref(false);
+// `drawerWidth`: calcula el ancho del menú dependiendo de si está minimizado.
+const drawerWidth = computed(() => miniVariant.value ? 100 : 280);
+// `notificationCenterOpen`: controla si el centro de notificaciones está abierto.
+const notificationCenterOpen = ref(false);
 
 function goToProfile() {
   router.push('/volunteer/profile');
@@ -138,13 +185,50 @@ function goToSettings() {
   router.push('/volunteer/settings');
 }
 
-async function handleLogout() {
+function goToNotifications() {
+  notificationCenterOpen.value = true;
+}
+
+function handleNotificationClick(notificationId) {
+  const notificationStore = useNotificationStore();
+  const notification = notificationStore.allNotifications.find(n => 
+    n.id === notificationId || n.id_notificacion === notificationId
+  );
+  
+  if (notification) {
+    if (notification.tipo_entidad === 'proyecto' && notification.id_proyecto) {
+      router.push(`/volunteer/projects/${notification.id_proyecto}`);
+    } else if (notification.tipo_entidad === 'tarea' && notification.id_proyecto && notification.id_entidad) {
+      router.push(`/volunteer/projects/${notification.id_proyecto}?task=${notification.id_entidad}`);
+    }
+  }
+}
+
+function handleNotificationAction({ notificationId, action }) {
+  const notificationStore = useNotificationStore();
+  const notification = notificationStore.allNotifications.find(n => 
+    n.id === notificationId || n.id_notificacion === notificationId
+  );
+  
+  if (!notification) return;
+  
+  if (action.action === 'view-project' && action.data?.id_proyecto) {
+    router.push(`/volunteer/projects/${action.data.id_proyecto}`);
+  } else if (action.action === 'view-task' && action.data?.id_proyecto && action.data?.id_tarea) {
+    router.push(`/volunteer/projects/${action.data.id_proyecto}?task=${action.data.id_tarea}`);
+  } else if (action.action === 'view-comments' && action.data?.id_proyecto) {
+    router.push(`/volunteer/projects/${action.data.id_proyecto}`);
+  }
+}
+
+async function logout() {
   await authStore.logout();
   router.push('/auth/login');
 }
 </script>
 
-<style scoped>
+
+<style>
 /* --- ESTILOS GLOBALES PARA EL DASHBOARD --- */
 .v-application {
   background-color: #ffffff !important;
@@ -187,45 +271,288 @@ async function handleLogout() {
 
 /* --- ESTILOS MEJORADOS PARA LOS ENLACES DE NAVEGACIÓN --- */
 .nav-item .v-list-item__overlay {
-  /* Color del efecto "ripple" al hacer clic */
   background-color: rgba(var(--v-theme-primary-rgb), 0.15) !important;
 }
 
 .nav-item .v-icon {
-  /* Color de los iconos inactivos - tono más suave */
-  color: #64748b !important;
-  transition: all 0.3s ease;
+  color: #64748B !important;
+  flex-shrink: 0 !important;
+  transition: color 0.3s ease !important;
+}
+
+.nav-item .v-list-item-title {
+  color: #475569 !important;
+  transition: color 0.3s ease !important;
 }
 
 .nav-item {
   border-radius: 12px !important;
   margin: 4px 8px !important;
+  padding: 8px 12px !important;
+  min-height: 48px !important;
   transition: all 0.2s ease-in-out !important;
+}
+
+.nav-item .v-list-item-title {
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  font-size: 0.9375rem !important;
 }
 
 /* Efecto al pasar el ratón sobre un elemento inactivo */
 .nav-item:not(.v-list-item--active):hover {
-  background-color: rgba(59, 130, 246, 0.08) !important;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+  background-color: rgba(44, 62, 80, 0.15) !important;
+  box-shadow: 0 4px 12px rgba(44, 62, 80, 0.1);
   transform: translateX(4px);
   transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
 }
 
 .nav-item:not(.v-list-item--active):hover .v-icon,
 .nav-item:not(.v-list-item--active):hover .v-list-item-title {
-  color: rgb(45, 45, 54) !important;
+  color: #2c3e50 !important;
   transition: color 0.3s ease;
 }
 
 /* Estilo para el elemento de navegación activo */
 .nav-item.v-list-item--active {
-  background: linear-gradient(135deg, #2c3e50, rgb(80, 116, 153)) !important;
+  background: #2c3e50 !important;
   color: white !important;
-  box-shadow: 0 6px 20px -4px rgba(37, 99, 235, 0.4) !important;
+  box-shadow: 0 6px 20px -4px rgba(44, 62, 80, 0.5) !important;
 }
 
-.nav-item.v-list-item--active .v-icon,
+.nav-item.v-list-item--active .v-icon {
+  color: white !important;
+}
+
 .nav-item.v-list-item--active .v-list-item-title {
+  color: white !important;
+  font-weight: 600 !important;
+}
+
+/* Estilos para el submenú */
+.nav-group {
+  border-radius: 12px !important;
+  margin: 4px 8px !important;
+  overflow: visible !important;
+}
+
+.nav-group :deep(.v-list-group__items) {
+  background: rgba(0, 0, 0, 0.02) !important;
+  border-radius: 0 0 12px 12px !important;
+  padding: 6px 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  margin-top: 2px !important;
+  overflow: visible !important;
+}
+
+/* Eliminar padding interno de Vuetify que desplaza a la derecha */
+.nav-group :deep(.v-list-group__items) {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+.nav-group :deep(.v-list-group__items .v-list-item) {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  min-width: 0 !important; /* Permitir que el contenido se ajuste */
+}
+
+/* Asegurar que el wrapper del item no agregue padding */
+.nav-group :deep(.v-list-group__items .v-list-item .v-list-item__content) {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+  overflow: visible !important;
+}
+
+/* Forzar que el drawer no trunque el contenido */
+.custom-navigation-drawer :deep(.v-list-group__items) {
+  overflow: visible !important;
+  max-width: 100% !important;
+}
+
+.custom-navigation-drawer :deep(.v-list-item) {
+  overflow: visible !important;
+  max-width: 100% !important;
+}
+
+.nav-item-parent {
+  border-radius: 12px !important;
+  font-weight: 500 !important;
+  min-height: 48px !important;
+  padding: 8px 12px !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.nav-item-parent .v-list-item-title {
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  font-size: 0.9375rem !important;
+  color: #475569 !important;
+  transition: color 0.3s ease !important;
+}
+
+.nav-item-parent .v-icon {
+  color: #64748B !important;
+  flex-shrink: 0 !important;
+  transition: color 0.3s ease !important;
+}
+
+.nav-item-parent:hover {
+  background-color: rgba(44, 62, 80, 0.15) !important;
+  transform: translateX(4px);
+}
+
+.nav-item-parent:hover .v-icon,
+.nav-item-parent:hover .v-list-item-title {
+  color: #2c3e50 !important;
+}
+
+.nav-item-child {
+  border-radius: 8px !important;
+  margin: 2px 8px 2px 0 !important; /* Sin margin izquierdo, solo derecho */
+  min-height: 38px !important;
+  padding: 5px 8px !important;
+  padding-left: 12px !important; /* Padding izquierdo reducido para mejor alineación */
+  transition: all 0.2s ease-in-out !important;
+}
+
+.nav-item-child .v-list-item-title {
+  white-space: nowrap !important; /* Mantener en una línea */
+  overflow: visible !important; /* No ocultar texto */
+  text-overflow: clip !important; /* No truncar con ellipsis */
+  font-size: 0.8125rem !important;
+  font-weight: 500 !important;
+  color: #475569 !important;
+  transition: color 0.3s ease !important;
+  line-height: 1.3 !important;
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+}
+
+.nav-item-child .v-icon {
+  color: #64748B !important;
+  transition: color 0.3s ease !important;
+  font-size: 16px !important;
+}
+
+.nav-item-child .v-list-item__prepend {
+  flex-shrink: 0 !important;
+  margin-right: 8px !important;
+  margin-left: 0 !important;
+  min-width: 20px !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  width: auto !important;
+}
+
+/* Asegurar que el contenido del item no tenga padding adicional */
+.nav-item-child :deep(.v-list-item__content) {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  min-width: 0 !important;
+  overflow: visible !important;
+  flex: 1 1 auto !important;
+}
+
+/* Asegurar que el título tenga espacio completo */
+.nav-item-child :deep(.v-list-item-title) {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  overflow: visible !important;
+  white-space: normal !important;
+}
+
+.nav-item-child:hover {
+  background: rgba(var(--v-theme-primary), 0.08) !important;
+  transform: translateX(4px);
+}
+
+.nav-item-child:hover .v-icon {
+  color: rgb(var(--v-theme-primary)) !important;
+}
+
+.nav-item-child:hover .v-list-item-title {
+  color: rgb(var(--v-theme-primary)) !important;
+}
+
+.nav-item-child.v-list-item--active {
+  background: rgba(var(--v-theme-primary), 0.15) !important;
+  font-weight: 600 !important;
+  border-left: 3px solid rgb(var(--v-theme-primary)) !important;
+  padding-left: 0px !important; /* 3px border + 9px padding = 12px total, igual que no activo */
+}
+
+.nav-item-child.v-list-item--active .v-icon {
+  color: rgb(var(--v-theme-primary)) !important;
+}
+
+.nav-item-child.v-list-item--active .v-list-item-title {
+  color: rgb(var(--v-theme-primary)) !important;
+}
+
+.v-list-group--active > .v-list-item .v-icon {
+  color: rgb(var(--v-theme-primary)) !important;
+}
+
+.v-list-group--active > .v-list-item .v-list-item-title {
+  color: rgb(var(--v-theme-primary)) !important;
+}
+
+/* Cuando el grupo está expandido, resaltar el activador si algún hijo está activo */
+.v-list-group--active .nav-item-parent {
+  background: rgba(var(--v-theme-primary), 0.05) !important;
+}
+
+/* Asegurar que el menú expandido no se corte */
+.nav-group :deep(.v-list-group__header) {
+  overflow: visible !important;
+}
+
+/* Asegurar espaciado consistente en el drawer */
+.custom-navigation-drawer :deep(.v-list) {
+  padding: 8px 0 !important;
+}
+
+/* Asegurar que todos los elementos tengan el mismo color base */
+.custom-navigation-drawer .v-list-item {
+  color: #475569 !important;
+}
+
+.custom-navigation-drawer .v-list-item .v-icon {
+  color: #64748B !important;
+}
+
+/* Mejorar la visibilidad en modo mini */
+.custom-navigation-drawer.v-navigation-drawer--mini-variant .nav-item .v-list-item-title,
+.custom-navigation-drawer.v-navigation-drawer--mini-variant .nav-group {
+  opacity: 0 !important;
+  width: 0 !important;
+}
+
+.custom-navigation-drawer.v-navigation-drawer--mini-variant .nav-item {
+  justify-content: center !important;
+  padding: 8px !important;
+}
+
+.custom-navigation-drawer.v-navigation-drawer--mini-variant .nav-item .v-icon {
+  color: #64748B !important;
+  margin: 0 !important;
+}
+
+.custom-navigation-drawer.v-navigation-drawer--mini-variant .nav-item.v-list-item--active .v-icon {
   color: white !important;
 }
 
@@ -265,21 +592,9 @@ async function handleLogout() {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
 }
 
-/* Estilos para el botón de nuevo proyecto */
-.new-project-btn {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  font-weight: 600;
-  color: white !important;
-}
-
-.new-project-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(0, 184, 148, 0.3);
-}
-
 /* Estilos para el menú de usuario */
 .user-menu-list {
-  min-width: 260px !important;
+  min-width: 280px !important;
   border-radius: 16px !important;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12) !important;
 }
@@ -313,24 +628,87 @@ async function handleLogout() {
 }
 
 /* Ajustes responsivos */
-@media (max-width: 599px) {
-  .new-project-btn {
-    display: none;
+/* Responsive Design Improvements */
+@media (max-width: 960px) {
+  .app-bar-style {
+    padding: 0 12px !important;
+  }
+  
+  .custom-navigation-drawer {
+    margin: 0 !important;
+    border-radius: 0 !important;
+    max-height: 100% !important;
+  }
+  
+  .main-content {
+    padding: 16px;
   }
 }
 
+@media (max-width: 768px) {
+  .app-bar-style {
+    padding: 0 8px !important;
+  }
+  
+  .main-content {
+    padding: 12px;
+  }
+  
+  .nav-item {
+    margin: 2px 4px !important;
+  }
+}
+
+@media (max-width: 599px) {
+  .app-bar-style {
+    padding: 0 4px !important;
+  }
+  
+  .main-content {
+    padding: 8px;
+  }
+  
+  /* Full screen dialogs on mobile */
+  :deep(.v-dialog) {
+    margin: 0 !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    border-radius: 0 !important;
+  }
+}
+
+
+</style>
+
+<style scoped>
 /* Animación de transición para las vistas */
-.slide-fade-enter-active {
-  transition: all 0.3s ease-out;
+/* Transiciones optimizadas para mejor rendimiento */
+.fade-slide-enter-active {
+  transition: opacity 0.2s ease-out, transform 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-.slide-fade-leave-active {
-  transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1);
+.fade-slide-leave-active {
+  transition: opacity 0.15s ease-in, transform 0.2s cubic-bezier(0.4, 0, 0.6, 1);
 }
 
-.slide-fade-enter-from,
-.slide-fade-leave-to {
-  transform: translateY(20px);
+.fade-slide-enter-from {
   opacity: 0;
+  transform: translateY(10px);
+}
+
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-5px);
+}
+
+.fade-slide-enter-to,
+.fade-slide-leave-from {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Optimización para prevenir reflows durante la transición */
+.v-main > * {
+  will-change: opacity, transform;
 }
 </style>

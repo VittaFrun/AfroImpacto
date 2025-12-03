@@ -26,7 +26,7 @@
     <div class="afro-grid afro-grid-4 mb-6">
       <div class="afro-metric-card afro-card-elevated">
         <div class="metric-content">
-          <div class="afro-metric-value">{{ publicProjects.length }}</div>
+          <div class="afro-metric-value">{{ totalProjects }}</div>
           <div class="afro-metric-label">Proyectos Activos</div>
           <div class="metric-icon">
             <v-icon size="32" color="success">mdi-check-circle</v-icon>
@@ -118,19 +118,17 @@
       <p class="afro-body mt-4">Cargando proyectos...</p>
     </div>
 
-    <div v-else-if="filteredProjects.length === 0" class="afro-empty-state">
-      <div class="afro-empty-state-icon">
-        <v-icon size="64" color="grey-lighten-1">mdi-folder-search-outline</v-icon>
-      </div>
-      <div class="afro-empty-state-title">No hay proyectos disponibles</div>
-      <div class="afro-empty-state-description">
-        {{ search ? 'No se encontraron proyectos con los filtros aplicados' : 'No hay proyectos públicos disponibles en este momento' }}
-      </div>
-    </div>
+    <EmptyState
+      v-else-if="publicProjects.length === 0"
+      icon="mdi-folder-search-outline"
+      title="No hay proyectos disponibles"
+      :description="search ? 'No se encontraron proyectos con los filtros aplicados' : 'No hay proyectos públicos disponibles en este momento'"
+      :variant="search ? 'search' : 'no-data'"
+    />
 
     <div v-else class="projects-grid">
       <div
-        v-for="project in paginatedProjects"
+        v-for="project in publicProjects"
         :key="project.id"
         class="project-card afro-card-elevated"
         @click="viewProject(project)"
@@ -556,21 +554,22 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { usePublicProjectStore } from '@/features/volunteer/stores/publicProjectStore';
 import { storeToRefs } from 'pinia';
 import VolunteerEnrollmentForm from '@/features/volunteer/components/VolunteerEnrollmentForm.vue';
 import { formatDate, formatDateRange } from '@/utils/formatters';
 import defaultProjectImage from '@/assets/images/background_login.png';
+import EmptyState from '@/components/feedback/EmptyState.vue';
 
 const publicProjectStore = usePublicProjectStore();
-const { loading, publicProjects } = storeToRefs(publicProjectStore);
+const { loading, publicProjects, pagination, availableFilters } = storeToRefs(publicProjectStore);
 
 // Reactive data
 const search = ref('');
 const locationFilter = ref('');
 const categoryFilter = ref('');
-const sortBy = ref('name');
+const sortBy = ref('recent');
 const currentPage = ref(1);
 const itemsPerPage = ref(9);
 const projectDetailDialog = ref(false);
@@ -578,77 +577,23 @@ const enrollmentDialog = ref(false);
 const selectedProject = ref(null);
 const joinedProjects = ref([]);
 const enrollmentSuccess = ref(false);
+let fetchTimeout = null;
 
 // Computed properties
-const categoryOptions = computed(() => {
-  const categories = [...new Set(publicProjects.value.map(p => p.category))];
-  return categories;
-});
+const categoryOptions = computed(() => availableFilters.value.categories || []);
 
 const sortOptions = computed(() => [
+  { title: 'Más recientes', value: 'recent' },
   { title: 'Nombre', value: 'name' },
   { title: 'Fecha de inicio', value: 'startDate' },
   { title: 'Presupuesto', value: 'budget' },
   { title: 'Ubicación', value: 'location' }
 ]);
 
-const locationOptions = computed(() => {
-  const locations = [...new Set(publicProjects.value.map(p => p.location))];
-  return locations;
-});
+const locationOptions = computed(() => availableFilters.value.locations || []);
 
-const filteredProjects = computed(() => {
-  let filtered = [...publicProjects.value];
-
-  // Search filter
-  if (search.value) {
-    const query = search.value.toLowerCase();
-    filtered = filtered.filter(project =>
-      project.name.toLowerCase().includes(query) ||
-      project.description.toLowerCase().includes(query) ||
-      project.location.toLowerCase().includes(query) ||
-      project.organization.toLowerCase().includes(query)
-    );
-  }
-
-  // Location filter
-  if (locationFilter.value) {
-    filtered = filtered.filter(project => project.location === locationFilter.value);
-  }
-
-  // Category filter
-  if (categoryFilter.value) {
-    filtered = filtered.filter(project => project.category === categoryFilter.value);
-  }
-
-  // Sort
-  filtered.sort((a, b) => {
-    switch (sortBy.value) {
-      case 'name':
-        return a.name.localeCompare(b.name);
-      case 'startDate':
-        return new Date(a.startDate) - new Date(b.startDate);
-      case 'budget':
-        return b.budget - a.budget;
-      case 'location':
-        return a.location.localeCompare(b.location);
-      default:
-        return 0;
-    }
-  });
-
-  return filtered;
-});
-
-const paginatedProjects = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage.value;
-  const end = start + itemsPerPage.value;
-  return filteredProjects.value.slice(start, end);
-});
-
-const totalPages = computed(() => {
-  return Math.ceil(filteredProjects.value.length / itemsPerPage.value);
-});
+const totalPages = computed(() => pagination.value.totalPages || 1);
+const totalProjects = computed(() => pagination.value.total || 0);
 
 const totalVolunteers = computed(() => {
   return publicProjects.value.reduce((sum, p) => sum + (p.volunteersCount || 0), 0);
@@ -681,7 +626,7 @@ function onEnrollmentSuccess() {
   enrollmentDialog.value = false;
   projectDetailDialog.value = false;
   // Recargar proyectos para actualizar contadores
-  publicProjectStore.fetchPublicProjects();
+  loadProjects();
 }
 
 function onEnrollmentError(error) {
@@ -693,7 +638,7 @@ function isAlreadyJoined(project) {
 }
 
 async function refreshProjects() {
-  await publicProjectStore.fetchPublicProjects();
+  await loadProjects();
 }
 
 function getCategoryColor(category) {
@@ -777,9 +722,49 @@ function getPaymentFrequencyText(frequency) {
   return frequencies[frequency] || '';
 }
 
+function triggerFetch() {
+  clearTimeout(fetchTimeout);
+  fetchTimeout = setTimeout(() => {
+    loadProjects();
+  }, 400);
+}
+
+function scheduleFetch(resetPage = false) {
+  if (resetPage && currentPage.value !== 1) {
+    currentPage.value = 1;
+    return;
+  }
+  triggerFetch();
+}
+
+async function loadProjects() {
+  await publicProjectStore.fetchPublicProjects({
+    search: search.value || undefined,
+    location: locationFilter.value || undefined,
+    category: categoryFilter.value || undefined,
+    sort: sortBy.value || 'recent',
+    page: currentPage.value,
+    limit: itemsPerPage.value,
+  });
+
+  const maxPage = pagination.value.totalPages || 1;
+  if (currentPage.value > maxPage) {
+    currentPage.value = maxPage;
+  }
+}
+
+watch([search, locationFilter, categoryFilter, sortBy], () => {
+  scheduleFetch(true);
+});
+
+watch(currentPage, (newPage, oldPage) => {
+  if (newPage !== oldPage) {
+    triggerFetch();
+  }
+});
+
 onMounted(async () => {
-  // Load projects data from API
-  await publicProjectStore.fetchPublicProjects();
+  await loadProjects();
 });
 </script>
 

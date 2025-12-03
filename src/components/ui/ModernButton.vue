@@ -10,6 +10,8 @@
     :class="buttonClass"
     v-bind="$attrs"
     @click="handleClick"
+    @keydown.enter="handleKeydown"
+    @keydown.space.prevent="handleKeydown"
   >
     <slot>{{ text }}</slot>
   </v-btn>
@@ -86,7 +88,18 @@ const buttonClass = computed(() => {
 });
 
 function handleClick(event) {
-  emit('click', event);
+  if (!props.disabled && !props.loading) {
+    emit('click', event);
+  }
+}
+
+function handleKeydown(event) {
+  if (event.key === 'Enter' || event.key === ' ') {
+    event.preventDefault();
+    if (!props.disabled && !props.loading) {
+      emit('click', event);
+    }
+  }
 }
 </script>
 
@@ -194,9 +207,4 @@ function handleClick(event) {
   box-shadow: none !important;
 }
 
-/* Focus state */
-.modern-button:focus-visible {
-  outline: 2px solid rgba(var(--v-theme-primary-rgb), 0.5) !important;
-  outline-offset: 2px !important;
-}
 </style>

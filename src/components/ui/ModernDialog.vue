@@ -7,22 +7,29 @@
     :fullscreen="fullscreen"
     :class="dialogClass"
     @update:model-value="handleDialogChange"
+    @keydown.esc="handleEscape"
   >
-    <v-card class="modern-dialog-card">
+    <v-card class="modern-dialog-card" ref="dialogCard">
       <!-- Header -->
-      <v-card-title v-if="showHeader" class="modern-dialog-header">
+      <v-card-title 
+        v-if="showHeader" 
+        class="modern-dialog-header"
+      >
         <div class="d-flex align-center w-100">
           <v-avatar 
             v-if="icon" 
             :color="iconColor" 
-            class="mr-4"
-            size="48"
-          >
+        class="mr-4"
+        size="48"
+      >
             <v-icon color="white" size="24">{{ icon }}</v-icon>
           </v-avatar>
           <div class="flex-grow-1">
             <h2 class="text-h5 font-weight-bold mb-1">{{ title }}</h2>
-            <p v-if="subtitle" class="text-body-2 text-grey mb-0">{{ subtitle }}</p>
+            <p 
+              v-if="subtitle" 
+              class="text-body-2 text-grey mb-0"
+            >{{ subtitle }}</p>
           </div>
           <v-btn
             v-if="showCloseButton"
@@ -66,6 +73,7 @@
             :loading="cancelLoading"
             class="modern-btn"
             size="large"
+            ref="cancelButton"
           >
             <v-icon start>mdi-close</v-icon>
             {{ cancelText }}
@@ -82,6 +90,7 @@
             :disabled="confirmDisabled"
             class="modern-btn"
             size="large"
+            ref="confirmButton"
           >
             <v-icon start>{{ confirmIcon }}</v-icon>
             {{ confirmText }}
@@ -93,7 +102,7 @@
 </template>
 
 <script setup>
-import { computed, watch } from 'vue';
+import { computed, watch, ref, onMounted, onBeforeUnmount, nextTick } from 'vue';
 
 const props = defineProps({
   modelValue: {
@@ -210,6 +219,12 @@ const dialogModel = computed({
   set: (value) => emit('update:modelValue', value)
 });
 
+// Refs
+const dialogCard = ref(null);
+const cancelButton = ref(null);
+const confirmButton = ref(null);
+let previousActiveElement = null;
+
 const dialogClass = computed(() => {
   const classes = ['modern-dialog'];
   if (props.fullscreen) {
@@ -255,6 +270,12 @@ function handleConfirm() {
   }
 }
 
+function handleEscape() {
+  if (!props.persistent) {
+    closeDialog();
+  }
+}
+
 // Watch for external changes
 watch(() => props.modelValue, (newValue) => {
   if (newValue) {
@@ -264,6 +285,10 @@ watch(() => props.modelValue, (newValue) => {
     // Dialog closed
     document.body.style.overflow = '';
   }
+});
+
+onBeforeUnmount(() => {
+  document.body.style.overflow = '';
 });
 </script>
 
@@ -345,18 +370,24 @@ watch(() => props.modelValue, (newValue) => {
 
 /* Animation for dialog entrance */
 .modern-dialog {
-  animation: slideInUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: modalEnter 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@keyframes slideInUp {
+@keyframes modalEnter {
   from {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(-20px) scale(0.95);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
+}
+
+/* Backdrop blur effect */
+:deep(.v-overlay__scrim) {
+  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.4) !important;
 }
 
 /* Responsive adjustments */
@@ -414,11 +445,6 @@ watch(() => props.modelValue, (newValue) => {
   border-radius: 12px !important;
 }
 
-/* Focus states */
-.modern-btn:focus-visible {
-  outline: 2px solid rgba(var(--v-theme-primary-rgb), 0.5) !important;
-  outline-offset: 2px !important;
-}
 
 /* Icon spacing */
 .modern-btn:deep(.v-btn__prepend) {

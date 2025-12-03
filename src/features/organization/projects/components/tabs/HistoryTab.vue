@@ -6,11 +6,11 @@
         <v-card-text class="pa-4">
           <div class="d-flex align-center justify-space-between flex-wrap gap-3">
             <div>
-              <h2 class="text-h6 font-weight-bold mb-1">
+              <h2 class="text-h6 font-weight-bold mb-1 history-title">
                 <v-icon class="mr-2" color="primary">mdi-history</v-icon>
                 Historial de Eliminaciones
               </h2>
-              <p class="text-body-2 text-grey mb-0">
+              <p class="text-body-2 history-subtitle mb-0">
                 Registro de todas las eliminaciones realizadas en este proyecto
               </p>
             </div>
@@ -212,6 +212,27 @@ onMounted(() => {
 <style scoped>
 .v-timeline-item {
   min-height: 80px;
+}
+
+/* Asegurar contraste en títulos */
+.history-title {
+  color: rgba(0, 0, 0, 0.87) !important;
+}
+
+.history-subtitle {
+  color: rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Asegurar que todos los textos sean visibles */
+.v-card-text h2,
+.v-card-text h3,
+.v-card-text .text-h6 {
+  color: rgba(0, 0, 0, 0.87) !important;
+}
+
+.v-card-text .text-grey,
+.v-card-text .text-body-2 {
+  color: rgba(0, 0, 0, 0.6) !important;
 }
 </style>
 

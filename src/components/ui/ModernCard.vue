@@ -28,7 +28,10 @@
     </v-card-title>
 
     <!-- Content Section -->
-    <v-card-text :class="contentClass" :style="contentStyle">
+    <v-card-text 
+      :class="contentClass" 
+      :style="contentStyle"
+    >
       <slot>
         <div v-if="loading" class="d-flex justify-center align-center py-8">
           <v-progress-circular indeterminate :color="loadingColor" size="48"></v-progress-circular>
@@ -81,7 +84,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 
 const props = defineProps({
   title: {
@@ -201,10 +204,11 @@ const props = defineProps({
     type: String,
     default: '135deg',
     validator: (value) => ['45deg', '90deg', '135deg', '180deg', '225deg', '270deg', '315deg'].includes(value)
-  }
+  },
 });
 
 const emit = defineEmits(['confirm', 'cancel']);
+
 
 const cardClass = computed(() => {
   const classes = ['modern-card'];
@@ -293,6 +297,7 @@ function handleConfirm() {
   word-wrap: break-word !important;
   overflow-wrap: break-word !important;
   hyphens: auto !important;
+  color: rgba(0, 0, 0, 0.87) !important; /* Color oscuro para contraste */
 }
 
 .gradient-card .modern-card-header {
@@ -375,11 +380,7 @@ function handleConfirm() {
   }
 }
 
-/* Focus States */
-.modern-btn:focus-visible {
-  outline: 2px solid rgba(var(--v-theme-primary-rgb), 0.5) !important;
-  outline-offset: 2px !important;
-}
+
 
 /* Icon Spacing */
 .modern-btn:deep(.v-btn__prepend) {

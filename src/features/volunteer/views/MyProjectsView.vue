@@ -125,23 +125,24 @@
       </v-alert>
     </div>
 
-    <div v-else-if="filteredProjects.length === 0" class="afro-empty-state">
-      <div class="afro-empty-state-icon">
-        <v-icon size="64" color="grey-lighten-1">mdi-folder-heart-outline</v-icon>
-      </div>
-      <div class="afro-empty-state-title">No hay proyectos</div>
-      <div class="afro-empty-state-description">
-        {{ searchQuery ? 'No se encontraron proyectos con los filtros aplicados' : 'Aún no te has unido a ningún proyecto' }}
-      </div>
-      <v-btn
-        color="primary"
-        variant="outlined"
-        @click="browseProjects"
-        class="mt-4"
-      >
-        Explorar Proyectos
-      </v-btn>
-    </div>
+    <EmptyState
+      v-else-if="filteredProjects.length === 0"
+      icon="mdi-folder-heart-outline"
+      :title="searchQuery ? 'No se encontraron proyectos' : 'No hay proyectos'"
+      :description="searchQuery ? 'No se encontraron proyectos con los filtros aplicados' : 'Aún no te has unido a ningún proyecto'"
+      :variant="searchQuery ? 'search' : 'no-data'"
+    >
+      <template #actions>
+        <v-btn
+          color="primary"
+          variant="outlined"
+          prepend-icon="mdi-folder-search"
+          @click="browseProjects"
+        >
+          Explorar Proyectos
+        </v-btn>
+      </template>
+    </EmptyState>
 
     <div v-else class="projects-grid">
       <div
@@ -265,6 +266,7 @@ import { useAuthStore } from '@/features/auth/stores/authStore';
 import { useVolunteerStore } from '@/features/volunteer/stores/volunteerStore';
 import { ROUTES } from '@/constants/routes';
 import defaultProjectImage from '@/assets/images/background_login.png';
+import EmptyState from '@/components/feedback/EmptyState.vue';
 
 const router = useRouter();
 const authStore = useAuthStore();

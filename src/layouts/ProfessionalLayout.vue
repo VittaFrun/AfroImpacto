@@ -168,7 +168,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { useAuthStore } from '@/features/auth/stores/authStore';
 import GlobalSearch from '@/components/ui/GlobalSearch.vue';
-import NotificationBell from '@/components/ui/NotificationBell.vue';
+import NotificationBell from '@/components/notifications/NotificationBell.vue';
 
 const route = useRoute();
 const router = useRouter();

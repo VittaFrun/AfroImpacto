@@ -295,37 +295,11 @@
 }
 
 /* ========================================
-   FOCUS STATES
-   ======================================== */
-.focus-ring:focus-visible {
-  outline: 2px solid var(--afro-primary);
-  outline-offset: 2px;
-}
-
-/* ========================================
    TRUNCATE TEXT
    ======================================== */
 .truncate {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-/* ========================================
-   REDUCED MOTION SUPPORT
-   ======================================== */
-@media (prefers-reduced-motion: reduce) {
-  .animate-slide-in-up,
-  .animate-fade-in-up,
-  .animate-slide-in-left,
-  .animate-slide-in-right,
-  .animate-pulse,
-  .animate-bounce,
-  .hover-lift:hover,
-  .hover-scale:hover {
-    animation: none !important;
-    transition: none !important;
-    transform: none !important;
-  }
 }
 

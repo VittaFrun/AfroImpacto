@@ -69,7 +69,7 @@ export const useVolunteerStore = defineStore('volunteer', {
 
     async fetchProjectTasks(projectId) {
       try {
-        const response = await api.get(`/asignacion/voluntario/proyecto/${projectId}`);
+        const response = await api.get(`/projects/${projectId}/volunteer-tasks`);
         return response.data || [];
       } catch (error) {
         console.error('Error fetching project tasks:', error);
@@ -91,7 +91,14 @@ export const useVolunteerStore = defineStore('volunteer', {
       this.loadingProjects = true;
       this.errorProjects = null;
       try {
+        // El endpoint /projects devuelve los proyectos del voluntario cuando el usuario es voluntario
         const response = await api.get('/projects');
+        
+        if (!response.data || !Array.isArray(response.data)) {
+          console.warn('Respuesta inesperada del servidor:', response.data);
+          this.myProjects = [];
+          return;
+        }
         
         // Mapear datos del backend al formato del frontend
         this.myProjects = (response.data || []).map(proyecto => {

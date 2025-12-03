@@ -218,12 +218,15 @@ export const useProjectStore = defineStore('project', () => {
       
       const index = allProjects.value.findIndex(p => p.id === id);
       if (index !== -1) {
-        allProjects.value[index] = project;
+        // Actualizar el proyecto existente con una nueva referencia para forzar reactividad
+        allProjects.value[index] = { ...project };
       } else {
         allProjects.value.push(project);
       }
       
-      return project;
+      invalidateCache(); // Invalidar caché al obtener proyecto individual
+      // Devolver una nueva referencia para asegurar reactividad
+      return { ...project };
     } catch (err) {
       console.error(`Error fetching project with id ${id}:`, err);
       error.value = 'Failed to fetch project details. Please try again later.';
@@ -425,6 +428,36 @@ export const useProjectStore = defineStore('project', () => {
                           err.response?.data?.error || 
                           err.message || 
                           'Error al actualizar la fase. Por favor, inténtalo de nuevo.';
+      error.value = errorMessage;
+      throw new Error(errorMessage);
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  async function reorderProjectPhases(projectId, newOrder) {
+    loading.value = true;
+    error.value = null;
+    
+    try {
+      // El backend espera un array de { id_fase, orden }
+      const response = await axios.post(`/fase/proyecto/${projectId}/reorder`, newOrder, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      // El backend devuelve las fases actualizadas
+      // Necesitamos refrescar el proyecto completo para obtener las fases actualizadas
+      await fetchProjectById(projectId);
+      
+      return response.data;
+    } catch (err) {
+      console.error(`Error reordering phases in project with id ${projectId}:`, err);
+      const errorMessage = err.response?.data?.message || 
+                          err.response?.data?.error || 
+                          err.message || 
+                          'Error al reordenar las fases. Por favor, inténtalo de nuevo.';
       error.value = errorMessage;
       throw new Error(errorMessage);
     } finally {
@@ -653,6 +686,7 @@ export const useProjectStore = defineStore('project', () => {
     // Phase management (legacy methods)
     addProjectPhase,
     updateProjectPhase,
+    reorderProjectPhases,
     deleteProjectPhase,
     // Task management (legacy methods)
     addProjectTask,

@@ -1,0 +1,115 @@
+/* ========================================
+   PROFESSIONAL HOVER STATES
+   Mejoras en estados hover para mejor UX
+   ======================================== */
+
+/* Botones con hover mejorado */
+.v-btn {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.v-btn:hover:not(:disabled) {
+  transform: scale(1.02);
+}
+
+.v-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+/* ModernButton hover mejorado */
+.modern-button:hover:not(:disabled),
+.modern-btn:hover:not(:disabled) {
+  transform: translateY(-1px) scale(1.01);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.modern-button:active:not(:disabled),
+.modern-btn:active:not(:disabled) {
+  transform: translateY(0) scale(0.99);
+}
+
+/* Cards con hover mejorado */
+.v-card {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+}
+
+.v-card:hover {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+}
+
+/* Professional cards hover */
+.professional-card:hover,
+.professional-metric-card:hover,
+.professional-section-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Chips con hover */
+.v-chip {
+  transition: all 0.2s ease !important;
+}
+
+.v-chip:hover {
+  transform: scale(1.05);
+}
+
+/* Iconos con hover */
+.v-icon {
+  transition: all 0.2s ease !important;
+}
+
+.v-btn:hover .v-icon {
+  transform: scale(1.1);
+}
+
+/* Tooltips mejorados */
+.v-tooltip .v-overlay__content {
+  animation: tooltipFadeIn 0.2s ease-out;
+}
+
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Inputs con focus mejorado */
+.v-text-field:focus-within,
+.v-select:focus-within,
+.v-textarea:focus-within {
+  transform: scale(1.01);
+  transition: transform 0.2s ease;
+}
+
+/* List items con hover */
+.v-list-item:hover {
+  background: rgba(var(--v-theme-primary), 0.05) !important;
+  transition: background 0.2s ease;
+}
+
+/* Tabs con hover */
+.v-tab:hover {
+  background: rgba(var(--v-theme-primary), 0.05) !important;
+}
+
+/* Smooth transitions globales */
+* {
+  transition-property: transform, box-shadow, border-color, background-color, opacity;
+  transition-duration: 0.2s, 0.3s, 0.2s, 0.2s, 0.2s;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Excepciones para elementos que no deben tener transición */
+.v-progress-circular,
+.v-progress-linear,
+.v-skeleton-loader {
+  transition: none !important;
+}
+

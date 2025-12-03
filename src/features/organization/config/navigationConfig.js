@@ -31,10 +31,10 @@ export const navigationItems = [
     ]
   },
   {
-    id: 'volunteers',
-    title: 'Voluntarios',
+    id: 'team',
+    title: 'Equipo',
     icon: 'mdi-account-group',
-    route: '/organization/dashboard/volunteers'
+    route: '/organization/dashboard/team'
   },
   {
     id: 'donations',
@@ -47,6 +47,13 @@ export const navigationItems = [
     title: 'Reportes',
     icon: 'mdi-file-chart',
     route: '/organization/dashboard/reports'
+  },
+  {
+    id: 'messages',
+    title: 'Mensajes',
+    icon: 'mdi-message-text',
+    route: '/messages',
+    badge: 'unread' // Se puede actualizar dinámicamente con el contador
   },
   {
     id: 'settings',

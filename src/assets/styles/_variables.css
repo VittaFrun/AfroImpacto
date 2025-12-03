@@ -179,26 +179,4 @@
   }
 } */
 
-/* ========================================
-   HIGH CONTRAST MODE SUPPORT
-   ======================================== */
-@media (prefers-contrast: high) {
-  :root {
-    --afro-border: #000000;
-    --afro-text-primary: #000000;
-    --afro-text-secondary: #333333;
-  }
-}
-
-/* ========================================
-   REDUCED MOTION SUPPORT
-   ======================================== */
-@media (prefers-reduced-motion: reduce) {
-  :root {
-    --afro-transition-fast: 0ms;
-    --afro-transition-base: 0ms;
-    --afro-transition-normal: 0ms;
-    --afro-transition-slow: 0ms;
-  }
-}
 

@@ -31,63 +31,123 @@
             </v-breadcrumbs-item>
           </template>
         </v-breadcrumbs>
-      </div>
+          </div>
 
-      <!-- Header Compacto -->
-      <v-card class="mb-4 project-header-card elevation-1" rounded="lg">
-        <v-card-text class="pa-4">
-          <v-row align="center" no-gutters>
-            <v-col cols="12" md="8">
-              <div class="d-flex align-center flex-wrap mb-2 gap-2">
-                <h1 class="text-h5 font-weight-bold text-grey-darken-2 mr-3">
+      <!-- Header con Banner - Estilo Voluntarios -->
+      <div class="workspace-header-card mb-6">
+        <div class="header-image-container">
+          <v-img
+            :src="projectImage"
+            height="240"
+            cover
+            class="header-image"
+            gradient="to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.7)"
+          >
+            <div class="header-overlay">
+              <div class="header-content">
+                <div class="d-flex align-center mb-3">
+                  <v-btn
+                    icon="mdi-arrow-left"
+                    variant="text"
+                    color="white"
+                    @click="router.back()"
+                    class="mr-4"
+                  ></v-btn>
+                  <v-breadcrumbs
+                    :items="breadcrumbItems"
+                    class="pa-0"
+                    color="white"
+                    density="compact"
+                  >
+                    <template v-slot:divider>
+                      <v-icon size="small" color="white">mdi-chevron-right</v-icon>
+                    </template>
+                  </v-breadcrumbs>
+                </div>
+                <h1 class="text-h4 font-weight-bold text-white mb-3" style="color: white !important; text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);">
                   {{ project.name }}
                 </h1>
-                <v-chip 
-                  :color="getStatusColor(project.id_estado)" 
-                  size="small"
-                  class="mr-2"
-                >
-                  <v-icon start size="16">{{ getStatusIcon(project.id_estado) }}</v-icon>
-                  {{ getStatusText(project.id_estado) }}
-                </v-chip>
-                <v-chip 
-                  :color="project.es_publico ? 'success' : 'grey'" 
-                  variant="tonal"
-                  size="small"
-                >
-                  <v-icon start size="14">{{ project.es_publico ? 'mdi-eye' : 'mdi-eye-off' }}</v-icon>
-                  {{ project.es_publico ? 'Público' : 'Privado' }}
-                </v-chip>
+                <div class="d-flex align-center gap-3 flex-wrap mb-3">
+                  <v-chip
+                    :color="getStatusColor(project.id_estado)"
+                    size="small"
+                    variant="flat"
+                    prepend-icon="mdi-circle"
+                  >
+                    {{ getStatusText(project.id_estado) }}
+                  </v-chip>
+                  <v-chip
+                    :color="project.es_publico ? 'success' : 'grey'"
+                    size="small"
+                    variant="flat"
+                    prepend-icon="mdi-eye"
+                  >
+                    {{ project.es_publico ? 'Público' : 'Privado' }}
+                  </v-chip>
+                  <v-chip
+                    v-if="project.ubicacion"
+                    color="white"
+                    size="small"
+                    variant="flat"
+                    prepend-icon="mdi-map-marker"
+                  >
+                    {{ project.ubicacion }}
+                  </v-chip>
+                  <v-chip
+                    v-if="project.fecha_inicio && project.fecha_fin"
+                    color="white"
+                    size="small"
+                    variant="flat"
+                    prepend-icon="mdi-calendar-range"
+                  >
+                    {{ formatDateRange(project.fecha_inicio, project.fecha_fin) }}
+                  </v-chip>
+                </div>
+                <div class="d-flex align-center gap-2">
+                  <v-tooltip text="Editar información del proyecto" location="bottom">
+                    <template #activator="{ props }">
+                      <v-btn
+                        v-bind="props"
+                        color="white"
+                        variant="flat"
+                        prepend-icon="mdi-pencil"
+                        size="small"
+                        @click="openEditProjectDialog"
+                      >
+                        Editar
+                      </v-btn>
+                    </template>
+                  </v-tooltip>
+                </div>
               </div>
-              <p class="text-body-2 text-grey-darken-1 mb-0">
-                {{ project.description }}
+            </div>
+          </v-img>
+        </div>
+      </div>
+      
+      <!-- Información del Proyecto -->
+      <v-card class="mb-4 elevation-2" rounded="xl" variant="flat">
+        <v-card-text class="project-info-section pa-6">
+          <div class="d-flex align-start gap-4 flex-wrap">
+            <div class="project-description-modern">
+              <h3 class="text-subtitle-1 font-weight-bold mb-2">
+                <v-icon start color="primary">mdi-information</v-icon>
+                Descripción
+              </h3>
+              <p class="text-body-1 text-grey-darken-1 mb-0">
+                {{ project.description || 'Sin descripción' }}
               </p>
-            </v-col>
-            
-            <v-col cols="12" md="4" class="text-md-right mt-3 mt-md-0">
-              <div class="d-flex flex-wrap justify-md-end gap-2">
-                <ModernButton
-                  color="grey"
-                  variant="outlined"
-                  prepend-icon="mdi-arrow-left"
-                  @click="router.back()"
-                  size="small"
-                >
-                  Volver
-                </ModernButton>
-                
-                <ModernButton
-                  color="warning"
-                  variant="outlined"
-                  prepend-icon="mdi-pencil"
-                  @click="openEditProjectDialog"
-                  size="small"
-                >
-                  Editar
-                </ModernButton>
-              </div>
-            </v-col>
-          </v-row>
+            </div>
+            <div class="project-meta-modern" v-if="project.objetivo">
+              <h3 class="text-subtitle-1 font-weight-bold mb-2">
+                <v-icon start color="primary">mdi-target</v-icon>
+                Objetivo
+              </h3>
+              <p class="text-body-1 text-grey-darken-1 mb-0">
+                {{ project.objetivo }}
+              </p>
+            </div>
+          </div>
         </v-card-text>
       </v-card>
 
@@ -150,7 +210,7 @@
             <span class="tab-text">Configuración</span>
           </v-tab>
         </v-tabs>
-      </v-card>
+          </v-card>
 
       <!-- Tabs Content -->
       <v-window v-model="activeTab" class="mt-4">
@@ -170,11 +230,18 @@
             :format-currency="formatCurrency"
             :get-tipo-pago-text="getTipoPagoText"
             :get-frecuencia-text="getFrecuenciaText"
+            :get-phase-status="getPhaseStatus"
+            :get-phase-status-color="getPhaseStatusColor"
+            :get-phase-status-icon="getPhaseStatusIcon"
+            :get-phase-tasks-count="getPhaseTasksCount"
+            :get-phase-progress="getPhaseProgress"
+            :get-completed-tasks-by-phase="getCompletedTasksByPhase"
             @open-beneficio-dialog="openBeneficioDialog"
             @open-hours-dialog="openHorasDialog"
             @open-reports="openProjectReports"
             @export-data="exportProjectData"
             @toggle-visibility="toggleProjectVisibility"
+            @phase-click="handlePhaseClick"
           />
         </v-window-item>
 
@@ -192,6 +259,7 @@
             :assignment-to-remove="assignmentToRemove"
             @open-role-management="openRoleManagement"
             @open-assign-volunteer="openAssignVolunteerDialog"
+            @open-bulk-assign-volunteers="openBulkAssignVolunteersDialog"
             @view-member-details="viewMemberDetails"
             @remove-all-member-assignments="removeAllMemberAssignments"
             @add-role="handleAddRole"
@@ -220,6 +288,8 @@
             @confirm-reject-all-pending="confirmRejectAllPending"
             @confirm-delete-all-active="confirmDeleteAllActive"
             @approve-all-pending="approveAllPending"
+            @bulk-update-solicitudes="handleBulkUpdateSolicitudes"
+            @bulk-delete-solicitudes="handleBulkDeleteSolicitudes"
           />
         </v-window-item>
 
@@ -229,19 +299,26 @@
             :project="project"
             :get-all-tasks="getAllTasks"
             :get-total-tasks="getTotalTasks"
+            :get-completed-tasks-count="getCompletedTasksCount"
             :tasks-by-phase="tasksByPhase"
             :get-completed-tasks-by-phase="getCompletedTasksByPhase"
             :get-phase-status="getPhaseStatus"
             :get-phase-status-color="getPhaseStatusColor"
+            :get-phase-status-icon="getPhaseStatusIcon"
+            :get-phase-progress="getPhaseProgress"
+            :get-phase-tasks-count="getPhaseTasksCount"
             :get-task-status-color="getTaskStatusColor"
             :get-task-status-icon="getTaskStatusIcon"
             :get-task-status="getTaskStatus"
             :get-priority-color="getPriorityColor"
+            :get-phase-name="getPhaseName"
+            :format-date-range="formatDateRange"
+            @reorder-phases="handleReorderPhases"
             @open-add-phase="openAddPhaseDialog"
             @edit-phase="openEditPhaseDialog"
             @delete-phase="openDeletePhaseDialog"
             @open-add-task="openAddTaskDialog"
-            @add-task-to-phase="openAddTaskDialog"
+            @add-task-to-phase="handleAddTaskToPhase"
             @edit-task="openEditTaskDialog"
             @delete-task="openDeleteTaskDialog"
             @update-task-status="updateTaskStatusFromKanban"
@@ -267,19 +344,21 @@
             :get-frecuencia-text="getFrecuenciaText"
             :format-currency="formatCurrency"
             :is-loading="isLoading"
+            :status-options="projectStatusOptions"
             @toggle-visibility="toggleProjectVisibility"
             @edit-project="openEditProjectDialog"
             @open-beneficio-dialog="openBeneficioDialog"
             @open-reports="openProjectReports"
             @export-data="exportProjectData"
             @delete-project="openDeleteProjectDialog"
+            @update-status="handleStatusUpdate"
           />
         </v-window-item>
       </v-window>
-    </div>
+                </div>
 
     <div v-else>
-      <v-alert type="warning" prominent>
+       <v-alert type="warning" prominent>
         No se pudo encontrar el proyecto.
       </v-alert>
     </div>
@@ -299,6 +378,8 @@
       :errors="errors"
       :get-task-status-color="getTaskStatusColor"
       :get-task-status-icon="getTaskStatusIcon"
+      :project-start-date="project?.startDate || project?.fecha_inicio"
+      :project-end-date="project?.endDate || project?.fecha_fin"
       :get-task-status="getTaskStatus"
       :get-priority-color="getPriorityColor"
       :format-date-range="formatDateRange"
@@ -313,6 +394,8 @@
       :phase="currentPhase"
       :loading="isLoading('addingPhase') || isLoading('updatingPhase')"
       :errors="errors"
+      :project-start-date="project?.startDate || project?.fecha_inicio"
+      :project-end-date="project?.endDate || project?.fecha_fin"
       @save="handlePhaseSave"
     />
 
@@ -339,6 +422,39 @@
       @save="handleAssignVolunteer"
     />
 
+    <!-- Bulk Assign Volunteers Dialog -->
+    <BulkAssignVolunteersDialog
+      v-model="bulkAssignVolunteersDialog"
+      :tasks="getAllTasks()"
+      :available-volunteers="availableVolunteers"
+      :available-project-roles="availableProjectRoles"
+      :roles-loading="roleStore.loading"
+      :loading="isLoading('bulkAssigningVolunteers')"
+      :get-role-type-color="getRoleTypeColor"
+      :get-role-type-label="getRoleTypeLabel"
+      :get-task-status-color="getTaskStatusColor"
+      :get-task-status="getTaskStatusText"
+      :get-phase-name="getPhaseName"
+      @save="handleBulkAssignVolunteers"
+    />
+
+    <!-- Assign After Approval Dialog -->
+    <AssignAfterApprovalDialog
+      v-model="assignAfterApprovalDialog"
+      v-if="approvedVolunteer"
+      :volunteer-id="approvedVolunteer.id"
+      :volunteer-name="approvedVolunteer.name"
+      :project-id="project?.id_proyecto || project?.id"
+      :available-tasks="getAllTasks()"
+      :available-project-roles="availableProjectRoles"
+      :phases="project?.phases || []"
+      :loading="isLoading('assigningVolunteer')"
+      :tasks-loading="isLoading('loadingTasks')"
+      :roles-loading="roleStore.loading"
+      @assign="handleAssignAfterApproval"
+      @skip="handleSkipAssignment"
+    />
+
     <!-- Manage Roles Dialog -->
     <ManageRolesDialog
       v-model="manageRolesDialog"
@@ -356,6 +472,7 @@
       v-model="roleDialog"
       :role="currentRole"
       :role-types="roleTypes"
+      :project-id="project?.id_proyecto || project?.id || parseInt(route.params.id, 10)"
       :loading="isLoading('savingRole')"
       @save="handleRoleSave"
       @role-type-change="onRoleTypeChange"
@@ -464,6 +581,7 @@
       v-model="solicitudesDialog"
       :solicitudes="solicitudes"
       :loading="isLoading('updatingSolicitud')"
+      :updating-id="updatingSolicitudId"
       :get-estado-color="getEstadoColor"
       :get-estado-text="getEstadoText"
       @update-estado="updateSolicitudEstado"
@@ -474,14 +592,11 @@
       v-model="horasDialog"
       :volunteer-hours="volunteerHours"
       :loading="loadingHoras"
-      :verifying-hours="verifyingHours"
-      :format-date="formatDate"
-      @verify-hours="verificarHoras"
+      :verifying-hours="verifyingHoras"
+      @verify-hours="(id) => verificarHoras(id, true)"
+      @unverify-hours="(id) => verificarHoras(id, false)"
+      @verify-multiple="verificarHorasMultiple"
     />
-
-    <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="3000">
-      {{ snackbar.text }}
-    </v-snackbar>
 
   </v-container>
 </template>
@@ -499,6 +614,8 @@ import { useProyectoBeneficioStore } from '@/features/organization/projects/stor
 import { useSolicitudInscripcionStore } from '@/features/organization/projects/stores/solicitudInscripcionStore';
 import { useFormValidation } from '@/features/organization/projects/composables/useFormValidation';
 import { useProjectOperations } from '@/features/organization/projects/composables/useProjectOperations';
+import { useNotifications } from '@/composables/useNotifications';
+import { useAutoNotifications, useTaskDeadlineMonitor } from '@/composables/useAutoNotifications';
 import {
   PROJECT_STATUS_OPTIONS,
   TASK_STATUS_OPTIONS,
@@ -529,6 +646,8 @@ import TaskDialog from '../components/dialogs/TaskDialog.vue';
 import PhaseDialog from '../components/dialogs/PhaseDialog.vue';
 import ProjectEditDialog from '../components/dialogs/ProjectEditDialog.vue';
 import AssignVolunteerDialog from '../components/dialogs/AssignVolunteerDialog.vue';
+import BulkAssignVolunteersDialog from '../components/dialogs/BulkAssignVolunteersDialog.vue';
+import AssignAfterApprovalDialog from '../components/dialogs/AssignAfterApprovalDialog.vue';
 import RoleDialog from '../components/dialogs/RoleDialog.vue';
 import ManageRolesDialog from '../components/dialogs/ManageRolesDialog.vue';
 import BeneficioDialog from '../components/dialogs/BeneficioDialog.vue';
@@ -541,6 +660,7 @@ import MultipleAssignmentsRemovalDialog from '../components/MultipleAssignmentsR
 import { useVolunteerValidation } from '../composables/useVolunteerValidation';
 import { formatDate, formatDateRange } from '@/utils/formatters';
 import { ROUTES } from '@/constants/routes';
+import defaultCoverImage from '@/assets/images/background_login.png';
 
 const route = useRoute();
 const router = useRouter();
@@ -579,6 +699,15 @@ const { allEstados } = storeToRefs(estadoStore);
 
 const project = computed(() => projectStore.getProjectById(parseInt(route.params.id, 10)));
 
+const projectImage = computed(() => {
+  if (!project.value) return defaultCoverImage;
+  const img = project.value.imagen_principal || project.value.banner || project.value.image;
+  if (img && img !== '/assets/images/background_login.png') {
+    return img;
+  }
+  return defaultCoverImage;
+});
+
 // Tab state
 const activeTab = ref('overview');
 
@@ -595,6 +724,10 @@ const breadcrumbItems = computed(() => [
     disabled: true
   }
 ]);
+
+// Monitoreo de tareas para notificaciones automáticas
+const allTasksForMonitoring = computed(() => getAllTasks());
+useTaskDeadlineMonitor(allTasksForMonitoring, project);
 
 onMounted(async () => {
   const projectId = parseInt(route.params.id, 10);
@@ -620,6 +753,7 @@ const currentPhase = ref(null);
 const phaseForm = ref({ name: '', description: '', orden: 1 });
 const manageRolesDialog = ref(false);
 const assignVolunteerDialog = ref(false);
+const bulkAssignVolunteersDialog = ref(false);
 const selectedVolunteerId = ref(null);
 const assignedRole = ref(null);
 const selectedTaskForAssignmentId = ref(null);
@@ -689,11 +823,23 @@ const projectStatusOptions = computed(() => {
   return PROJECT_STATUS_OPTIONS;
 });
 
-// Snackbar state
-const snackbar = ref({ show: false, text: '', color: '' });
+// Notifications
+const { showSuccess, showError, showWarning, showInfo } = useNotifications();
 
 function showSnackbar(text, color = 'success') {
-  snackbar.value = { show: true, text, color };
+  switch (color) {
+    case 'error':
+      showError(text);
+      break;
+    case 'warning':
+      showWarning(text);
+      break;
+    case 'info':
+      showInfo(text);
+      break;
+    default:
+      showSuccess(text);
+  }
 }
 
 // Task management functions
@@ -756,7 +902,7 @@ async function savePhase() {
     'Error al guardar la fase',
     async () => {
       await projectStore.fetchProjectById(project.value.id);
-      phaseDialog.value = false;
+  phaseDialog.value = false;
       phaseForm.value = { name: '', description: '', orden: 1 };
     }
   );
@@ -809,6 +955,24 @@ const saveTask = async () => {
   if (!project.value) return;
 
   clearErrors();
+  
+  // Validar phaseId antes de continuar
+  if (!taskForm.value.phaseId) {
+    showSnackbar('Error: Debes seleccionar una fase para la tarea', 'error');
+    return;
+  }
+
+  // Validar que phaseId sea un número válido
+  const phaseId = typeof taskForm.value.phaseId === 'number' 
+    ? taskForm.value.phaseId 
+    : parseInt(taskForm.value.phaseId);
+
+  if (isNaN(phaseId)) {
+    showSnackbar('Error: La fase seleccionada no es válida. Por favor, recarga la página.', 'error');
+    console.error('Invalid phaseId:', taskForm.value.phaseId, 'Available phases:', project.value.phases);
+    return;
+  }
+
   if (!validateTaskForm(taskForm.value)) {
     showSnackbar('Por favor corrige los errores en el formulario', 'error');
     return;
@@ -821,7 +985,7 @@ const saveTask = async () => {
     prioridad: taskForm.value.prioridad || 'Media',
     complejidad: taskForm.value.complejidad || 'Media',
     id_estado: taskForm.value.id_estado || 1,
-    id_fase: taskForm.value.phaseId
+    id_fase: phaseId // Usar el phaseId validado
   };
 
   const operation = currentTask.value
@@ -839,13 +1003,13 @@ const saveTask = async () => {
     'Error al guardar la tarea',
     async () => {
       await projectStore.fetchProjectById(project.value.id);
-      taskDialog.value = false;
-      currentTask.value = null;
+  taskDialog.value = false;
+  currentTask.value = null;
       isViewingTask.value = false;
-      taskForm.value = {
-        description: '',
-        startDate: '',
-        endDate: '',
+  taskForm.value = {
+    description: '',
+    startDate: '',
+    endDate: '',
         prioridad: 'Media',
         complejidad: 'Media',
         id_estado: 1,
@@ -884,8 +1048,8 @@ const saveProjectChanges = async () => {
     'Error al actualizar el proyecto',
     async () => {
       await projectStore.fetchProjectById(project.value.id);
-      editProjectDialog.value = false;
-    }
+    editProjectDialog.value = false;
+  }
   );
 };
 
@@ -920,20 +1084,74 @@ const openEditProjectDialog = () => {
   editProjectDialog.value = true;
 };
 
+// Función wrapper para manejar el evento add-task-to-phase
+const handleAddTaskToPhase = (phaseId) => {
+  // Asegurar que phaseId sea un número válido
+  let validPhaseId = null;
+  if (phaseId !== null && phaseId !== undefined) {
+    validPhaseId = typeof phaseId === 'number' ? phaseId : parseInt(phaseId);
+    if (isNaN(validPhaseId)) {
+      console.warn('Invalid phaseId provided:', phaseId);
+      validPhaseId = null;
+    }
+  }
+  
+  // Si no hay phaseId válido, intentar obtener de la primera fase
+  if (!validPhaseId && project.value?.phases?.length > 0) {
+    const firstPhase = project.value.phases[0];
+    validPhaseId = firstPhase.id_fase || firstPhase.id || null;
+  }
+  
+  // Abrir diálogo en modo creación con el phaseId
+  openAddTaskDialog(null, validPhaseId);
+};
+
 const openAddTaskDialog = (task = null, phaseId = null) => {
-  currentTask.value = task;
-  isViewingTask.value = !!task;
-  if (task) {
+  // Limpiar completamente el estado anterior
+  currentTask.value = null;
+  isViewingTask.value = false;
+  
+  // Validar que task sea realmente una tarea válida (tiene id)
+  const isValidTask = task && (task.id_tarea || task.id);
+  
+  if (isValidTask) {
+    // MODO EDICIÓN: Se pasó una tarea existente válida
+    console.log('Opening in EDIT mode for task:', task.id_tarea || task.id);
+    currentTask.value = task;
+    isViewingTask.value = false; // Por defecto en modo edición, no visualización
     taskForm.value = { 
-      description: task.descripcion,
-      startDate: task.fecha_inicio,
-      endDate: task.fecha_fin,
-      prioridad: task.prioridad,
-      complejidad: task.complejidad,
-      id_estado: task.id_estado,
-      phaseId: task.id_fase
+      description: task.descripcion || '',
+      startDate: formatDateForInput(task.fecha_inicio),
+      endDate: formatDateForInput(task.fecha_fin),
+      prioridad: task.prioridad || 'Media',
+      complejidad: task.complejidad || 'Media',
+      id_estado: task.id_estado || 1,
+      phaseId: task.id_fase || null
     };
   } else {
+    // MODO CREACIÓN: No se pasó tarea válida, es una nueva tarea
+    console.log('Opening in CREATE mode with phaseId:', phaseId);
+    // Asegurar que currentTask esté completamente limpio
+    currentTask.value = null;
+    isViewingTask.value = false;
+    
+    // Asegurar que phaseId sea un número válido
+    let validPhaseId = null;
+    if (phaseId !== null && phaseId !== undefined) {
+      validPhaseId = typeof phaseId === 'number' ? phaseId : parseInt(phaseId);
+      if (isNaN(validPhaseId)) {
+        console.warn('Invalid phaseId provided:', phaseId);
+        validPhaseId = null;
+      }
+    }
+    
+    // Si no hay phaseId válido, intentar obtener de la primera fase
+    if (!validPhaseId && project.value?.phases?.length > 0) {
+      const firstPhase = project.value.phases[0];
+      validPhaseId = firstPhase.id_fase || firstPhase.id || null;
+    }
+    
+    // Resetear formulario completamente para modo creación
     taskForm.value = {
       description: '',
       startDate: '',
@@ -941,39 +1159,68 @@ const openAddTaskDialog = (task = null, phaseId = null) => {
       prioridad: 'Media',
       complejidad: 'Media',
       id_estado: 1,
-      phaseId: phaseId || (project.value?.phases?.length > 0 ? project.value.phases[0].id : null)
+      phaseId: validPhaseId
     };
   }
+  
+  // Abrir el diálogo
   taskDialog.value = true;
 };
 
+// Helper para formatear fechas para input type="date"
+function formatDateForInput(date) {
+  if (!date) return '';
+  try {
+    const d = new Date(date);
+    if (isNaN(d.getTime())) return '';
+    return d.toISOString().split('T')[0];
+  } catch {
+    return '';
+  }
+}
+
 const openEditTaskDialog = (task) => {
-  openAddTaskDialog(task);
+  // Modo edición explícito
+  if (!task) {
+    console.error('openEditTaskDialog called without task');
+    return;
+  }
+  openAddTaskDialog(task, null);
+};
+
+// Función para cambiar a modo visualización
+const switchToViewMode = () => {
+  if (currentTask.value) {
+    isViewingTask.value = true;
+  }
+};
+
+// Función para cambiar a modo edición desde visualización
+const switchToEditMode = () => {
+  if (currentTask.value) {
+    isViewingTask.value = false;
+  }
 };
 
 const roleDialog = ref(false);
 const currentRole = ref(null);
-const roleForm = ref({ 
-  name: '', 
+const roleForm = ref({
+  name: '',
   description: '',
   tipo_rol: 'proyecto',
-  id_organizacion: null,
   id_proyecto: null,
+  id_organizacion: null,
   activo: true,
-  color: '#2196F3' 
+  color: '#2196F3'
 });
 
+// Para roles de proyecto, solo permitir tipo 'proyecto'
 const roleTypes = [
-  { label: 'Rol del Sistema (Global)', value: 'sistema', disabled: true },
-  { label: 'Rol de Organización (Reutilizable)', value: 'organizacion' },
-  { label: 'Rol de Proyecto (Específico)', value: 'proyecto' }
+  { label: 'Rol de Proyecto', value: 'proyecto' }
 ];
 
 const onRoleTypeChange = () => {
-  if (roleForm.value.tipo_rol === 'sistema') {
-    roleForm.value.id_organizacion = undefined;
-    roleForm.value.id_proyecto = undefined;
-  } else if (roleForm.value.tipo_rol === 'organizacion') {
+  if (roleForm.value.tipo_rol === 'organizacion') {
     roleForm.value.id_proyecto = undefined;
     if (project.value?.id_organizacion) {
       roleForm.value.id_organizacion = project.value.id_organizacion;
@@ -992,13 +1239,20 @@ const onRoleTypeChange = () => {
 
 const openAddRoleDialog = () => {
   currentRole.value = null;
-  const projectId = project.value?.id_proyecto;
+  // Obtener el ID del proyecto de diferentes formas posibles
+  const projectId = project.value?.id_proyecto || project.value?.id || parseInt(route.params.id, 10);
+  
+  if (!projectId) {
+    showError('No se pudo obtener el ID del proyecto. Por favor, recarga la página.');
+    return;
+  }
+  
   roleForm.value = { 
     name: '', 
     description: '',
     tipo_rol: 'proyecto',
     id_organizacion: undefined,
-    id_proyecto: projectId || undefined,
+    id_proyecto: projectId,
     activo: true,
     color: '#2196F3' 
   };
@@ -1014,7 +1268,7 @@ const openEditRoleDialog = (role) => {
     nombre: role.nombre || role.name || '',
     description: role.description || role.descripcion || '',
     descripcion: role.descripcion || role.description || '',
-    tipo_rol: role.tipo_rol || 'sistema',
+    tipo_rol: role.tipo_rol || 'organizacion',
     id_organizacion: role.id_organizacion || null,
     id_proyecto: role.id_proyecto || null,
     activo: role.activo !== undefined ? role.activo : true,
@@ -1025,41 +1279,69 @@ const openEditRoleDialog = (role) => {
 
 const saveRole = async () => {
   if (!roleForm.value.name?.trim()) {
-    showSnackbar('El nombre del rol es requerido', 'warning');
+    showError('El nombre del rol es requerido');
     return;
   }
 
   if (!roleForm.value.tipo_rol) {
-    showSnackbar('El tipo de rol es requerido', 'warning');
+    showError('El tipo de rol es requerido');
     return;
   }
 
   if (roleForm.value.tipo_rol === 'organizacion' && !roleForm.value.id_organizacion) {
-    showSnackbar('La organización es requerida para roles de organización', 'warning');
+    showError('La organización es requerida para roles de organización');
     return;
   }
 
-  if (roleForm.value.tipo_rol === 'proyecto' && !roleForm.value.id_proyecto) {
-    showSnackbar('El proyecto es requerido para roles de proyecto', 'warning');
+  // Obtener el projectId de múltiples fuentes posibles
+  const projectId = roleForm.value.id_proyecto || project.value?.id_proyecto || project.value?.id || parseInt(route.params.id, 10);
+  
+  if (roleForm.value.tipo_rol === 'proyecto' && !projectId) {
+    showError('El proyecto es requerido para roles de proyecto. Por favor, recarga la página e intenta nuevamente.');
     return;
   }
+
+  // Asegurar que el projectId esté en el formulario
+  if (roleForm.value.tipo_rol === 'proyecto' && projectId) {
+    roleForm.value.id_proyecto = projectId;
+  }
+
+  // Normalizar color
+  let color = roleForm.value.color || '#2196F3';
+  if (color && !color.startsWith('#')) {
+    color = '#' + color;
+  }
+  color = color.toUpperCase();
 
   try {
     if (currentRole.value) {
       const roleToUpdate = {
         ...roleForm.value,
-        id_rol: currentRole.value.id_rol || currentRole.value.id
+        id_rol: currentRole.value.id_rol || currentRole.value.id,
+        id_proyecto: projectId, // Asegurar que id_proyecto esté presente
+        color: color
       };
       await roleStore.updateRole(roleToUpdate);
+      showSuccess('Rol actualizado correctamente');
     } else {
-      await roleStore.addRole(roleForm.value);
+      const roleToCreate = {
+        ...roleForm.value,
+        id_proyecto: projectId, // Asegurar que id_proyecto esté presente explícitamente
+        color: color
+      };
+      console.log('Creando rol con datos:', roleToCreate); // Debug
+      await roleStore.addRole(roleToCreate);
+      showSuccess('Rol creado correctamente');
     }
     roleDialog.value = false;
-    if (project.value?.id_proyecto) {
-      await roleStore.fetchProjectRoles(project.value.id_proyecto);
+    currentRole.value = null;
+    // Reutilizar projectId que ya se definió arriba
+    if (projectId) {
+      await roleStore.fetchProjectRoles(projectId);
     }
   } catch (error) {
     console.error('Error saving role:', error);
+    showError(error.response?.data?.message || error.message || 'Error al guardar el rol');
   }
 };
 
@@ -1080,7 +1362,29 @@ const confirmDeleteRole = async (roleId) => {
 
 // Handler functions for dialog components
 const handleTaskSave = async (formData) => {
-  taskForm.value = { ...formData };
+  // Validar que phaseId esté presente
+  if (!formData.phaseId) {
+    showSnackbar('Error: Debes seleccionar una fase para la tarea', 'error');
+    return;
+  }
+
+  // Asegurar que phaseId sea un número
+  const phaseId = typeof formData.phaseId === 'number' 
+    ? formData.phaseId 
+    : parseInt(formData.phaseId);
+
+  if (isNaN(phaseId)) {
+    showSnackbar('Error: La fase seleccionada no es válida', 'error');
+    console.error('Invalid phaseId:', formData.phaseId, 'Available phases:', project.value?.phases);
+    return;
+  }
+
+  // Actualizar taskForm con los datos validados
+  taskForm.value = {
+    ...formData,
+    phaseId: phaseId
+  };
+  
   await saveTask();
 };
 
@@ -1112,6 +1416,55 @@ const handleAssignVolunteer = async (formData) => {
   await assignVolunteerToTask();
 };
 
+const handleBulkAssignVolunteers = async ({ assignments }) => {
+  if (!project.value || !assignments || assignments.length === 0) return;
+  
+  await handleOperation(
+    async () => {
+      // Procesar todas las asignaciones
+      const promises = assignments.map(async (assignment) => {
+        selectedTaskForAssignmentId.value = assignment.taskId;
+        selectedVolunteerId.value = assignment.volunteerId;
+        assignedRole.value = assignment.roleId;
+        assignmentNotes.value = assignment.notes || '';
+        return await assignVolunteerToTask();
+      });
+      
+      await Promise.all(promises);
+    },
+    'bulkAssigningVolunteers',
+    `Se asignaron ${assignments.length} voluntario(s) correctamente`,
+    'Error al realizar la asignación masiva',
+    async () => {
+      await projectStore.fetchProjectById(project.value.id);
+      bulkAssignVolunteersDialog.value = false;
+    }
+  );
+};
+
+const handleReorderPhases = async (newOrder) => {
+  if (!project.value || !newOrder || newOrder.length === 0) return;
+  
+  await handleOperation(
+    async () => {
+      await projectStore.reorderProjectPhases(project.value.id, newOrder);
+    },
+    'reorderingPhases',
+    'Fases reordenadas correctamente',
+    'Error al reordenar las fases',
+    async () => {
+      // Refrescar el proyecto para obtener las fases actualizadas
+      await projectStore.fetchProjectById(project.value.id);
+    }
+  );
+};
+
+const getPhaseName = (phaseId) => {
+  if (!project.value?.phases) return 'N/A';
+  const phase = project.value.phases.find(p => (p.id_fase || p.id) === phaseId);
+  return phase?.nombre || phase?.name || 'N/A';
+};
+
 const handleAddRole = () => {
   manageRolesDialog.value = false;
   openAddRoleDialog();
@@ -1122,13 +1475,14 @@ const handleEditRole = (role) => {
   openEditRoleDialog(role);
 };
 
-const verifyingHours = ref(null);
+const verifyingHoras = ref(null);
 
 const updateTaskStatusFromKanban = async ({ taskId, newStatus }) => {
   if (!project.value) return;
   try {
     const taskToUpdate = getAllTasks().find(task => task.id === parseInt(taskId, 10));
-    if (taskToUpdate) {
+  if (taskToUpdate) {
+      const oldStatus = taskToUpdate.id_estado;
       const taskData = { 
         descripcion: taskToUpdate.descripcion,
         fecha_inicio: taskToUpdate.fecha_inicio,
@@ -1139,6 +1493,12 @@ const updateTaskStatusFromKanban = async ({ taskId, newStatus }) => {
         id_fase: taskToUpdate.id_fase
       };
       await projectStore.updateProjectTask(project.value.id, taskToUpdate.id, taskData);
+      
+      // Notificar cambio de estado
+      if (oldStatus !== newStatus) {
+        const { notifyTaskStatusChange } = useAutoNotifications();
+        notifyTaskStatusChange(taskToUpdate, project.value, oldStatus, newStatus);
+      }
       
       if (project.value.phases) {
         project.value.phases.forEach(phase => {
@@ -1170,27 +1530,25 @@ const availableProjectRoles = computed(() => {
     .map(rol => ({
       value: rol.id_rol,
       label: `${rol.nombre}${rol.tipo_rol ? ` (${getRoleTypeLabel(rol.tipo_rol)})` : ''}`,
-      tipo_rol: rol.tipo_rol || 'sistema',
+      tipo_rol: rol.tipo_rol || 'organizacion',
       ...rol
-    }));
+  }));
 });
 
 const getRoleTypeLabel = (tipo) => {
   const labels = {
-    'sistema': 'Sistema',
     'organizacion': 'Organización',
     'proyecto': 'Proyecto'
   };
-  return labels[tipo] || 'Sistema';
+  return labels[tipo] || 'Organización';
 };
 
 const getRoleTypeColor = (tipo) => {
   const colors = {
-    'sistema': 'primary',
     'organizacion': 'info',
     'proyecto': 'success'
   };
-  return colors[tipo] || 'primary';
+  return colors[tipo] || 'info';
 };
 
 const availableVolunteers = computed(() => {
@@ -1225,11 +1583,34 @@ const openAssignVolunteerDialog = async () => {
   }
   
   if (availableVolunteers.value.length === 0) {
-    showSnackbar('No hay voluntarios aprobados disponibles para asignar. Primero aprueba las solicitudes de inscripción.', 'warning');
+    showWarning('No hay voluntarios aprobados disponibles para asignar. Primero aprueba las solicitudes de inscripción.');
     return;
   }
   
   assignVolunteerDialog.value = true;
+};
+
+const openBulkAssignVolunteersDialog = async () => {
+  if (project.value?.id_proyecto) {
+    await solicitudStore.fetchByProject(project.value.id_proyecto);
+    solicitudes.value = solicitudStore.allSolicitudes;
+  }
+  
+  if (project.value?.id_proyecto) {
+    await roleStore.fetchProjectRoles(project.value.id_proyecto);
+  }
+  
+  if (availableVolunteers.value.length === 0) {
+    showWarning('No hay voluntarios aprobados disponibles para asignar. Primero aprueba las solicitudes de inscripción.');
+    return;
+  }
+  
+  if (getAllTasks().length === 0) {
+    showWarning('No hay tareas disponibles para asignar. Primero crea tareas en el proyecto.');
+    return;
+  }
+  
+  bulkAssignVolunteersDialog.value = true;
 };
 
 const assignVolunteerToTask = async () => {
@@ -1299,6 +1680,30 @@ function getPhaseStatusColor(phase) {
   return 'warning';
 }
 
+function getPhaseStatusIcon(phase) {
+  const status = getPhaseStatus(phase);
+  if (status.includes('Completada')) return 'mdi-check-circle';
+  if (status.includes('progreso')) return 'mdi-progress-clock';
+  return 'mdi-clock-outline';
+}
+
+function getPhaseTasksCount(phase) {
+  return phase?.tareas?.length || 0;
+}
+
+function getPhaseProgress(phase) {
+  if (!phase?.tareas || phase.tareas.length === 0) return 0;
+  const completed = phase.tareas.filter(t => t.id_estado === 3).length;
+  return Math.round((completed / phase.tareas.length) * 100);
+}
+
+function handlePhaseClick(phase) {
+  // Navegar a la pestaña de tareas y hacer scroll a la fase
+  activeTab.value = 'tasks';
+  // El componente TasksTab puede manejar el scroll a la fase específica
+  showSnackbar(`Navegando a la fase: ${phase.name || phase.nombre}`, 'info');
+}
+
 function getTaskStatus(taskStatusId) {
   return getTaskStatusText(taskStatusId);
 }
@@ -1317,7 +1722,9 @@ function getTipoPagoText(tipo) {
     'volunteer': 'Voluntariado',
     'stipend': 'Estipendio',
     'salary': 'Salario',
-    'honorarium': 'Honorarios'
+    'honorarium': 'Honorario',
+    'commission': 'Comisión',
+    'bonus': 'Bono'
   };
   return tipos[tipo] || tipo;
 }
@@ -1325,8 +1732,10 @@ function getTipoPagoText(tipo) {
 function getFrecuenciaText(frecuencia) {
   const frecuencias = {
     'none': 'Sin frecuencia',
-    'monthly': 'Mensual',
+    'hourly': 'Por hora',
+    'daily': 'Diario',
     'weekly': 'Semanal',
+    'monthly': 'Mensual',
     'project': 'Por proyecto'
   };
   return frecuencias[frecuencia] || frecuencia;
@@ -1404,7 +1813,18 @@ async function openSolicitudesDialog() {
   );
 }
 
+const updatingSolicitudId = ref(null);
+
+// Estado para auto-asignación después de aprobar
+const assignAfterApprovalDialog = ref(false);
+const approvedVolunteer = ref(null);
+
 async function updateSolicitudEstado(solicitudId, nuevoEstado) {
+  updatingSolicitudId.value = solicitudId;
+  
+  // Obtener información de la solicitud antes de actualizar
+  const solicitud = solicitudes.value.find(s => s.id_solicitud === solicitudId);
+  
   await handleOperation(
     () => solicitudStore.updateSolicitud(solicitudId, { estado: nuevoEstado }),
     'updatingSolicitud',
@@ -1417,7 +1837,17 @@ async function updateSolicitudEstado(solicitudId, nuevoEstado) {
         solicitudes.value = solicitudStore.allSolicitudes;
       }
       
-      if (nuevoEstado === 'aprobada') {
+      if (nuevoEstado === 'aprobada' && solicitud) {
+        // Preparar datos para auto-asignación
+        approvedVolunteer.value = {
+          id: solicitud.id_voluntario,
+          name: solicitud.voluntario?.usuario?.nombre || solicitud.voluntario?.nombre || 'Voluntario',
+          solicitudId: solicitudId
+        };
+        
+        // Mostrar diálogo de auto-asignación
+        assignAfterApprovalDialog.value = true;
+        
         if (volunteerStore.fetchVolunteers) {
           await volunteerStore.fetchVolunteers();
         }
@@ -1426,8 +1856,61 @@ async function updateSolicitudEstado(solicitudId, nuevoEstado) {
       if (project.value?.id) {
         await projectStore.fetchProjectById(project.value.id);
       }
+      
+      updatingSolicitudId.value = null;
     }
   );
+}
+
+// Manejar asignación después de aprobar
+async function handleAssignAfterApproval(formData) {
+  if (!approvedVolunteer.value || !formData.taskId) return;
+  
+  await handleOperation(
+    async () => {
+      // Usar el método del store para asignar
+      const taskId = typeof formData.taskId === 'number' ? formData.taskId : parseInt(formData.taskId);
+      const volunteerId = approvedVolunteer.value.id;
+      const roleId = formData.roleId || null;
+      
+      // Obtener el nombre del rol si existe
+      let roleName = null;
+      if (roleId) {
+        const role = availableProjectRoles.value.find(r => r.value === roleId);
+        roleName = role?.label || null;
+      }
+      
+      await projectStore.assignVolunteerToTask(
+        project.value.id,
+        taskId,
+        volunteerId,
+        roleName
+      );
+    },
+    'assigningVolunteer',
+    `Voluntario asignado a la tarea correctamente`,
+    'Error al asignar el voluntario',
+    async () => {
+      assignAfterApprovalDialog.value = false;
+      approvedVolunteer.value = null;
+      
+      // Refrescar datos
+      if (project.value?.id) {
+        await projectStore.fetchProjectById(project.value.id);
+      }
+      
+      const projectId = project.value?.id_proyecto || project.value?.id;
+      if (projectId) {
+        await solicitudStore.fetchByProject(projectId);
+        solicitudes.value = solicitudStore.allSolicitudes;
+      }
+    }
+  );
+}
+
+function handleSkipAssignment() {
+  assignAfterApprovalDialog.value = false;
+  approvedVolunteer.value = null;
 }
 
 // Funciones para gestionar solicitudes
@@ -1528,6 +2011,66 @@ async function approveAllPending() {
   );
 }
 
+// Manejar actualización masiva de solicitudes
+async function handleBulkUpdateSolicitudes({ ids, estado }) {
+  if (!ids || ids.length === 0) return;
+  
+  const estadoText = estado === 'aprobada' ? 'aprobadas' : estado === 'rechazada' ? 'rechazadas' : 'actualizadas';
+  
+  await handleOperation(
+    async () => {
+      await Promise.all(
+        ids.map(id => solicitudStore.updateSolicitud(id, { estado }))
+      );
+    },
+    'updatingSelectedSolicitudes',
+    `Se ${estadoText} ${ids.length} solicitud(es) correctamente`,
+    `Error al ${estadoText} las solicitudes`,
+    async () => {
+      const projectId = project.value?.id_proyecto || project.value?.id;
+      if (projectId) {
+        await solicitudStore.fetchByProject(projectId);
+        solicitudes.value = solicitudStore.allSolicitudes;
+      }
+      
+      // Si se aprobaron, refrescar voluntarios
+      if (estado === 'aprobada' && volunteerStore.fetchVolunteers) {
+        await volunteerStore.fetchVolunteers();
+      }
+      
+      if (project.value?.id) {
+        await projectStore.fetchProjectById(project.value.id);
+      }
+    }
+  );
+}
+
+// Manejar eliminación masiva de solicitudes
+async function handleBulkDeleteSolicitudes(ids) {
+  if (!ids || ids.length === 0) return;
+  
+  await handleOperation(
+    async () => {
+      await Promise.all(
+        ids.map(id => solicitudStore.deleteSolicitud(id))
+      );
+    },
+    'deletingSelectedSolicitudes',
+    `Se eliminaron ${ids.length} solicitud(es) correctamente`,
+    'Error al eliminar las solicitudes',
+    async () => {
+      const projectId = project.value?.id_proyecto || project.value?.id;
+      if (projectId) {
+        await solicitudStore.fetchByProject(projectId);
+        solicitudes.value = solicitudStore.allSolicitudes;
+      }
+      if (project.value?.id) {
+        await projectStore.fetchProjectById(project.value.id);
+      }
+    }
+  );
+}
+
 function confirmDeleteAllActive() {
   const activas = solicitudes.value.filter(
     s => s.estado === 'pendiente' || s.estado === 'aprobada'
@@ -1614,6 +2157,44 @@ function getEstadoText(estado) {
   return texts[estado] || estado;
 }
 
+async function handleStatusUpdate(newStatus) {
+  if (!project.value) return;
+  
+  const projectId = project.value.id_proyecto || project.value.id;
+  if (!projectId) {
+    showSnackbar('Error: No se pudo identificar el proyecto', 'error');
+    return;
+  }
+  
+  await handleOperation(
+    () => projectStore.updateProject(projectId, { 
+      id_estado: newStatus,
+      nombre: project.value.name || project.value.nombre,
+      descripcion: project.value.description || project.value.descripcion,
+      objetivo: project.value.objective || project.value.objetivo,
+      ubicacion: project.value.location || project.value.ubicacion,
+      fecha_inicio: project.value.startDate || project.value.fecha_inicio,
+      fecha_fin: project.value.endDate || project.value.fecha_fin,
+      presupuesto_total: project.value.budget || project.value.presupuesto_total,
+      es_publico: project.value.es_publico,
+      requisitos: project.value.requisitos || null
+    }),
+    'updatingStates',
+    `Estado del proyecto actualizado a: ${getStatusText(newStatus)}`,
+    'Error al actualizar el estado del proyecto',
+    async () => {
+      // Refrescar el proyecto completo para obtener el estado actualizado
+      const updatedProject = await projectStore.fetchProjectById(projectId);
+      if (updatedProject) {
+        // Actualizar el proyecto reactivo
+        project.value = updatedProject;
+        // Forzar reactividad
+        project.value = { ...updatedProject };
+      }
+    }
+  );
+}
+
 async function toggleProjectVisibility() {
   if (!project.value) return;
   try {
@@ -1637,15 +2218,7 @@ async function toggleProjectVisibility() {
   }
 }
 
-function switchToEditMode() {
-  isViewingTask.value = false;
-}
-
-function getPhaseName(phaseId) {
-  if (!project.value?.phases) return 'Sin fase';
-  const phase = project.value.phases.find(p => p.id === phaseId);
-  return phase?.name || 'Sin fase';
-}
+// Función eliminada - duplicada, usar la versión de arriba (línea 1306)
 
 function getProjectProgress() {
   if (!project.value?.phases) return 0;
@@ -1757,29 +2330,68 @@ async function verificarHoras(horasId, verificada) {
   }
 }
 
-function exportProjectData() {
-  const projectData = {
-    project: project.value,
-    phases: project.value?.phases || [],
-    tasks: project.value?.phases?.flatMap(phase => phase.tareas || []) || [],
-    volunteers: getAllAssignments(),
-    progress: {
-      phases: getCompletedPhasesCount(),
-      tasks: getCompletedTasksCount(),
-      total: getTotalTasks()
+async function verificarHorasMultiple(ids, verificada) {
+  verifyingHoras.value = 'multiple';
+  try {
+    await Promise.all(
+      ids.map(id => axios.patch(`/horas-voluntariadas/${id}/verificar`, { verificada }))
+    );
+    showSnackbar(`${ids.length} hora(s) ${verificada ? 'verificadas' : 'desverificadas'} correctamente`, 'success');
+    await loadVolunteerHours();
+  } catch (error) {
+    console.error('Error verifying multiple hours:', error);
+    showSnackbar('Error al verificar las horas', 'error');
+  } finally {
+    verifyingHoras.value = null;
+  }
+}
+
+async function exportProjectData(format = 'json') {
+  if (format === 'pdf') {
+    try {
+      showSnackbar('Generando PDF...', 'info');
+      
+      // Obtener imágenes de gráficos si están disponibles
+      const chartImages = [];
+      // Aquí se pueden agregar gráficos capturados de los componentes
+      
+      const { exportProjectToPDF } = await import('@/utils/pdfExportService.js');
+      await exportProjectToPDF(project.value, {
+        includePhases: true,
+        includeTasks: true,
+        includeVolunteers: true,
+        includeHours: false, // Las horas se exportan por separado
+        includeCharts: chartImages.length > 0,
+        chartImages
+      });
+      
+      showSnackbar('PDF exportado correctamente', 'success');
+    } catch (error) {
+      console.error('Error exporting to PDF:', error);
+      showSnackbar('Error al exportar PDF', 'error');
     }
-  };
-  
-  const dataStr = JSON.stringify(projectData, null, 2);
-  const dataBlob = new Blob([dataStr], { type: 'application/json' });
-  const url = URL.createObjectURL(dataBlob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = `proyecto-${project.value?.name || 'sin-nombre'}-${new Date().toISOString().split('T')[0]}.json`;
-  link.click();
-  URL.revokeObjectURL(url);
-  
-  showSnackbar('Datos exportados correctamente');
+  } else {
+    // Exportación JSON (comportamiento original)
+    const projectData = {
+      project: project.value,
+      phases: project.value?.phases || [],
+      tasks: project.value?.phases?.flatMap(phase => phase.tareas || []) || [],
+      volunteers: getAllAssignments(),
+      progress: {
+        phases: getCompletedPhasesCount(),
+        tasks: getCompletedTasksCount(),
+        total: getTotalTasks()
+      }
+    };
+    
+    const { exportToJSON } = await import('@/utils/exportUtils.js');
+    exportToJSON(
+      projectData,
+      `proyecto-${project.value?.name || 'sin-nombre'}-${new Date().toISOString().split('T')[0]}.json`
+    );
+    
+    showSnackbar('Datos exportados correctamente', 'success');
+  }
 }
 
 // Computed para verificar si el proyecto puede ser eliminado
@@ -2005,10 +2617,60 @@ const assignmentNotes = ref('');
   margin: 0 auto;
 }
 
-.project-header-card {
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;
-  border: 1px solid rgba(0, 0, 0, 0.08) !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+.workspace-header-card {
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.header-image-container {
+  position: relative;
+}
+
+.header-image {
+  border-radius: 16px;
+}
+
+.header-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.7));
+  display: flex;
+  align-items: flex-end;
+  padding: 32px;
+}
+
+.header-content {
+  width: 100%;
+  color: white;
+}
+
+.project-info-section {
+  background: white;
+}
+
+.project-description-modern {
+  flex: 1;
+  min-width: 300px;
+}
+
+.project-meta-modern {
+  flex: 1;
+  min-width: 300px;
+}
+
+@media (max-width: 960px) {
+  .header-overlay {
+    padding: 24px;
+  }
+  
+  .project-description-modern,
+  .project-meta-modern {
+    width: 100%;
+  }
 }
 
 /* Enterprise Tabs */
@@ -2039,7 +2701,17 @@ const assignmentNotes = ref('');
   margin-left: 8px;
 }
 
-/* Responsive - Hide text on mobile */
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .project-detail-view {
+    padding: 16px;
+  }
+  
+  .project-header-card {
+    padding: 16px !important;
+  }
+}
+
 @media (max-width: 960px) {
   .tab-text {
     display: none;
@@ -2048,6 +2720,53 @@ const assignmentNotes = ref('');
   .enterprise-tabs .v-tab {
     padding: 0 12px;
     min-height: 48px;
+  }
+  
+  .project-detail-view {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .project-detail-view {
+    padding: 8px;
+  }
+  
+  .enterprise-tabs {
+    overflow-x: auto;
+  }
+  
+  .enterprise-tabs .v-tab {
+    padding: 0 8px;
+    min-height: 44px;
+    font-size: 0.875rem;
+  }
+  
+  /* Make tables scrollable on mobile */
+  .v-table {
+    overflow-x: auto;
+    display: block;
+  }
+  
+  /* Stack cards vertically on mobile */
+  .v-row {
+    flex-direction: column;
+  }
+  
+  .v-col {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .project-detail-view {
+    padding: 4px;
+  }
+  
+  .enterprise-tabs .v-tab {
+    padding: 0 4px;
+    min-height: 40px;
   }
 }
 </style>
